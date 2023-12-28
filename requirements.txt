@@ -1,0 +1,11 @@
+beautifulsoup4==4.12.2
+Bootstrap_Flask==2.3.2
+Flask==3.0.0
+Flask_Caching==2.1.0
+flask_wtf==1.2.1
+gql==3.4.1
+itsdangerous==2.1.2
+python-dotenv==1.0.0
+Requests==2.31.0
+Werkzeug==3.0.1
+WTForms==3.1.1
