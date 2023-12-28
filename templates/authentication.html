@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100">
+    {% from 'bootstrap5/form.html' import render_form %}
+    <head>
+        <meta charset="utf-8">
+        <title>Adventure Plate generator</title>
+        {{ bootstrap.load_css() }}
+    </head>
+    <body class="d-flex h-100 text-center text-bg-dark">
+        
+        <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+            <header class="mb-auto">
+                <div>
+                <!-- <h3 class="float-md-start mb-0">Cover</h3> -->
+                <!-- <nav class="nav nav-masthead justify-content-center float-md-end">
+                <a class="nav-link fw-bold py-1 px-0 active" aria-current="page" href="#">Home</a>
+                <a class="nav-link fw-bold py-1 px-0" href="#">Features</a>
+                <a class="nav-link fw-bold py-1 px-0" href="#">Contact</a>
+                </nav> -->
+                </div>
+            </header>
+
+            <main class="px-3">
+                <h1>Final Fantasy XIV Character Card Generator</h1>
+                <p class="lead">Your confirmation code is</p>
+                <p class="list-group-item">{{ token }}</p>
+                <form action="{{ url_for('claim_charid', token=token,id=id) }}" method="post" class="w-50 m-auto">
+                    {{ form.submit(class="btn btn-primary") }}
+                </form>
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                <p class="flash text-danger w-75 mx-auto">{{ messages[0] }}</p>
+                {% endif %}
+                {% endwith %}
+            </main>
+
+            {% include "footer.html" %}
+        </div>
+        <script src="/docs/5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    </body>
+</html>

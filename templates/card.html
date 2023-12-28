@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Adventure Plate generator</title>
+        {{ bootstrap.load_css() }}
+        {{ bootstrap.load_js() }}
+        <script src="https://code.createjs.com/1.0.0/createjs.min.js"></script>
+        <link rel="stylesheet" href="{{url_for('static', filename='assets/styles/styles.css')}}">
+        <!-- Desktop layout coded and styled against 1280x720 (720p) displays. Any smaller and maybe mobile format? -->
+    </head>
+
+    <body>
+        <div class="container main-container px-0 pb-2 h-100" style="border: 2px solid black; border-radius: 10px;">
+            <header class="bg-dark text-white">
+                <!-- Navigation tabs -->
+                <ul class="nav nav-tabs" id="myTabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="summary-tab" data-bs-toggle="tab" href="#summary">Summary</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="raid-performance-tab" data-bs-toggle="tab" href="#raid-performance">Raid Performance</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="mounts-minions-tab" data-bs-toggle="tab" href="#mounts-minions">Mounts/Minions</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="roleplay-tab" data-bs-toggle="tab" href="#roleplay">Roleplay</a>
+                    </li>
+                </ul>
+            </header>
+    
+            <!-- Avatar and text container -->
+            <!-- Content tabs -->
+            <div class="tab-content tab-containers px-3">
+                <!-- Summary tab content -->
+                <div class="tab-pane fade show active h-100" id="summary">
+                    <div class="row my-1 h-100">
+                        <!-- Avatar container with max dimensions and centered position -->
+                        <div class="col-md-4 d-flex align-items-center">
+                            <div class="avatar-container">
+                                <!-- Your dynamic avatar image -->
+                                <img class="avatar img-fluid" src="https://cdn.discordapp.com/attachments/958658611582738468/1184880197523218532/mayu.png?ex=658d94ad&is=657b1fad&hm=fe479ebc9052b4c25a36bd86d522841934a96e0167c3c727ae6e5a27ac6e4d70&" alt="Avatar">
+                            </div>
+                        </div>
+    
+                        <!-- Text container for right-aligned text -->
+                        <div class="col text-container">
+                            <div class="row">
+                                {% include "job-containers.html" %}
+                                <div class="col">
+                                    <div class="character-name"><h1>{{character["name"]}}</h1></div>
+                                    <div class="ingame-title"><h2>« {{character["title"]}} »</h2></div>
+                                    <div class="server-info"><h2>{{character["dcserver"][1]}} - {{character["dcserver"][0]}}</h2></div>
+                                    <div class="free-company">
+                                        <div class="flex-container">
+                                            <!-- Three overlapping images -->
+                                            <img class="company-logo top-layer" src="{{character['freecompany']['top']}}" alt="Logo 1">
+                                            <img class="company-logo middle-layer" src="{{character['freecompany']['middle']}}" alt="Logo 2">
+                                            <img class="company-logo bottom-layer" src="{{character['freecompany']['bottom']}}" alt="Logo 3">
+                                            <!-- Text content -->
+                                            <div class="text-content">
+                                                <h3>{{character["freecompany"]["name"]}} - {{character["freecompany"]["tag"]}}</h3>
+                                            </div>
+                                
+                                        </div>
+                                    </div>
+                                    <!-- Additional element for displaying up to 500 characters of text -->
+                                    <div class="additional-text">
+                                        China is where dead RTSs go to die
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Raid Performance tab content -->
+                <div class="tab-pane fade h-100" id="raid-performance">
+                    <div class="row h-100 my-2">
+                        {% include "raids.html" %}
+                    </div>
+                </div>
+
+                <!-- Mounts/Minions tab content -->
+                <div class="tab-pane fade" id="mounts-minions">
+                    <h2>Mounts/Minions Content Goes Here</h2>
+                </div>
+
+                <!-- Roleplay tab content -->
+                <div class="tab-pane fade" id="roleplay">
+                    <h2>Roleplay Content Goes Here</h2>
+                </div>
+            </div>
+
+            <footer>
+                <!-- Your footer content here -->
+            </footer>
+        </div>
+        <!-- Add Bootstrap JS and Popper.js scripts -->
+        {{ bootstrap.load_js() }}
+    </body>
+</html>
