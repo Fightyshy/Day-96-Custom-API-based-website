@@ -95,7 +95,8 @@ class CharacterRaids:
                         "best-rdps": "{:.1f}".format(floor["bestAmount"]) if floor["bestAmount"] != 0 else "-",
                         "ranking": int(floor["rankPercent"]) if floor["rankPercent"] is not None else "-",
                         "floor": floor["encounter"]["name"],
-                        "job": floor["spec"] if floor["spec"] is not None else "-",
+                        "job": floor["bestSpec"] if floor.get("bestSpec") is not None else "-",
+                        "total-kills": floor["totalKills"]
                     }
                     for floor in raid["rankings"]
                 ],

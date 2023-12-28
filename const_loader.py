@@ -26,7 +26,9 @@ class Servers:
 
     def get_jp(self) -> list:
         server = []
-        with open(r"static/assets/constants/server_region_JP.csv") as jpservers:
+        with open(
+            r"static/assets/constants/server_region_JP.csv"
+        ) as jpservers:
             file = csv.DictReader(jpservers)
             for row in file:
                 server.append(
@@ -40,7 +42,9 @@ class Servers:
 
     def get_NA(self) -> list:
         server = []
-        with open(r"static/assets/constants/server_region_NA.csv") as jpservers:
+        with open(
+            r"static/assets/constants/server_region_NA.csv"
+        ) as jpservers:
             file = csv.DictReader(jpservers)
             for row in file:
                 server.append(
@@ -54,7 +58,9 @@ class Servers:
 
     def get_EU(self) -> list:
         server = []
-        with open(r"static/assets/constants/server_region_EU.csv") as jpservers:
+        with open(
+            r"static/assets/constants/server_region_EU.csv"
+        ) as jpservers:
             file = csv.DictReader(jpservers)
             for row in file:
                 server.append(
@@ -68,7 +74,9 @@ class Servers:
 
     def get_OC(self) -> list:
         server = []
-        with open(r"static/assets/constants/server_region_OC.csv") as jpservers:
+        with open(
+            r"static/assets/constants/server_region_OC.csv"
+        ) as jpservers:
             file = csv.DictReader(jpservers)
             for row in file:
                 server.append(
@@ -117,7 +125,9 @@ class MetaLinks:
         self.meta_links = self.get_meta_links()
 
     def get_meta_links(self):
-        with open(r"static\assets\lodestone-css-selectors-main\meta.json") as meta:
+        with open(
+            r"static\assets\lodestone-css-selectors-main\meta.json"
+        ) as meta:
             return json.load(meta)
 
 
@@ -144,10 +154,12 @@ class CharacterData:
             return json.load(chardata)
 
     def get_classjob_abbreviation(self):
-        with open(r"static\assets\constants\class_abbreviation.csv") as abbreviations:
+        with open(
+            r"static\assets\constants\class_abbreviation.csv"
+        ) as abbreviations:
             file = csv.DictReader(abbreviations)
             return {key["full"]: key["abbr"] for key in file}
-        
+
     def get_classjob_role(sefl):
         with open(r"static\assets\constants\class_abbreviation.csv") as roles:
             file = csv.DictReader(roles)
@@ -166,5 +178,7 @@ class CharacterData:
             return json.load(mount)
 
     def get_freecompany(self):
-        with open(r"static\assets\lodestone-css-selectors-main\freecompany\freecompany.json") as freecompany:
+        with open(
+            r"static\assets\lodestone-css-selectors-main\freecompany\freecompany.json"
+        ) as freecompany:
             return json.load(freecompany)

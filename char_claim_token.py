@@ -2,6 +2,7 @@ from itsdangerous import URLSafeTimedSerializer
 
 # https://www.freecodecamp.org/news/setup-email-verification-in-flask-app/
 
+
 def generate_token(charid, app):
     serializer = URLSafeTimedSerializer(app.config["SECRET_KEY"])
     return serializer.dumps(charid, salt=app.config["SECURITY_PASSWORD_SALT"])
