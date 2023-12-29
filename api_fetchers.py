@@ -1,17 +1,15 @@
+from itertools import groupby
+import json
 import os
-import string
 from flask import url_for
 import requests
 from requests.auth import HTTPBasicAuth
-import random
-from hashlib import sha256
-from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
 from gql import Client
 from gql.dsl import DSLQuery, DSLSchema, dsl_gql
 from gql.transport.requests import RequestsHTTPTransport
-from character import *
-from const_loader import *
+from character import Character, CharacterRaids
+from const_loader import CharacterData, MetaLinks, Raidzones, Servers
 from dotenv import load_dotenv
 import bs4
 from flask_caching import Cache
@@ -27,19 +25,18 @@ FFLOGS_API_URL = "https://www.fflogs.com/api/v2/client"
 AUTHORIZE_URI = "https://www.fflogs.com/oauth/authorize"
 TOKEN_URI = "https://www.fflogs.com/oauth/token"
 
-# Server>region lists
+# Consts
 # Name | DC | Region
 SERVERS = Servers()
-
-#Endgame raidurs
 RAIDS = Raidzones()
+META_LINKS = MetaLinks()
+CHARACTER_SELECTORS = CharacterData()
 
-#xivapi consts and globals
+# xivapi consts and globals
 # PRIVATE_KEY = os.environ["XIVAPI_PRIVATE"]
 # XIVAPI_CHAR_URL = "https://xivapi.com/character/"
 
-META_LINKS = MetaLinks()
-CHARACTER_SELECTORS = CharacterData()
+FFXIV_COLLECT = "https://ffxivcollect.com/api/characters/%i/%s/%s"
 
 # fixed number counts
 MAX_MINIONS = 483
@@ -48,24 +45,24 @@ MAX_MOUNTS = 340
 
 # XIVAPI request funcs
 @cache.cached(timeout=600, key_prefix="lodestone_char_basic")
-def get_lodestone_char_basic(charid:int) -> Character:
+def get_lodestone_char_basic(char_id: int) -> Character:
     # """Retrieves basic character data for AP facing plate. Lodestone information provided through XIVApi."""
     """Retrieve basic character data for AP summary/front plate. Lodestone data scrapeed via BS, as XIVApi endpoints are broken currently."""
 
     # Soups scrape and parse
-    char_summary_response = requests.get(META_LINKS.meta_links["applicableUris"]["profile/character.json"] % ("na", charid))
+    char_summary_response = requests.get(META_LINKS.meta_links["applicableUris"]["profile/character.json"] % ("na", char_id))
     char_summary_response.raise_for_status()
     char_summary_soup = bs4.BeautifulSoup(char_summary_response.text, "html.parser")
 
-    char_classjob_response = requests.get(META_LINKS.meta_links["applicableUris"]["profile/classjob.json"] % ("na", charid))
+    char_classjob_response = requests.get(META_LINKS.meta_links["applicableUris"]["profile/classjob.json"] % ("na", char_id))
     char_classjob_response.raise_for_status()
     char_classjob_soup = bs4.BeautifulSoup(char_classjob_response.text, "html.parser")
 
-    char_mount_response = requests.get(META_LINKS.meta_links["applicableUris"]["profile/mount.json"] % ("na", charid))
+    char_mount_response = requests.get(META_LINKS.meta_links["applicableUris"]["profile/mount.json"] % ("na", char_id))
     char_mount_response.raise_for_status()
     char_mount_soup = bs4.BeautifulSoup(char_mount_response.text, "html.parser")
 
-    char_minion_response = requests.get(META_LINKS.meta_links["applicableUris"]["profile/minion.json"] % ("na", charid))
+    char_minion_response = requests.get(META_LINKS.meta_links["applicableUris"]["profile/minion.json"] % ("na", char_id))
     char_minion_response.raise_for_status()
     char_minion_soup = bs4.BeautifulSoup(char_minion_response.text, "html.parser")
 
@@ -131,13 +128,43 @@ def get_lodestone_char_basic(charid:int) -> Character:
     #                        char_jobs=format_jobs_simple(lodestone["class_jobs"]))
     # return found_char
 
+# TODO bigo optimise, ~2000 data points at worst being retrieved.
+@cache.cached(timeout=600, key_prefix="ffxiv_collect")
+def get_ffxiv_collect(char_id: int) -> dict:
+    """Gets mount, minion, and achivevements of character using the char_id"""
+    # multiple gets
+    owned_mounts = requests.get(FFXIV_COLLECT % (char_id, "mounts", "owned"),
+                                params={"latest": True})
+    owned_mounts.raise_for_status()
+    owned_minions = requests.get(FFXIV_COLLECT % (char_id, "minions", "owned"),
+                                params={"latest": True})
+    owned_minions.raise_for_status()
+    owned_achieves = requests.get(FFXIV_COLLECT % (char_id, "achievements", "owned"),
+                                params={"latest": True}) 
+    owned_achieves.raise_for_status()
+
+    # grouping by
+    # type > categories > achievement
+    sortachieves = {}
+    for entry in owned_achieves.json():
+        _type = entry.get("type").get("name")
+        _category = entry.get("category").get("name")
+        if sortachieves.get(_type) is None:
+            sortachieves[_type] = {}
+        if sortachieves.get(_type).get(_category) is None:
+            sortachieves[_type][_category] = []
+        sortachieves[_type][_category].append(entry)
+
+    return {
+        "mounts": owned_mounts.json(),
+        "minions": owned_minions.json(),
+        "achievements": sortachieves
+    }
+
 # FFLogs request funcs
 @cache.cached(timeout=600, key_prefix="fflogs_token")
-def get_fflogs_token()->dict:
+def get_fflogs_token() -> dict:
     """Returns a new auth bearer token from fflogs as a dict ready to be used in a header"""
-
-    # Generate new sha256 hash and salted token to pass
-    # hashed = generate_password_hash(''.join(random.choices(string.ascii_uppercase, k=128)), method="pbkdf2:sha256:600000", salt_length=8)
 
     # token_params = {
     #     "client_id":CLIENT_KEY,
@@ -159,9 +186,10 @@ def get_fflogs_character(token:dict, name:str, server:str, region:str)->dict:
     #Form GraphQL query, structure each curly is a query layer deeper, accessed vars inside deepest query
     # Zone is tier
     # Encounter is fight
-    # therefore each savage zone is 5 encounters (last is door+new form boss) normally
-    # Ultimates treated differently, each fight is grouped based on when it released
-    # And when it was cleared (eg. TEA has 2 diff "encounters", expac parity and legacy in EW)
+    # therefore each savage zone is 4-5 encounters (5th is a boss' checkpointed second phase if applicable)
+    # Ultimates are different, as they have a "current content" zone and "legacy" zone
+    # Each current content zone has one encounter - the ultimate raid of the patch
+    # Each legacy zone has all the previous ultimate raids before the expac 
 
     # we are running synced, i.e. everything executes sequentially on command
     # so we use RequestHTTPTransport method
@@ -223,6 +251,7 @@ def get_fflogs_character(token:dict, name:str, server:str, region:str)->dict:
 
         # execute query and return
         result = session.execute(query)
+        print(result)
         return result if result["characterData"]["character"] is not None else {"Status":404, "Message":"Character logs not found, either un-private your logs, or make a fflogs account claim your character."}
 
 # Helper funcs
