@@ -1,0 +1,56 @@
+<!-- Collectibles container -->
+<!-- Horizontal tab navigation for Mounts, Minions, and Achievements -->
+<ul class="nav nav-tabs" id="collectiblesTabs">
+    <li class="nav-item">
+        <a class="nav-link active" id="mounts-tab" data-bs-toggle="tab" href="#mounts">Mounts</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="minions-tab" data-bs-toggle="tab" href="#minions">Minions</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="achievements-tab" data-bs-toggle="tab" href="#achievements">Achievements</a>
+    </li>
+</ul>
+<div class="tab-content mt-2 tab-containers">
+    <!-- Mounts content -->
+    <div class="tab-pane fade overflow-y-auto show active h-100" id="mounts">
+        <h2>{{ collectible["mounts"]|length }} Mounts</h2>
+
+        <div class="row w-100">
+            {% for mount in collectible["mounts"] %}
+                <div class="col-sm-1 mb-2 px-0 text-center">
+                        <!-- Mount image -->
+                        <img class="collectible-icon" src="{{mount['icon']}}" alt="{{mount['name']}}" data-bs-toggle="tooltip" data-bs-placement="top" title="{{mount['name']}}" data-bs-trigger="hover focus" data-bs-delay="0">
+                        
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Minions content -->
+    <div class="tab-pane overflow-y-auto h-100 fade" id="minions">
+        <h2>{{ collectible["minions"]|length }} Mounts</h2>
+
+        <div class="row w-100">
+            {% for minion in collectible["minions"] %}
+                <div class="col-sm-1 mb-2 px-0 text-center">
+                        <!-- Mount image -->
+                        <img class="collectible-icon" src="{{minion['icon']}}" alt="{{minion['name']}}" data-bs-toggle="tooltip" data-bs-placement="top" title="{{minion['name']}}" data-bs-trigger="hover focus" data-bs-delay="0">
+                        
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Achievements content -->
+    <div class="tab-pane fade" id="achievements">
+
+    </div>
+</div>
+<!-- Initialize Bootstrap tooltips -->
+<script>
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+</script>
