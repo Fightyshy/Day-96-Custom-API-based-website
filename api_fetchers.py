@@ -36,7 +36,8 @@ CHARACTER_SELECTORS = CharacterData()
 # PRIVATE_KEY = os.environ["XIVAPI_PRIVATE"]
 # XIVAPI_CHAR_URL = "https://xivapi.com/character/"
 
-FFXIV_COLLECT = "https://ffxivcollect.com/api/characters/%i/%s/%s"
+FFXIV_COLLECT = "https://ffxivcollect.com/api/characters/%i"
+FFXIV_COLLECT_EXTERNALS = "/%s/%s"
 
 # fixed number counts
 MAX_MINIONS = 483
@@ -132,14 +133,19 @@ def get_lodestone_char_basic(char_id: int) -> Character:
 @cache.cached(timeout=600, key_prefix="ffxiv_collect")
 def get_ffxiv_collect(char_id: int) -> dict:
     """Gets mount, minion, and achivevements of character using the char_id"""
+    # Format char_id into initial link
+    owner_uri = FFXIV_COLLECT % (char_id)
+
     # multiple gets
-    owned_mounts = requests.get(FFXIV_COLLECT % (char_id, "mounts", "owned"),
+    owner = requests.get(owner_uri)
+    owner.raise_for_status()
+    owned_mounts = requests.get(owner_uri + FFXIV_COLLECT_EXTERNALS % ("mounts", "owned"),
                                 params={"latest": True})
     owned_mounts.raise_for_status()
-    owned_minions = requests.get(FFXIV_COLLECT % (char_id, "minions", "owned"),
+    owned_minions = requests.get(owner_uri + FFXIV_COLLECT_EXTERNALS % ("minions", "owned"),
                                 params={"latest": True})
     owned_minions.raise_for_status()
-    owned_achieves = requests.get(FFXIV_COLLECT % (char_id, "achievements", "owned"),
+    owned_achieves = requests.get(owner_uri + FFXIV_COLLECT_EXTERNALS % ("achievements", "owned"),
                                 params={"latest": True}) 
     owned_achieves.raise_for_status()
 
@@ -156,6 +162,7 @@ def get_ffxiv_collect(char_id: int) -> dict:
         sortachieves[_type][_category].append(entry)
 
     return {
+        "character": owner.json(),
         "mounts": owned_mounts.json(),
         "minions": owned_minions.json(),
         "achievements": sortachieves
