@@ -1,5 +1,5 @@
                         <!-- Job and Level container -->
-                        <div class="col-md-4 ml-1 pl-3 pe-0">
+                        <div class="col-md-5 ml-1 pl-3 pe-0">
                             <div class="job-level-container">
                                 <!-- Job and Level pair 1 -->
                                 <div class="job-level-pair text-center">
@@ -12,7 +12,7 @@
                                 {% for job in character["char_jobs"] %}
                                 {% if job["role"]=="tank" %}
                                 <div class="job-level-pair text-center">
-                                    <div class="job-icon">
+                                    <div class="job-icon mb-2">
                                         <img class="icon" src="{{job['icon_local']}}" alt="{{job['name']}}">
                                     </div>
                                     <div class="job-level">{{job["level"]}}</div>
@@ -33,7 +33,7 @@
                                 {% for job in character["char_jobs"] %}
                                 {% if job["role"]=="healer" %}
                                 <div class="job-level-pair text-center">
-                                    <div class="job-icon">
+                                    <div class="job-icon mb-2">
                                         <img class="icon" src="{{job['icon_local']}}" alt="{{job['name']}}">
                                     </div>
                                     <div class="job-level">{{job["level"]}}</div>
@@ -54,7 +54,7 @@
                                 {% for job in character["char_jobs"] %}
                                 {% if job["role"]=="melee" %}
                                 <div class="job-level-pair text-center">
-                                    <div class="job-icon">
+                                    <div class="job-icon mb-2">
                                         <img class="icon" src="{{job['icon_local']}}" alt="{{job['name']}}">
                                     </div>
                                     <div class="job-level">{{job["level"]}}</div>
@@ -75,7 +75,7 @@
                                 {% for job in character["char_jobs"] %}
                                 {% if job["role"]=="prange" %}
                                 <div class="job-level-pair text-center">
-                                    <div class="job-icon">
+                                    <div class="job-icon mb-2">
                                         <img class="icon" src="{{job['icon_local']}}" alt="{{job['name']}}">
                                     </div>
                                     <div class="job-level">{{job["level"]}}</div>
@@ -96,7 +96,7 @@
                                 {% for job in character["char_jobs"] %}
                                 {% if job["role"]=="caster" %}
                                 <div class="job-level-pair text-center">
-                                    <div class="job-icon">
+                                    <div class="job-icon mb-2">
                                         <img class="icon" src="{{job['icon_local']}}" alt="{{job['name']}}">
                                     </div>
                                     <div class="job-level">{{job["level"]}}</div>
@@ -120,7 +120,7 @@
                                 {% for job in character["char_jobs"] %}
                                 {% if job["role"]=="doh" %}
                                 <div class="job-level-pair text-center">
-                                    <div class="job-icon">
+                                    <div class="job-icon mb-2">
                                         <img class="icon" src="{{job['icon_local']}}" alt="{{job['name']}}">
                                     </div>
                                     <div class="job-level">{{job["level"]}}</div>
@@ -141,7 +141,7 @@
                                 {% for job in character["char_jobs"] %}
                                 {% if job["role"]=="dol" %}
                                 <div class="job-level-pair text-center">
-                                    <div class="job-icon">
+                                    <div class="job-icon mb-2">
                                         <img class="icon" src="{{job['icon_local']}}" alt="{{job['name']}}">
                                     </div>
                                     <div class="job-level">{{job["level"]}}</div>

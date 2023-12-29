@@ -46,8 +46,9 @@
                         </div>
     
                         <!-- Text container for right-aligned text -->
-                        <div class="col text-container">
+                        <div class="col text-container align-items-center">
                             <div class="row">
+
                                 {% include "job-containers.html" %}
                                 <div class="col">
                                     <div class="character-name"><h1>{{character["name"]}}</h1></div>
@@ -78,7 +79,7 @@
 
                 <!-- Raid Performance tab content -->
                 <div class="tab-pane fade h-100" id="raid-performance">
-                    <div class="row h-100 my-2">
+                    <div class="row h-100 py-2">
                         {% include "raids.html" %}
                     </div>
                 </div>
