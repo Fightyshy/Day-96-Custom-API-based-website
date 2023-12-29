@@ -145,8 +145,6 @@
         }
 
         // Set initial content for the first subcategory
-        // document.getElementsByClassName("achievementContent").innerHTML
-        console.log(subcategoryLinks)
         var initialSubcategory = subcategoryLinks[0].getAttribute('data-subcategory');
         var initialAchievements = subcategoryLinks[0].getAttribute('data-achievements');
         document.getElementById(subcategoryLinks[0].getAttribute("id")).classList.add("active")

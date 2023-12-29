@@ -28,11 +28,7 @@
                 <!-- Use dict name as everything for tab -->
                 {% for tier in raid["ultimates"] %}
                 <li class="nav-item">
-                    {% if loop.index == 1 %}
-                    <a class="nav-link active" id="{{tier|replace(' ','-')|replace('\'s', '')}}-tab" data-bs-toggle="tab" href="#{{tier|replace(' ','-')|replace('\'s', '')}}">{{tier.title()|replace("'S", "'s")}}</a>
-                    {% else %}
                     <a class="nav-link" id="{{tier|replace(' ','-')|replace('\'s', '')}}-tab" data-bs-toggle="tab" href="#{{tier|replace(' ','-')|replace('\'s', '')}}">{{tier.title()|replace("'S", "'s")}}</a>
-                    {% endif %}
                 </li>
                 {% endfor %}
             </ul>
@@ -50,11 +46,7 @@
                 <!-- Use dict name as everything for tab -->
                 {% for tier in raid["endwalker"] %}
                 <li class="nav-item">
-                    {% if loop.index == 1 %}
-                    <a class="nav-link active" id="{{tier|replace(' ','-')|replace('\'s', '')}}-tab" data-bs-toggle="tab" href="#{{tier|replace(' ','-')|replace('\'s', '')}}">{{tier.title()|replace("'S", "'s")}}</a>
-                    {% else %}
                     <a class="nav-link" id="{{tier|replace(' ','-')|replace('\'s', '')}}-tab" data-bs-toggle="tab" href="#{{tier|replace(' ','-')|replace('\'s', '')}}">{{tier.title()|replace("'S", "'s")}}</a>
-                    {% endif %}
                 </li>
                 {% endfor %}
             </ul>
@@ -71,11 +63,7 @@
                 <!-- Use dict name as everything for tab -->
                 {% for tier in raid["shadowbringers"] %}
                 <li class="nav-item">
-                    {% if loop.index == 1 %}
-                    <a class="nav-link active" id="{{tier|replace(' ','-')|replace('\'s', '')}}-tab" data-bs-toggle="tab" href="#{{tier|replace(' ','-')|replace('\'s', '')}}">{{tier.title()|replace("'S", "'s")}}</a>
-                    {% else %}
                     <a class="nav-link" id="{{tier|replace(' ','-')|replace('\'s', '')}}-tab" data-bs-toggle="tab" href="#{{tier|replace(' ','-')|replace('\'s', '')}}">{{tier.title()|replace("'S", "'s")}}</a>
-                    {% endif %}
                 </li>
                 {% endfor %}
             </ul>
@@ -92,11 +80,7 @@
                 <!-- Use dict name as everything for tab -->
                 {% for tier in raid["stormblood"] %}
                 <li class="nav-item">
-                    {% if loop.index == 1 %}
-                    <a class="nav-link active" id="{{tier|replace(' ','-')|replace('\'s', '')}}-tab" data-bs-toggle="tab" href="#{{tier|replace(' ','-')|replace('\'s', '')}}">{{tier.title()|replace("'S", "'s")}}</a>
-                    {% else %}
                     <a class="nav-link" id="{{tier|replace(' ','-')|replace('\'s', '')}}-tab" data-bs-toggle="tab" href="#{{tier|replace(' ','-')|replace('\'s', '')}}">{{tier.title()|replace("'S", "'s")}}</a>
-                    {% endif %}
                 </li>
                 {% endfor %}
             </ul>
@@ -113,11 +97,7 @@
                 <!-- Use dict name as everything for tab -->
                 {% for tier in raid["heavensward"] %}
                 <li class="nav-item">
-                    {% if loop.index == 1 %}
-                    <a class="nav-link active" id="{{tier|replace(' ','-')|replace('\'s', '')}}-tab" data-bs-toggle="tab" href="#{{tier|replace(' ','-')|replace('\'s', '')}}">{{tier.title()|replace("'S", "'s")}}</a>
-                    {% else %}
                     <a class="nav-link" id="{{tier|replace(' ','-')|replace('\'s', '')}}-tab" data-bs-toggle="tab" href="#{{tier|replace(' ','-')|replace('\'s', '')}}">{{tier.title()|replace("'S", "'s")}}</a>
-                    {% endif %}
                 </li>
                 {% endfor %}
             </ul>
@@ -129,3 +109,38 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var initialTab = new bootstrap.Tab(document.getElementById('ultimates-tab'));
+        initialTab.show(); // Activate the Ultimates tab
+
+        var ultimatesTab = new bootstrap.Tab(document.getElementById('the-omega-protocol-tab'));
+        ultimatesTab.show(); // Activate the Omega Protocol subtab
+    });
+
+    // TODO onclick for each major tab to enable each subtab
+    document.getElementById("ultimates-tab").addEventListener("click", function(){
+        var ultimatesTab = new bootstrap.Tab(document.getElementById('the-omega-protocol-tab'));
+        ultimatesTab.show(); // Activate the Omega Protocol subtab
+    })
+
+    document.getElementById("endwalker-tab").addEventListener("click", function(){
+        var endwalkerTab = new bootstrap.Tab(document.getElementById("anabaseios-tab"));
+            endwalkerTab.show()
+    })
+
+    document.getElementById("shadowbringers-tab").addEventListener("click", function(){
+        var endwalkerTab = new bootstrap.Tab(document.getElementById("eden-promise-tab"));
+            endwalkerTab.show()
+    })
+
+    document.getElementById("stormblood-tab").addEventListener("click", function(){
+        var endwalkerTab = new bootstrap.Tab(document.getElementById("alphascape-tab"));
+            endwalkerTab.show()
+    })
+
+        document.getElementById("heavensward-tab").addEventListener("click", function(){
+        var endwalkerTab = new bootstrap.Tab(document.getElementById("alexander:-the-creator-tab"));
+            endwalkerTab.show()
+    })
+</script>
