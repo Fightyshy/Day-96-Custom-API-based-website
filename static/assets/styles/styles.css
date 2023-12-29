@@ -1,3 +1,14 @@
+html{
+    font-size:16px;
+}
+
+/* set root font-size for 720p+ */
+@media screen and (min-width: 1281px) {
+    html {
+        font-size: calc(16px + 0.5vw);
+    }
+}
+
 p{
     margin: 0;
     font-size: 1rem;
@@ -9,8 +20,13 @@ p{
 
 /* Custom styles for the main container */
 .main-container {
-    min-width: 72rem;
-    /* max-height: 54rem; */
+    /* min is 1280x720 */
+    /* min-width: 72rem;
+    min-height: 45rem; */
+    /* max */
+    /* max-width: 160rem;
+    max-height: 90rem; */
+    max-width: 72rem;
     max-height: 45rem;
     margin: auto;
     position: absolute;
