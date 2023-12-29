@@ -26,7 +26,7 @@
         <div class="tab-pane fade show active" id="ultimates">
             <ul class="nav nav-tabs" id="ultimateSubtabs" style="border-radius: 10px;">
                 <!-- Use dict name as everything for tab -->
-                {% for tier in character["char_raids"]["ultimates"] %}
+                {% for tier in raid["ultimates"] %}
                 <li class="nav-item">
                     {% if loop.index == 1 %}
                     <a class="nav-link active" id="{{tier|replace(' ','-')|replace('\'s', '')}}-tab" data-bs-toggle="tab" href="#{{tier|replace(' ','-')|replace('\'s', '')}}">{{tier.title()|replace("'S", "'s")}}</a>
@@ -38,7 +38,7 @@
             </ul>
             <div class="tab-content">
                 <!-- Loop to unpack and use information -->
-                {% for name, tier in character["char_raids"]["ultimates"]|items %}
+                {% for name, tier in raid["ultimates"]|items %}
                 {% include "raid-containers.html"%}
                 {% endfor %}
             </div>
@@ -48,7 +48,7 @@
             <!-- Content for Category 2 goes here -->
             <ul class="nav nav-tabs" id="endwalkerSubtabs">
                 <!-- Use dict name as everything for tab -->
-                {% for tier in character["char_raids"]["endwalker"] %}
+                {% for tier in raid["endwalker"] %}
                 <li class="nav-item">
                     {% if loop.index == 1 %}
                     <a class="nav-link active" id="{{tier|replace(' ','-')|replace('\'s', '')}}-tab" data-bs-toggle="tab" href="#{{tier|replace(' ','-')|replace('\'s', '')}}">{{tier.title()|replace("'S", "'s")}}</a>
@@ -59,7 +59,7 @@
                 {% endfor %}
             </ul>
             <div class="tab-content">
-                {% for name, tier in character["char_raids"]["endwalker"]|items %}
+                {% for name, tier in raid["endwalker"]|items %}
                 {% include "raid-containers.html" %}
                 {% endfor %}
             </div>
@@ -69,7 +69,7 @@
             <!-- Content for Category 2 goes here -->
             <ul class="nav nav-tabs" id="shadowbringersSubtabs">
                 <!-- Use dict name as everything for tab -->
-                {% for tier in character["char_raids"]["shadowbringers"] %}
+                {% for tier in raid["shadowbringers"] %}
                 <li class="nav-item">
                     {% if loop.index == 1 %}
                     <a class="nav-link active" id="{{tier|replace(' ','-')|replace('\'s', '')}}-tab" data-bs-toggle="tab" href="#{{tier|replace(' ','-')|replace('\'s', '')}}">{{tier.title()|replace("'S", "'s")}}</a>
@@ -80,7 +80,7 @@
                 {% endfor %}
             </ul>
             <div class="tab-content">
-                {% for name, tier in character["char_raids"]["shadowbringers"]|items %}
+                {% for name, tier in raid["shadowbringers"]|items %}
                 {% include "raid-containers.html" %}
                 {% endfor %}
             </div>
@@ -90,7 +90,7 @@
             <!-- Content for Category 2 goes here -->
             <ul class="nav nav-tabs" id="stormbloodSubtabs">
                 <!-- Use dict name as everything for tab -->
-                {% for tier in character["char_raids"]["stormblood"] %}
+                {% for tier in raid["stormblood"] %}
                 <li class="nav-item">
                     {% if loop.index == 1 %}
                     <a class="nav-link active" id="{{tier|replace(' ','-')|replace('\'s', '')}}-tab" data-bs-toggle="tab" href="#{{tier|replace(' ','-')|replace('\'s', '')}}">{{tier.title()|replace("'S", "'s")}}</a>
@@ -101,7 +101,7 @@
                 {% endfor %}
             </ul>
             <div class="tab-content">
-                {% for name, tier in character["char_raids"]["stormblood"]|items %}
+                {% for name, tier in raid["stormblood"]|items %}
                 {% include "raid-containers.html" %}
                 {% endfor %}
             </div>
@@ -111,7 +111,7 @@
             <!-- Content for Category 2 goes here -->
             <ul class="nav nav-tabs" id="heavenswardSubtabs">
                 <!-- Use dict name as everything for tab -->
-                {% for tier in character["char_raids"]["heavensward"] %}
+                {% for tier in raid["heavensward"] %}
                 <li class="nav-item">
                     {% if loop.index == 1 %}
                     <a class="nav-link active" id="{{tier|replace(' ','-')|replace('\'s', '')}}-tab" data-bs-toggle="tab" href="#{{tier|replace(' ','-')|replace('\'s', '')}}">{{tier.title()|replace("'S", "'s")}}</a>
@@ -122,7 +122,7 @@
                 {% endfor %}
             </ul>
             <div class="tab-content">
-                {% for name, tier in character["char_raids"]["heavensward"]|items %}
+                {% for name, tier in raid["heavensward"]|items %}
                 {% include "raid-containers.html" %}
                 {% endfor %}
             </div>

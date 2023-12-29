@@ -43,8 +43,9 @@
                 </div>
                 {% endif %}
                 
-                <!-- Highest rdps -->
+                <!-- Highest rdps and total kills -->
                 <p class="mt-2 fight-text">Highest RDPS: {{ fight["best-rdps"] }}</p>
+                <p class="fight-text">Kills: {{fight["total-kills"]}}</p>
             </div>
         </div>
         {% endfor %}

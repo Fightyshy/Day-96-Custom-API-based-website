@@ -15,7 +15,7 @@ class Character:
         mount_total: int,
         minion_total: int,
         freecompany: dict,
-        char_raids: type[CharacterRaids] = None,
+        # char_raids: type[CharacterRaids] = None,
     ):
         self.name = name
         self.title = title
@@ -24,7 +24,7 @@ class Character:
         self.nameday = nameday
         self.twelve = twelve
         self.char_jobs = char_jobs
-        self.char_raids = char_raids
+        # self.char_raids = char_raids
         self.mount_total = mount_total
         self.minion_total = minion_total
         self.freecompany = freecompany
@@ -39,7 +39,7 @@ class Character:
             "nameday": self.nameday,
             "twelve": self.twelve,
             "char_jobs": self.char_jobs,
-            "char_raids": self.char_raids.to_dict(),
+            # "char_raids": self.char_raids.to_dict(),
             "mount_total": self.mount_total,
             "minion_total": self.minion_total,
             "freecompany": self.freecompany

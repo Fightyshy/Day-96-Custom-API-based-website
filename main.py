@@ -1,6 +1,6 @@
 import dotenv
-from flask import Flask, flash, redirect, render_template, request, url_for
-from api_fetchers import get_fflogs_token, get_fflogs_character, cache
+from flask import Flask, flash, jsonify, redirect, render_template, request, url_for
+from api_fetchers import get_fflogs_token, get_fflogs_character, cache, get_ffxiv_collect
 from flask_bootstrap import Bootstrap5
 from flask_wtf import FlaskForm
 from wtforms import URLField, SubmitField, FileField
@@ -50,7 +50,9 @@ class ClaimCharForm(FlaskForm):
 
 @app.route("/test")
 def test():
-    return render_template("test.html")
+    # get_ffxiv_collect(5286865)
+    # return jsonify(get_ffxiv_collect(5286865))
+    return jsonify(get_ffxiv_collect(5286865))
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -117,17 +119,19 @@ def retrieve_char_details():
         # Then we fetch lodestone data -> fflogs data (if exists)
         # TODO waiting for xivapi to fix their lodestone scraper endpoint
         retrieved_data = get_lodestone_char_basic(lodestone_id)
-        # Fetch fflogs data
+        # Fetch FFXIV collect data
+        retrieve_collectibles = get_ffxiv_collect(lodestone_id)
+        # Fetch FFLogs data
         retrieve_token = get_fflogs_token()
-        retrieved_logs = get_fflogs_character(
+        retrieved_logs = merge_raids(get_fflogs_character(
             retrieve_token,
             retrieved_data.name,
             retrieved_data.dcserver[0],
             SERVERS.get_region(retrieved_data.dcserver[0]),
-        )
+        ))
         # Merge fflogs dict into char dict if not None, error message for no-logs still displays
-        if retrieved_logs != None:
-            retrieved_data.char_raids = merge_raids(retrieved_logs)
+        # if retrieved_logs != None:
+        #     retrieved_data.char_raids = merge_raids(retrieved_logs)
 
     except TypeError:
         return {
@@ -149,7 +153,8 @@ def retrieve_char_details():
         }
     else:
         print(retrieved_data.to_dict())
-        return render_template("card.html", character=retrieved_data.to_dict())
+        print(retrieved_logs.to_dict())
+        return render_template("card.html", character=retrieved_data.to_dict(), raid=retrieved_logs.to_dict(), collectible=retrieve_collectibles)
 
 
 if __name__ == "__main__":
