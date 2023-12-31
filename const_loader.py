@@ -140,6 +140,7 @@ class CharacterData:
         self.minions = self.get_minions()
         self.mounts = self.get_mounts()
         self.freecompany = self.get_freecompany()
+        self.achievements = self.get_achievements()
 
     def get_character_selectors(self):
         with open(
@@ -182,3 +183,9 @@ class CharacterData:
             r"static\assets\lodestone-css-selectors-main\freecompany\freecompany.json"
         ) as freecompany:
             return json.load(freecompany)
+
+    def get_achievements(self):
+        with open(
+            r"static\assets\lodestone-css-selectors-main\profile\achievements.json", encoding="utf8"
+        ) as achievement:
+            return json.load(achievement)

@@ -8,10 +8,14 @@
         {{ bootstrap.load_js() }}
         <script src="https://code.createjs.com/1.0.0/createjs.min.js"></script>
         <link rel="stylesheet" href="{{url_for('static', filename='assets/styles/styles.css')}}">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
         <!-- Desktop layout coded and styled against 1280x720 (720p) displays. Any smaller and maybe mobile format? -->
+        {% from 'bootstrap5/form.html' import render_form %}
     </head>
 
     <body>
+        {{render_form(form, id="portrait-form", novalidate=True)}}
+        {{form.char_id()}}
         <div class="container main-container px-0 pb-2 h-100" style="border: 2px solid black; border-radius: 10px;">
             <header class="bg-dark text-white">
                 <!-- Navigation tabs -->
@@ -41,7 +45,11 @@
                         <div class="col-md-4 d-flex align-items-center">
                             <div class="avatar-container">
                                 <!-- Your dynamic avatar image -->
-                                <img class="avatar img-fluid" src="https://cdn.discordapp.com/attachments/958658611582738468/1184880197523218532/mayu.png?ex=658d94ad&is=657b1fad&hm=fe479ebc9052b4c25a36bd86d522841934a96e0167c3c727ae6e5a27ac6e4d70&" alt="Avatar">
+                                {% if src == None %}
+                                <img class="avatar img-fluid" id="avatar" src="{{collectible['character']['portrait']}}" alt="Avatar">
+                                {% else %}
+                                <img class="avatar img-fluid" id="avatar" src="{{src}}" alt="Avatar">
+                                {% endif %}
                             </div>
                         </div>
     
@@ -54,6 +62,7 @@
                                     <div class="character-name"><h1>{{character["name"]}}</h1></div>
                                     <div class="ingame-title"><h2>« {{character["title"]}} »</h2></div>
                                     <div class="server-info"><h2>{{character["dcserver"][1]}} - {{character["dcserver"][0]}}</h2></div>
+                                    {% if character.get("freecompany") != None %}
                                     <div class="free-company">
                                         <div class="flex-container">
                                             <!-- Three overlapping images -->
@@ -67,6 +76,7 @@
                                 
                                         </div>
                                     </div>
+                                    {% endif %}
                                     <!-- Additional element for displaying up to 500 characters of text -->
                                     <div class="additional-text">
                                         China is where dead RTSs go to die
@@ -86,7 +96,9 @@
 
                 <!-- Mounts/Minions tab content -->
                 <div class="tab-pane fade h-100" id="collectibles">
-                    {% include "collectible-containers.html" %}
+                    <div class="row h-100 py-2">
+                        {% include "collectible-containers.html" %}
+                    </div>
                 </div>
 
                 <!-- Roleplay tab content -->
@@ -100,6 +112,29 @@
             </footer>
         </div>
         <!-- Add Bootstrap JS and Popper.js scripts -->
+        <script type="text/javascript">
+
+            $("#submit").click(event=>{
+                console.log("here")
+                event.preventDefault();
+
+                const editForm = new FormData(document.getElementById("portrait-form"))
+
+                $.ajax({
+                    url: "{{url_for('upload_portrait')}}",
+                    data: editForm,
+                    contentType: false,
+                    processData: false,
+                    type: "POST",
+                    success: data=>{
+                        document.getElementById("avatar").src=data["src"]
+                    }
+                }).done(data=>{
+                    imgurl=`${data["src"]}?timestamp=${Date.now()}`
+                    document.getElementById("avatar").src=imgurl
+                })
+            })
+        </script>
         {{ bootstrap.load_js() }}
     </body>
 </html>

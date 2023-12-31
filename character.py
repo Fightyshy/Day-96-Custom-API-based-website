@@ -12,8 +12,8 @@ class Character:
         nameday: str,
         twelve: str,
         char_jobs: dict,
-        mount_total: int,
-        minion_total: int,
+        # mount_total: int,
+        # minion_total: int,
         freecompany: dict,
         # char_raids: type[CharacterRaids] = None,
     ):
@@ -25,8 +25,8 @@ class Character:
         self.twelve = twelve
         self.char_jobs = char_jobs
         # self.char_raids = char_raids
-        self.mount_total = mount_total
-        self.minion_total = minion_total
+        # self.mount_total = mount_total
+        # self.minion_total = minion_total
         self.freecompany = freecompany
 
     # Manually formed, less pain
@@ -40,8 +40,8 @@ class Character:
             "twelve": self.twelve,
             "char_jobs": self.char_jobs,
             # "char_raids": self.char_raids.to_dict(),
-            "mount_total": self.mount_total,
-            "minion_total": self.minion_total,
+            # "mount_total": self.mount_total,
+            # "minion_total": self.minion_total,
             "freecompany": self.freecompany
         }
 

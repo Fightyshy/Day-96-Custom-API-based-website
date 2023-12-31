@@ -1,9 +1,10 @@
 import dotenv
 from flask import Flask, flash, jsonify, redirect, render_template, request, url_for
-from api_fetchers import get_fflogs_token, get_fflogs_character, cache, get_ffxiv_collect
+from api_fetchers import ffxiv_cached_resources, get_fflogs_token, get_fflogs_character, cache, get_ffxiv_collect
 from flask_bootstrap import Bootstrap5
 from flask_wtf import FlaskForm
-from wtforms import URLField, SubmitField, FileField
+from flask_wtf.file import FileField, FileAllowed
+from wtforms import HiddenField, URLField, SubmitField
 from wtforms.validators import DataRequired, URL
 import bs4
 from api_fetchers import (
@@ -16,10 +17,12 @@ import requests
 import os
 from char_claim_token import generate_token, confirm_token
 import const_loader
+from werkzeug.utils import secure_filename
 
 # load selectors and helpers
 CHARACTER_SELECTORS = const_loader.CharacterData()
 SERVERS = const_loader.Servers()
+
 
 dotenv.load_dotenv()
 
@@ -30,7 +33,6 @@ app.config["CACHE_TYPE"] = "SimpleCache"
 app.config["CACHE_DEFAULT_TIMEOUT"] = 300
 Bootstrap5(app)
 cache.init_app(app)
-
 
 class LodestoneForm(FlaskForm):
     lodestone_url = URLField(
@@ -45,14 +47,33 @@ class ClaimCharForm(FlaskForm):
     )
 
 
+class UploadPortraitForm(FlaskForm):
+    portrait = FileField("If you want, you can preload a portrait image (otherwise we'll tear the default one from the Lodestone)", validators=[FileAllowed(["jpg", "png", "jpeg"], "JPG/PNG only")])
+    char_id = HiddenField(validators=[DataRequired()])
+    submit = SubmitField(
+        "Upload portrait"
+    )
+
+COLLECT_CACHE = ffxiv_cached_resources()
+LEN_MOUNTS = len(COLLECT_CACHE["mounts"])
+LEN_MINIONS = len(COLLECT_CACHE["minions"])
+LEN_ACHIEVES = len(COLLECT_CACHE["achievements"])
+
 # TODO another form for image and other things
 
 
-@app.route("/test")
-def test():
+@app.route("/test/<int:char_id>")
+def test(char_id):
     # get_ffxiv_collect(5286865)
     # return jsonify(get_ffxiv_collect(5286865))
-    return jsonify(get_ffxiv_collect(5286865))
+    # lodestone_achievement_scrape(5286865)
+    # retrieved = lodestone_achievement_scrape(char_id)
+    # final = [COLLECT_CACHE[2][int(id)] for id in retrieved]
+    # for entry in test:
+    #     for achieve in cached_achivements["results"]:
+    #         if achieve["id"]==int(entry):
+    #             final.append(achieve)
+    return jsonify({"test":cache.get("ffxiv_cached_resources")["mounts"]})
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -108,20 +129,53 @@ def claim_charid():
     return render_template("authentication.html", form=claimform, token=token)
 
 
-# Can't api char profile text field, might need to scrape from site as auth via key recieved?
+@app.route("/character/portrait", methods=["POST"])
+def upload_portrait():
+    if request.method=="POST":
+        portraitform = UploadPortraitForm()
+        if portraitform.validate():
+            image = portraitform.portrait.data
+            extension = image.filename.split(".")[-1]
+             # TODO get char_id and check against filename sans extension
+             # TODO add new file using char_id as file name while preserving file format
+             # May have to change in the future because O(n) could get expensive on a server
+            for root, dirs, files in os.walk(os.path.join(app.root_path,r"static\assets\uploaded-img")):
+                for name in files:
+                    print(name, root)
+                    if int(name.split(".")[0])==int(portraitform.char_id.data):
+                        print("working")
+                        print(rf"{root}\{name}")
+                        os.remove(rf"{root}\{name}")
+            
+            image.save(os.path.join(app.root_path, "static/assets/uploaded-img/", secure_filename(portraitform.char_id.data)+f".{extension}"))
+
+        return jsonify({"src":url_for("static", filename="assets/uploaded-img/"+secure_filename(portraitform.char_id.data))+f".{extension}"})
+    else:
+        return jsonify({"test":"error"})
+
 @app.route("/character")
 def retrieve_char_details():
     """Get all details of char from booth XIVAPI/Lodestone and FFLogs"""
-
+    portraitform=UploadPortraitForm()
     try:
         # Character's lodestone id
         lodestone_id = int(request.args.get("charid"))
-        # Then we fetch lodestone data -> fflogs data (if exists)
-        # TODO waiting for xivapi to fix their lodestone scraper endpoint
+        portraitform.char_id.data = lodestone_id
+        src = None
+        for root, dirs, files in os.walk(os.path.join(app.root_path,r"static\assets\uploaded-img")):
+            for name in files:
+                print(name, root)
+                if int(name.split(".")[0])==int(portraitform.char_id.data):
+                    print("working")
+                    print(rf"{root}\{name}")
+                    src = url_for('static', filename=f"/assets/uploaded-img/{name}")
+        
+        # GET reqs/Scraper funcs
+        # Character summary page data
         retrieved_data = get_lodestone_char_basic(lodestone_id)
-        # Fetch FFXIV collect data
+        # Collectibles data (either from FFXIV Collect API or scrape name/id and use FFXIV Collect queries to populate)
         retrieve_collectibles = get_ffxiv_collect(lodestone_id)
-        # Fetch FFLogs data
+        # Fetch FFLogs data and merge into single dict/json
         retrieve_token = get_fflogs_token()
         retrieved_logs = merge_raids(get_fflogs_character(
             retrieve_token,
@@ -129,10 +183,6 @@ def retrieve_char_details():
             retrieved_data.dcserver[0],
             SERVERS.get_region(retrieved_data.dcserver[0]),
         ))
-        # Merge fflogs dict into char dict if not None, error message for no-logs still displays
-        # if retrieved_logs != None:
-        #     retrieved_data.char_raids = merge_raids(retrieved_logs)
-
     except TypeError:
         return {
             "Status": "404",
@@ -152,9 +202,7 @@ def retrieve_char_details():
             "Message": "Value of data input is incorrect",
         }
     else:
-        print(retrieved_data.to_dict())
-        print(retrieved_logs.to_dict())
-        return render_template("card.html", character=retrieved_data.to_dict(), raid=retrieved_logs.to_dict(), collectible=retrieve_collectibles)
+        return render_template("card.html", character=retrieved_data.to_dict(), raid=retrieved_logs.to_dict() if retrieved_logs is not None else None, collectible=retrieve_collectibles, form=portraitform, src=src)
 
 
 if __name__ == "__main__":
