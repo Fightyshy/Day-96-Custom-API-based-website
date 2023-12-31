@@ -48,7 +48,7 @@ class ClaimCharForm(FlaskForm):
 
 
 class UploadPortraitForm(FlaskForm):
-    portrait = FileField("If you want, you can preload a portrait image (otherwise we'll tear the default one from the Lodestone)", validators=[FileAllowed(["jpg", "png", "jpeg"], "JPG/PNG only")])
+    portrait = FileField("Upload custom portrait here (otherwise we use the lodestone one)", validators=[FileAllowed(["jpg", "png", "jpeg"], "JPG/PNG only")])
     char_id = HiddenField(validators=[DataRequired()])
     submit = SubmitField(
         "Upload portrait"
@@ -202,8 +202,12 @@ def retrieve_char_details():
             "Message": "Value of data input is incorrect",
         }
     else:
-        return render_template("card.html", character=retrieved_data.to_dict(), raid=retrieved_logs.to_dict() if retrieved_logs is not None else None, collectible=retrieve_collectibles, form=portraitform, src=src)
-
+        # condition check edit mode or no
+        editting = True
+        if editting:
+            return render_template("card.html", character=retrieved_data.to_dict(), raid=retrieved_logs.to_dict() if retrieved_logs is not None else None, collectible=retrieve_collectibles, form=portraitform, src=src, is_edit=True)
+        else:
+            return render_template("card.html", character=retrieved_data.to_dict(), raid=retrieved_logs.to_dict() if retrieved_logs is not None else None, collectible=retrieve_collectibles, form=portraitform, src=src, is_edit=False)
 
 if __name__ == "__main__":
     app.run(debug=True)

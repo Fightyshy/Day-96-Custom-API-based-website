@@ -14,8 +14,6 @@
     </head>
 
     <body>
-        {{render_form(form, id="portrait-form", novalidate=True)}}
-        {{form.char_id()}}
         <div class="container main-container px-0 pb-2 h-100" style="border: 2px solid black; border-radius: 10px;">
             <header class="bg-dark text-white">
                 <!-- Navigation tabs -->
@@ -49,6 +47,10 @@
                                 <img class="avatar img-fluid" id="avatar" src="{{collectible['character']['portrait']}}" alt="Avatar">
                                 {% else %}
                                 <img class="avatar img-fluid" id="avatar" src="{{src}}" alt="Avatar">
+                                {% endif %}
+                                {% if is_edit == True %}
+                                {{render_form(form, id="portrait-form", novalidate=True)}}
+                                {{form.char_id()}}
                                 {% endif %}
                             </div>
                         </div>
