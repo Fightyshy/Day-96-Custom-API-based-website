@@ -6,6 +6,7 @@ A simple one-page (currently proof of concept) interactive "business"/"calling" 
 - Mounts/Minions/Achievements owned
 - Housing/Roleplaying activiets (really selling that business card vibe)
 - Probably more as I make it up
+- 
 Currently, only the first three have had any progress. With planning on how to do Housing/Roleplay still being worked on.
 
 Originally done as part of day 96 of the 100 Days of Code: The Complete Python Pro Bootcamp for 2023 course, [link here]([https://www.udemy.com/course/100-days-of-code/learn/practice/1251204#overview](https://www.udemy.com/course/100-days-of-code/)), which this is currently a branch of.
