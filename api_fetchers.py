@@ -94,6 +94,7 @@ def get_lodestone_char_basic(char_id: int) -> Character:
 # 0 is infinite cache
 @cache.cached(timeout=0, key_prefix="ffxiv_cached_resources")
 def ffxiv_cached_resources():
+    print("executing cacher")
     cached_mounts = requests.get("https://ffxivcollect.com/api/mounts")
     cached_mounts.raise_for_status()
     cached_mounts = cached_mounts.json()

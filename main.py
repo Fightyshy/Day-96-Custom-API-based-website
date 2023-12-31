@@ -207,7 +207,7 @@ def retrieve_char_details():
         if editting:
             return render_template("card.html", character=retrieved_data.to_dict(), raid=retrieved_logs.to_dict() if retrieved_logs is not None else None, collectible=retrieve_collectibles, form=portraitform, src=src, is_edit=True)
         else:
-            return render_template("card.html", character=retrieved_data.to_dict(), raid=retrieved_logs.to_dict() if retrieved_logs is not None else None, collectible=retrieve_collectibles, form=portraitform, src=src, is_edit=False)
+            return render_template("card.html", character=retrieved_data.to_dict(), raid=retrieved_logs.to_dict() if retrieved_logs is not None else None, collectible=retrieve_collectibles, src=src, is_edit=False)
 
 if __name__ == "__main__":
     app.run(debug=True)

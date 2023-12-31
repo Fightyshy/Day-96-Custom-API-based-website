@@ -56,16 +56,16 @@
                         </div>
     
                         <!-- Text container for right-aligned text -->
-                        <div class="col text-container align-items-center">
-                            <div class="row">
+                        <div class="col-md-8 text-container align-items-center">
+                            <div class="row h-100 justify-content-between">
 
                                 {% include "job-containers.html" %}
-                                <div class="col">
+                                <div class="col-md-6">
                                     <div class="character-name"><h1>{{character["name"]}}</h1></div>
                                     <div class="ingame-title"><h2>« {{character["title"]}} »</h2></div>
-                                    <div class="server-info"><h2>{{character["dcserver"][1]}} - {{character["dcserver"][0]}}</h2></div>
+                                    <div class="server-info mb-0"><h2 class="mb-0">{{character["dcserver"][1]}} - {{character["dcserver"][0]}}</h2></div>
                                     {% if character.get("freecompany") != None %}
-                                    <div class="free-company">
+                                    <div class="free-company py-3 mt-0">
                                         <div class="flex-container">
                                             <!-- Three overlapping images -->
                                             <img class="company-logo top-layer" src="{{character['freecompany']['top']}}" alt="Logo 1">
@@ -80,8 +80,11 @@
                                     </div>
                                     {% endif %}
                                     <!-- Additional element for displaying up to 500 characters of text -->
-                                    <div class="additional-text">
-                                        China is where dead RTSs go to die
+                                    <div id="additional-text" class="additional-text text-wrap">
+                                        <p>China is where dead RTSs go to die</p>
+                                        {% if is_edit == True %}
+                                        <span id="edit-summary-button" onclick="enableEditing()">📝</span>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
@@ -120,6 +123,52 @@
         </div>
         <!-- Add Bootstrap JS and Popper.js scripts -->
         <script type="text/javascript">
+
+            function enableEditing() {
+                // Get the existing text content
+                const existingText = document.querySelector('#additional-text p').innerText;
+
+                // Create an input element for editing
+                const inputElement = document.createElement('textarea');
+                // inputElement.type = 'text';
+                inputElement.value = existingText;
+                inputElement.maxLength = 200; // Set the maximum character limit
+                inputElement.classList.add("w-100")
+                inputElement.classList.add("form-control")
+                inputElement.style.height = "6.5rem"
+                inputElement.style.fontSize = "1rem"
+                inputElement.style.resize = "none"
+
+                // Create a button for confirmation
+                const confirmButton = document.createElement('button');
+                confirmButton.innerText = 'Confirm';
+                confirmButton.onclick = saveChanges;
+                confirmButton.classList.add("form-control")
+                confirmButton.classList.add("btn")
+                confirmButton.classList.add("btn-primary")
+
+                // Replace the existing div content with the input and button
+                document.getElementById("edit-summary-button").remove()
+                const additionalTextDiv = document.getElementById('additional-text');
+                additionalTextDiv.innerHTML = ''; // Clear existing content
+                additionalTextDiv.appendChild(inputElement);
+                additionalTextDiv.appendChild(confirmButton);
+
+                // Focus on the input field
+                inputElement.focus();
+            }
+
+            function saveChanges() {
+                // Get the input element and its value
+                const inputElement = document.querySelector('#additional-text textarea');
+                const newText = inputElement.value;
+                // Limit the text to 500 characters
+                const limitedText = newText.substring(0, 200);
+
+                // Replace the input and button with the updated text
+                const additionalTextDiv = document.getElementById('additional-text');
+                additionalTextDiv.innerHTML = `<p>${limitedText}</p><span id='edit-summary-button' onclick='enableEditing()'>📝</span>`;
+            }
 
             $("#submit").click(event=>{
                 console.log("here")
