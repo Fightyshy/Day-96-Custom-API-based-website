@@ -315,13 +315,14 @@ def get_fflogs_character(token:dict, name:str, server:str, region:str)->dict:
                         shb2=ds.Character.zoneRankings(zoneID=RAIDS.tier_to_ids("Eden's Verse"),difficulty=101),
                         shb3=ds.Character.zoneRankings(zoneID=RAIDS.tier_to_ids("Eden's Promise"),difficulty=101),
 
-                        sb1=ds.Character.zoneRankings(zoneID=RAIDS.tier_to_ids("Deltascape"),difficulty=101),
-                        sb2=ds.Character.zoneRankings(zoneID=RAIDS.tier_to_ids("Sigmascape"),difficulty=101),
-                        sb3=ds.Character.zoneRankings(zoneID=RAIDS.tier_to_ids("Alphascape"),difficulty=101),
+                        # difficulty was only selectable from shb onwards
+                        sb1=ds.Character.zoneRankings(zoneID=RAIDS.tier_to_ids("Deltascape")),
+                        sb2=ds.Character.zoneRankings(zoneID=RAIDS.tier_to_ids("Sigmascape")),
+                        sb3=ds.Character.zoneRankings(zoneID=RAIDS.tier_to_ids("Alphascape")),
 
-                        hw1=ds.Character.zoneRankings(zoneID=RAIDS.tier_to_ids("Alexander: Gordias"),difficulty=101),
-                        hw2=ds.Character.zoneRankings(zoneID=RAIDS.tier_to_ids("Alexander: Midas"),difficulty=101),
-                        hw3=ds.Character.zoneRankings(zoneID=RAIDS.tier_to_ids("Alexander: The Creator"),difficulty=101),
+                        hw1=ds.Character.zoneRankings(zoneID=RAIDS.tier_to_ids("Alexander: Gordias")),
+                        hw2=ds.Character.zoneRankings(zoneID=RAIDS.tier_to_ids("Alexander: Midas")),
+                        hw3=ds.Character.zoneRankings(zoneID=RAIDS.tier_to_ids("Alexander: The Creator")),
 
                         # Ults
                         top=ds.Character.zoneRankings(zoneID=RAIDS.tier_to_ids("The Omega Protocol")), # no difficulty forced, the only difficulty in ultimates is pain

@@ -90,7 +90,12 @@
                 <!-- Raid Performance tab content -->
                 <div class="tab-pane fade h-100" id="raid-performance">
                     <div class="row h-100 py-2">
+                        {% if raid != none %}
                         {% include "raids.html" %}
+                        {% else %}
+                        <!-- Another condition might be needed for fully private logs -->
+                        <h1>This character's raid logs either don't exist or are privated</h1>
+                        {% endif %}
                     </div>
                 </div>
 
