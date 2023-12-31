@@ -69,6 +69,14 @@ p{
     color: #666;
 }
 
+.race-subrace {
+    color: #666;
+}
+
+.twelve {
+    color: #666;
+}
+
 .server-info {
     color: #888;
 }
@@ -134,7 +142,8 @@ p{
 .text-content {
     z-index: 1; /* Ensure text is above images */
     margin-right: 3.75rem;
-    margin-top: 0.8rem
+    margin-top: 0.8rem;
+    color: #444;
 }
 
 /* Container for overlapping layers */

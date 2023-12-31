@@ -60,9 +60,11 @@
                             <div class="row h-100 justify-content-between">
 
                                 {% include "job-containers.html" %}
-                                <div class="col-md-6">
-                                    <div class="character-name"><h1>{{character["name"]}}</h1></div>
+                                <div class="col">
+                                    <div class="character-name"><h1>{{character["name"]}} / {{character["race"]["gender"]}}</h1></div>
                                     <div class="ingame-title"><h2>« {{character["title"]}} »</h2></div>
+                                    <div class="race-subrace"><h2>{{character["race"]["race"][0]}} - {{character["race"]["race"][1:]|join(" ")}}</h2></div>
+                                    <div class="twelve"><h2>{{character["twelve"]["name"]}} <img src="{{character['twelve']['icon']}}" /></h2></div>
                                     <div class="server-info mb-0"><h2 class="mb-0">{{character["dcserver"][1]}} - {{character["dcserver"][0]}}</h2></div>
                                     {% if character.get("freecompany") != None %}
                                     <div class="free-company py-3 mt-0">
@@ -85,6 +87,10 @@
                                         {% if is_edit == True %}
                                         <span id="edit-summary-button" onclick="enableEditing()">📝</span>
                                         {% endif %}
+                                    </div>
+                                    <div class="activity-indicators" style="border: 1px solid black;" style="height: 10rem;">
+                                        <!-- possibly will naturally fill -->
+                                        <!-- possibly up to 8 icons -->
                                     </div>
                                 </div>
                             </div>

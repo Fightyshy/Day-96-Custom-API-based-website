@@ -79,13 +79,22 @@ def get_lodestone_char_basic(char_id: int) -> Character:
     dcserver[1] = dcserver[1][1:len(dcserver[1])-1]
 
     title = char_summary_soup.select_one(CHARACTER_SELECTORS.character.get("TITLE")["selector"])
+
+    race_gender = char_summary_soup.select_one(CHARACTER_SELECTORS.character["RACE_CLAN_GENDER"]["selector"]).text.split(" / ")
     # TODO get achieves and mount/minion data for that page
     found_char = Character(name=char_summary_soup.select_one(CHARACTER_SELECTORS.character["NAME"]["selector"]).text,
                            dcserver=dcserver,
                            title=title.text if title is not None else None,
-                           race=char_summary_soup.select_one(CHARACTER_SELECTORS.character["RACE_CLAN_GENDER"]["selector"]).text,
+                           race={
+                            #    https://stackoverflow.com/a/58083736
+                               "race":"".join([(" "+i if i.isupper() else i) for i in race_gender[0]]).strip().split(),
+                               "gender":race_gender[1]
+                           },
                            nameday=char_summary_soup.select_one(CHARACTER_SELECTORS.character["NAMEDAY"]["selector"]).text,
-                           twelve=char_summary_soup.select_one(CHARACTER_SELECTORS.character["GUARDIAN_DEITY"]["NAME"]["selector"]).text,
+                           twelve={
+                               "name":char_summary_soup.select_one(CHARACTER_SELECTORS.character["GUARDIAN_DEITY"]["NAME"]["selector"]).text,
+                               "icon":char_summary_soup.select_one(CHARACTER_SELECTORS.character["GUARDIAN_DEITY"]["ICON"]["selector"]).attrs["src"]
+                           },
                            char_jobs=scrape_and_format_jobs(char_classjob_soup),
                            freecompany=freecompany
                            )
