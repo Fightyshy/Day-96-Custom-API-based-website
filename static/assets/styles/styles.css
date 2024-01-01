@@ -48,8 +48,10 @@ p{
 
 /* Custom styles for the avatar image */
 .avatar {
-    max-width: 100%;
-    max-height: 100%;
+    /* max-width: 100%; */
+    /* max-height: 100%; */
+    max-width: 23.4375rem;
+    max-height: 32.8125rem;
     display: block;
     margin: auto;
 }
@@ -197,6 +199,59 @@ p{
 .wrapped-text {
     max-width: 100%;
 }
+
+/* roleplaying page styles */
+/* Custom styles for aliases/nicknames, tagline, age, gender, sexuality, relationship status, and socials */
+.aliases-text {
+    font-size: 0.875rem; /* 14px converted to rem */
+    font-weight: bold;
+    word-wrap: break-word;
+}
+
+.list-unstyled li {
+    font-size: 0.75rem; /* 12px converted to rem */
+    word-wrap: break-word;
+}
+
+.character-detail {
+    font-size: 0.875rem; /* 14px converted to rem */
+    margin-bottom: 0.5rem; /* 8px converted to rem */
+    word-wrap: break-word;
+}
+
+.tagline {
+    /* font-size: 1rem; */
+    font-style: italic;
+    margin-bottom: 0.625rem; /* 10px converted to rem */
+    word-wrap: break-word;
+}
+
+.socials-box {
+    background-color: #f8f9fa;
+    margin-top: 1.25rem; /* 20px converted to rem */
+    border-radius: 0.3125rem; /* 5px converted to rem */
+    word-wrap: break-word;
+}
+
+.socials-box h4 {
+    font-size: 1.125rem; /* 18px converted to rem */
+    margin-bottom: 0;
+    /* margin-bottom: 0.25rem; 8px converted to rem */
+    word-wrap: break-word;
+}
+
+.socials-box ul {
+    list-style-type: none;
+    padding: 0;
+    word-wrap: break-word;
+}
+
+.socials-box li {
+    font-size: 0.875rem; /* 14px converted to rem */
+    margin-bottom: 0.3rem; /* 4px converted to rem */
+    word-wrap: break-word;
+}
+  
 
 /* Custom scrollbar style */
 ::-webkit-scrollbar {

@@ -204,8 +204,9 @@ def retrieve_char_details():
     else:
         # condition check edit mode or no
         editting = True
+        nicknames = ["Test", "test", "test"]
         if editting:
-            return render_template("card.html", character=retrieved_data.to_dict(), raid=retrieved_logs.to_dict() if retrieved_logs is not None else None, collectible=retrieve_collectibles, form=portraitform, src=src, is_edit=True)
+            return render_template("card.html", character=retrieved_data.to_dict(), raid=retrieved_logs.to_dict() if retrieved_logs is not None else None, collectible=retrieve_collectibles, form=portraitform, src=src, aliases=nicknames, is_edit=True)
         else:
             return render_template("card.html", character=retrieved_data.to_dict(), raid=retrieved_logs.to_dict() if retrieved_logs is not None else None, collectible=retrieve_collectibles, src=src, is_edit=False)
 

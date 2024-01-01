@@ -14,6 +14,11 @@
     </head>
 
     <body>
+        <!-- Layout Switch -->
+        <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" id="layoutSwitch" checked>
+            <label class="form-check-label" for="layoutSwitch">Switch to Roleplaying Profile</label>
+        </div>
         <div class="container main-container px-0 pb-2 h-100" style="border: 2px solid black; border-radius: 10px;">
             <header class="bg-dark text-white">
                 <!-- Navigation tabs -->
@@ -118,8 +123,15 @@
                 </div>
 
                 <!-- Roleplay tab content -->
-                <div class="tab-pane fade" id="roleplay">
-                    <h2>Roleplay Content Goes Here</h2>
+                <div class="tab-pane fade h-100" id="roleplay">
+                    {% include "roleplaying.html" %}
+
+                    <!-- Content for Business Card Layout -->
+                    <div id="businessCardLayout" style="display: none;">
+                        <!-- Include content for Business Card here -->
+                        <h3>Business Card</h3>
+                        <!-- Add your business card content here -->
+                    </div>
                 </div>
             </div>
 
@@ -129,6 +141,25 @@
         </div>
         <!-- Add Bootstrap JS and Popper.js scripts -->
         <script type="text/javascript">
+            document.addEventListener('DOMContentLoaded', function () {
+                // Get the switch and layout divs
+                const layoutSwitch = document.getElementById('layoutSwitch');
+                const roleplayingLayout = document.getElementById('roleplayingLayout');
+                const businessCardLayout = document.getElementById('businessCardLayout');
+
+                // Add an event listener to the switch
+                layoutSwitch.addEventListener('change', function () {
+                    // Toggle the display of layouts based on the switch state
+                    if (layoutSwitch.checked) {
+                    roleplayingLayout.style.display = 'block';
+                    businessCardLayout.style.display = 'none';
+                    } else {
+                    roleplayingLayout.style.display = 'none';
+                    businessCardLayout.style.display = 'block';
+                    }
+                });
+            });
+
 
             function enableEditing() {
                 // Get the existing text content

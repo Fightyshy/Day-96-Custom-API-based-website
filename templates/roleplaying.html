@@ -1,0 +1,105 @@
+<!-- roleplaying.html -->
+<div id="roleplayingLayout" class="row h-100 py-2">
+    <!-- Character Details (Column One) -->
+    <div class="col-md-4 py-2">
+        <!-- Character Name with Tagline -->
+        <h3>Character Name</h3>
+
+
+        <!-- Aliases/Nicknames (Smaller text) -->
+        {% if aliases|length == 1 %}
+        <p class="aliases-text mb-2">AKA: {{ aliases[0] }}</p>
+        {% elif aliases|length > 1 %}
+        <p class="aliases-text mb-2">
+            AKA: {{ aliases[:-1]|join(', ') }}, or {{ aliases[-1] }}
+        </p>
+        {% endif %}
+        <!-- Character Box -->
+        <div class="socials-box mt-0 px-1 py-2">
+            <!-- Character Age -->
+            <p class="character-detail">Age: 25</p>
+    
+            <!-- Gender -->
+            <p class="character-detail">Gender: Female</p>
+    
+            <!-- Sexuality -->
+            <p class="character-detail">Sexuality: Bisexual</p>
+    
+            <!-- Relationship Status -->
+            <p class="character-detail">Relationship Status: Single</p>
+        </div>
+  
+        <!-- Socials Box -->
+        <div class="socials-box px-1 py-2">
+            <h4>Socials</h4>
+            <ul>
+                <li><strong>Twitter:</strong> @CharacterTwitter</li>
+                <li><strong>Carrd/Tumblr:</strong> character-carrd</li>
+                <li><strong>Discord:</strong> CharacterName#1234</li>
+                <!-- 90 chars -->
+                <li><strong>Notes:</strong><span class="px-0 py-0">aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</span></li>
+            </ul>
+        </div>
+
+        <!-- About Me Box -->
+        <div class="socials-box px-1 py-2">
+            <h4>About Me</h4>
+            <!-- 294 chars -->
+            <p>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</p>
+        </div>
+    </div>
+  
+    <!-- Character Portrait (Column Two) -->
+    <div class="col-md-4 py-2 px-0 h-100">
+        <div class="row-auto h-100">
+            <!-- Include an image or any other content for the character's portrait -->
+            <img src="{{collectible['character']['portrait']}}" alt="Character Portrait" class="img-fluid avatar">
+            <!-- 40 chars -->
+            <h4 class="tagline mt-2 text-center">aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</h4>
+        </div>
+      </div>
+  
+    <!-- Other Details (Column Three) -->
+    <div class="col-md-4 py-2 text-md-end">
+       <!-- Positive and Negative Traits Box -->
+       <div class="socials-box mt-0 px-1 py-2 d-flex flex-row">
+            <!-- Positive Traits List -->
+            <div class="traits-list flex-fill text-center">
+                <h5>Positive Traits</h5>
+                <ul class="list-unstyled">
+                    <li>Positive Trait 1</li>
+                    <li>Positive Trait 2</li>
+                    <li>Positive Trait 3</li>
+                    <li>Positive Trait 4</li>
+                    <li>Positive Trait 5</li>
+                    <!-- Add more positive traits -->
+                </ul>
+            </div>
+            <!-- Negative Traits List -->
+            <div class="traits-list flex-fill text-center">
+                <h5>Negative Traits</h5>
+                <ul class="list-unstyled">
+                    <li>Negative Trait 1</li>
+                    <li>Negative Trait 2</li>
+                    <li>Negative Trait 3</li>
+                    <li>Negative Trait 4</li>
+                    <li>Negative Trait 5</li>
+                    <!-- Add more negative traits -->
+                </ul>
+            </div>
+        </div>
+        <!-- Hooks Box -->
+        <div class="socials-box px-1 py-1">
+            <!-- Hooks List -->
+            <ul class="list-unstyled">
+                <li><h4>Hook1</h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</li>
+                <li><h4>Hook1</h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</li>
+                <li><h4>Hook1</h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</li>
+            </ul>
+        </div>
+    </div>
+  
+        <!-- Additional information for the character -->
+        <!-- Add more details about the character as needed -->
+  </div>
+  
