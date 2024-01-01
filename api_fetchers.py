@@ -44,7 +44,7 @@ FFXIV_COLLECT_EXTERNALS = "/%s/%s"
 
 
 # XIVAPI request funcs
-@cache.memoize(timeout=600)
+@cache.memoize(timeout=3600)
 def get_lodestone_char_basic(char_id: int) -> Character:
     """Retrieve basic character data for AP summary/front plate. Lodestone data scrapeed via BS, as XIVApi endpoints are broken currently."""
 
@@ -145,120 +145,115 @@ def ffxiv_cached_resources():
 
 # TODO bigo optimise, ~2000 data points at worst being retrieved.
 # TODO there are ~68 categories to scrape
-@cache.memoize(timeout=600)
-def get_ffxiv_collect(char_id: int) -> dict:
+@cache.memoize(timeout=3600)
+def get_collectibles(char_id: int) -> dict:
     """Gets mount, minion, and achivevements of character using the char_id"""
     # Bypass circular import restrictiion by importing on func execute
     from main import COLLECT_CACHE, LEN_MOUNTS, LEN_ACHIEVES, LEN_MINIONS
-    # Format char_id into initial link
-    owner_uri = FFXIV_COLLECT % (char_id)
 
-    # check if user is tracked on ffxiv_collect
-    # if not, scrape lodestone and format minimally like ffxiv_collect
-    # else, reqs to ffxiv_collect
-    owner = requests.get(owner_uri)
-    if owner.json().get("status") == 404:
-        # Set user-agent to mobile to scrape other things
-        header = {
-            "User-Agent": META_LINKS.meta_links["userAgentMobile"]
-         }
+    # query ffxiv_collect once to build cache of objects
+    # scrape and match id/names once only, timeout every x
 
-        char_mount_response = requests.get(META_LINKS.meta_links["applicableUris"]["profile/mount.json"] % ("na", char_id), headers=header)
-        char_mount_response.raise_for_status()
-        char_mount_soup = bs4.BeautifulSoup(char_mount_response.text, "html.parser")
+    header = {
+        "User-Agent": META_LINKS.meta_links["userAgentMobile"]
+        }
 
-        char_minion_response = requests.get(META_LINKS.meta_links["applicableUris"]["profile/minion.json"] % ("na", char_id), headers=header)
-        char_minion_response.raise_for_status()
-        char_minion_soup = bs4.BeautifulSoup(char_minion_response.text, "html.parser")
+    char_mount_response = requests.get(META_LINKS.meta_links["applicableUris"]["profile/mount.json"] % ("na", char_id), headers=header)
+    char_mount_response.raise_for_status()
+    char_mount_soup = bs4.BeautifulSoup(char_mount_response.text, "html.parser")
 
-        char_portrait_response = requests.get(META_LINKS.meta_links["applicableUris"]["profile/character.json"] % ("na", char_id))
-        char_portrait_response.raise_for_status()
-        char_portrait = bs4.BeautifulSoup(char_portrait_response.text, "html.parser")
+    char_minion_response = requests.get(META_LINKS.meta_links["applicableUris"]["profile/minion.json"] % ("na", char_id), headers=header)
+    char_minion_response.raise_for_status()
+    char_minion_soup = bs4.BeautifulSoup(char_minion_response.text, "html.parser")
 
-        collected_mounts = [COLLECT_CACHE["mounts"][name.text] for name in char_mount_soup.select(CHARACTER_SELECTORS.mounts["MOUNTS"]["NAME"]["selector"])]
-        collected_minions = [COLLECT_CACHE["minions"][name.text] for name in char_minion_soup.select(CHARACTER_SELECTORS.minions["MINIONS"]["NAME"]["selector"])]
+    char_portrait_response = requests.get(META_LINKS.meta_links["applicableUris"]["profile/character.json"] % ("na", char_id))
+    char_portrait_response.raise_for_status()
+    char_portrait = bs4.BeautifulSoup(char_portrait_response.text, "html.parser")
 
-        achieve_urls = [f"https://na.finalfantasyxiv.com/lodestone/character/{char_id}/achievement/kind/1/#anchor_achievement",
-                f"https://na.finalfantasyxiv.com/lodestone/character/{char_id}/achievement/kind/2/#anchor_achievement",
-                f"https://na.finalfantasyxiv.com/lodestone/character/{char_id}/achievement/kind/3/#anchor_achievement",
-                f"https://na.finalfantasyxiv.com/lodestone/character/{char_id}/achievement/kind/4/#anchor_achievement",
-                f"https://na.finalfantasyxiv.com/lodestone/character/{char_id}/achievement/kind/5/#anchor_achievement",
-                f"https://na.finalfantasyxiv.com/lodestone/character/{char_id}/achievement/kind/8/#anchor_achievement",
-                f"https://na.finalfantasyxiv.com/lodestone/character/{char_id}/achievement/kind/11/#anchor_achievement",
-                f"https://na.finalfantasyxiv.com/lodestone/character/{char_id}/achievement/kind/12/#anchor_achievement"]
+    collected_mounts = [COLLECT_CACHE["mounts"][name.text] for name in char_mount_soup.select(CHARACTER_SELECTORS.mounts["MOUNTS"]["NAME"]["selector"])]
+    collected_minions = [COLLECT_CACHE["minions"][name.text] for name in char_minion_soup.select(CHARACTER_SELECTORS.minions["MINIONS"]["NAME"]["selector"])]
 
-        achieves = []
-        for url in achieve_urls:
-            requester = requests.get(url)
-            requester.raise_for_status()
-            requester = bs4.BeautifulSoup(requester.text, "html.parser")
-            achieves += [entry.attrs["href"].split("/")[-2] for entry in requester.find_all("a", class_="entry__achievement--complete")]
+    achieve_urls = [f"https://na.finalfantasyxiv.com/lodestone/character/{char_id}/achievement/kind/1/#anchor_achievement",
+            f"https://na.finalfantasyxiv.com/lodestone/character/{char_id}/achievement/kind/2/#anchor_achievement",
+            f"https://na.finalfantasyxiv.com/lodestone/character/{char_id}/achievement/kind/3/#anchor_achievement",
+            f"https://na.finalfantasyxiv.com/lodestone/character/{char_id}/achievement/kind/4/#anchor_achievement",
+            f"https://na.finalfantasyxiv.com/lodestone/character/{char_id}/achievement/kind/5/#anchor_achievement",
+            f"https://na.finalfantasyxiv.com/lodestone/character/{char_id}/achievement/kind/8/#anchor_achievement",
+            f"https://na.finalfantasyxiv.com/lodestone/character/{char_id}/achievement/kind/11/#anchor_achievement",
+            f"https://na.finalfantasyxiv.com/lodestone/character/{char_id}/achievement/kind/12/#anchor_achievement"]
 
-        collected_achieves = [COLLECT_CACHE["achievements"][int(id)] for id in achieves]
-        sortachieves = {}
-        for entry in collected_achieves:
-            _type = entry.get("type").get("name")
-            _category = entry.get("category").get("name")
-            if sortachieves.get(_type) is None:
-                sortachieves[_type] = {}
-            if sortachieves.get(_type).get(_category) is None:
-                sortachieves[_type][_category] = []
-            sortachieves[_type][_category].append(entry)
-        # duplicate structure so no special template conditions required
-        print(char_portrait.select_one(CHARACTER_SELECTORS.character["PORTRAIT"]["selector"]).attrs["src"])
-        return {
-            "character": {
-                "portrait":char_portrait.select_one(CHARACTER_SELECTORS.character["PORTRAIT"]["selector"]).attrs["src"],
-                "achievements":{
-                    "count": len(sortachieves),
-                    "total": LEN_ACHIEVES
-                },
-                "mounts":{
-                    "count": len(collected_mounts),
-                    "total": LEN_MOUNTS
-                },
-                "minions":{
-                    "count":len(collected_minions),
-                    "total": LEN_MINIONS
-                }
+    achieves = []
+    for url in achieve_urls:
+        requester = requests.get(url)
+        requester.raise_for_status()
+        requester = bs4.BeautifulSoup(requester.text, "html.parser")
+        achieves += [entry.attrs["href"].split("/")[-2] for entry in requester.find_all("a", class_="entry__achievement--complete")]
+
+    collected_achieves = [COLLECT_CACHE["achievements"][int(id)] for id in achieves]
+    sortachieves = {}
+    for entry in collected_achieves:
+        _type = entry.get("type").get("name")
+        _category = entry.get("category").get("name")
+        if sortachieves.get(_type) is None:
+            sortachieves[_type] = {}
+        if sortachieves.get(_type).get(_category) is None:
+            sortachieves[_type][_category] = []
+        sortachieves[_type][_category].append(entry)
+    # duplicate structure so no special template conditions required
+    print(char_portrait.select_one(CHARACTER_SELECTORS.character["PORTRAIT"]["selector"]).attrs["src"])
+    return {
+        "character": {
+            "portrait":char_portrait.select_one(CHARACTER_SELECTORS.character["PORTRAIT"]["selector"]).attrs["src"],
+            "achievements":{
+                "count": len(sortachieves),
+                "total": LEN_ACHIEVES
             },
-            "mounts": collected_mounts,
-            "minions": collected_minions,
-            "achievements": sortachieves
-        }
+            "mounts":{
+                "count": len(collected_mounts),
+                "total": LEN_MOUNTS
+            },
+            "minions":{
+                "count":len(collected_minions),
+                "total": LEN_MINIONS
+            }
+        },
+        "mounts": collected_mounts,
+        "minions": collected_minions,
+        "achievements": sortachieves
+    }
 
-    else:
-        owned_mounts = requests.get(owner_uri + FFXIV_COLLECT_EXTERNALS % ("mounts", "owned"),
-                                    params={"latest": True})
-        owned_mounts.raise_for_status()
-        owned_minions = requests.get(owner_uri + FFXIV_COLLECT_EXTERNALS % ("minions", "owned"),
-                                    params={"latest": True})
-        owned_minions.raise_for_status()
-        owned_achieves = requests.get(owner_uri + FFXIV_COLLECT_EXTERNALS % ("achievements", "owned"),
-                                    params={"latest": True})
-        owned_achieves.raise_for_status()
+    # else:
+    #     owned_mounts = requests.get(owner_uri + FFXIV_COLLECT_EXTERNALS % ("mounts", "owned"),
+    #                                 params={"latest": True})
+    #     owned_mounts.raise_for_status()
+    #     owned_minions = requests.get(owner_uri + FFXIV_COLLECT_EXTERNALS % ("minions", "owned"),
+    #                                 params={"latest": True})
+    #     owned_minions.raise_for_status()
+    #     owned_achieves = requests.get(owner_uri + FFXIV_COLLECT_EXTERNALS % ("achievements", "owned"),
+    #                                 params={"latest": True})
+    #     owned_achieves.raise_for_status()
 
-        # grouping by
-        # type > categories > achievement
-        sortachieves = {}
-        for entry in owned_achieves.json():
-            _type = entry.get("type").get("name")
-            _category = entry.get("category").get("name")
-            if sortachieves.get(_type) is None:
-                sortachieves[_type] = {}
-            if sortachieves.get(_type).get(_category) is None:
-                sortachieves[_type][_category] = []
-            sortachieves[_type][_category].append(entry)
+    #     # grouping by
+    #     # type > categories > achievement
+    #     sortachieves = {}
+    #     for entry in owned_achieves.json():
+    #         _type = entry.get("type").get("name")
+    #         _category = entry.get("category").get("name")
+    #         if sortachieves.get(_type) is None:
+    #             sortachieves[_type] = {}
+    #         if sortachieves.get(_type).get(_category) is None:
+    #             sortachieves[_type][_category] = []
+    #         sortachieves[_type][_category].append(entry)
 
-        return {
-            "character": owner.json(),
-            "mounts": owned_mounts.json(),
-            "minions": owned_minions.json(),
-            "achievements": sortachieves
-        }
+    #     return {
+    #         "character": owner.json(),
+    #         "mounts": owned_mounts.json(),
+    #         "minions": owned_minions.json(),
+    #         "achievements": sortachieves
+    #     }
 
 # FFLogs request funcs
-@cache.cached(timeout=600, key_prefix="fflogs_token")
+@cache.cached(timeout=3600, key_prefix="fflogs_token")
 def get_fflogs_token() -> dict:
     """Returns a new auth bearer token from fflogs as a dict ready to be used in a header"""
 
@@ -277,7 +272,7 @@ def get_fflogs_token() -> dict:
     print("Token recived")
     return {"Authorization":f"Bearer {response.json()["access_token"]}"}
 
-@cache.memoize(timeout=600)
+@cache.memoize(timeout=3600)
 # TODO savage+ stats only, currently gets normal parse if it exists as well
 def get_fflogs_character(token:dict, name:str, server:str, region:str)->dict:
     #Form GraphQL query, structure each curly is a query layer deeper, accessed vars inside deepest query
