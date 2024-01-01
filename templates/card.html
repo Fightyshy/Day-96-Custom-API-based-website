@@ -61,11 +61,11 @@
 
                                 {% include "job-containers.html" %}
                                 <div class="col">
-                                    <div class="character-name"><h1>{{character["name"]}} / {{character["race"]["gender"]}}</h1></div>
-                                    <div class="ingame-title"><h2>« {{character["title"]}} »</h2></div>
-                                    <div class="race-subrace"><h2>{{character["race"]["race"][0]}} - {{character["race"]["race"][1:]|join(" ")}}</h2></div>
-                                    <div class="twelve"><h2>{{character["twelve"]["name"]}} <img src="{{character['twelve']['icon']}}" /></h2></div>
-                                    <div class="server-info mb-0"><h2 class="mb-0">{{character["dcserver"][1]}} - {{character["dcserver"][0]}}</h2></div>
+                                    <div class="character-name"><h3>{{character["name"]}} / {{character["race"]["gender"]}} / <img class="icon" style="height: 2.5rem; width: 2.5rem;" src="static\assets\job_icons\weaver.png"></h3></div>
+                                    <div class="ingame-title"><h3>« {{character["title"]}} »</h3></div>
+                                    <div class="race-subrace"><h3>{{character["race"]["race"][0]}} - {{character["race"]["race"][1:]|join(" ")}}</h3></div>
+                                    <div class="twelve"><h2>{{character["twelve"]["name"]}} <img src="{{character['twelve']['icon']}}" /></h3></div>
+                                    <div class="server-info mb-0"><h3 class="mb-0">{{character["dcserver"][1]}} - {{character["dcserver"][0]}}</h3></div>
                                     {% if character.get("freecompany") != None %}
                                     <div class="free-company py-3 mt-0">
                                         <div class="flex-container">

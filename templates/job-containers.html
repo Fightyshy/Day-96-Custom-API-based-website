@@ -4,10 +4,10 @@
                                 <!-- Job and Level pair 1 -->
                                 <div class="job-level-pair text-center">
                                     <div class="job-icon">
-                                        <img class="icon" src="static\assets\job_icons\weaver.png">
+                                        <img class="icon" src="{{url_for('static', filename='assets/role_icons/clear_tank.png')}}">
                                     </div>
                                 </div>
-                                
+                                <h5>|</h5>
                                 <!-- Job and Level pair 2 -->
                                 {% for job in character["char_jobs"] %}
                                 {% if job["role"]=="tank" %}
@@ -25,10 +25,10 @@
                                 <!-- Job and Level pair 1 -->
                                 <div class="job-level-pair text-center">
                                     <div class="job-icon">
-                                        <img class="icon" src="static\assets\job_icons\weaver.png">
+                                        <img class="icon" src="{{url_for('static', filename='assets/role_icons/clear_healer.png')}}">
                                     </div>
                                 </div>
-    
+                                <h5>|</h5>
                                 <!-- Job and Level pair 2 -->
                                 {% for job in character["char_jobs"] %}
                                 {% if job["role"]=="healer" %}
@@ -46,10 +46,10 @@
                                 <!-- Job and Level pair 1 -->
                                 <div class="job-level-pair text-center">
                                     <div class="job-icon">
-                                        <img class="icon" src="static\assets\job_icons\weaver.png">
+                                        <img class="icon" src="{{url_for('static', filename='assets/role_icons/clear_dps.png')}}">
                                     </div>
                                 </div>
-    
+                                <h5>|</h5>
                                 <!-- Job and Level pair 2 -->
                                 {% for job in character["char_jobs"] %}
                                 {% if job["role"]=="melee" %}
@@ -67,10 +67,10 @@
                                 <!-- Job and Level pair 1 -->
                                 <div class="job-level-pair text-center">
                                     <div class="job-icon">
-                                        <img class="icon" src="static\assets\job_icons\weaver.png">
+                                        <img class="icon" src="{{url_for('static', filename='assets/role_icons/clear_ranged.png')}}">
                                     </div>
                                 </div>
-    
+                                <h5>|</h5>
                                 <!-- Job and Level pair 2 -->
                                 {% for job in character["char_jobs"] %}
                                 {% if job["role"]=="prange" %}
@@ -88,10 +88,10 @@
                                 <!-- Job and Level pair 1 -->
                                 <div class="job-level-pair text-center">
                                     <div class="job-icon">
-                                        <img class="icon" src="static\assets\job_icons\weaver.png">
+                                        <img class="icon" src="{{url_for('static', filename='assets/role_icons/clear_dps_magic.png')}}">
                                     </div>
                                 </div>
-    
+                                <h5>|</h5>
                                 <!-- Job and Level pair 2 -->
                                 {% for job in character["char_jobs"] %}
                                 {% if job["role"]=="caster" %}
@@ -112,10 +112,10 @@
                                 <!-- Job and Level pair 1 -->
                                 <div class="job-level-pair text-center">
                                     <div class="job-icon">
-                                        <img class="icon" src="static\assets\job_icons\weaver.png">
+                                        <img class="icon" src="{{url_for('static', filename='assets/role_icons/clear_doh.png')}}">
                                     </div>
                                 </div>
-    
+                                <h5>|</h5>
                                 <!-- Job and Level pair 2 -->
                                 {% for job in character["char_jobs"] %}
                                 {% if job["role"]=="doh" %}
@@ -133,10 +133,10 @@
                                 <!-- Job and Level pair 1 -->
                                 <div class="job-level-pair text-center">
                                     <div class="job-icon">
-                                        <img class="icon" src="static\assets\job_icons\weaver.png">
+                                        <img class="icon" src="{{url_for('static', filename='assets/role_icons/clear_dol.png')}}">
                                     </div>
                                 </div>
-    
+                                <h5>|</h5>
                                 <!-- Job and Level pair 2 -->
                                 {% for job in character["char_jobs"] %}
                                 {% if job["role"]=="dol" %}
