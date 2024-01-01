@@ -1,6 +1,6 @@
 import dotenv
 from flask import Flask, flash, jsonify, redirect, render_template, request, url_for
-from api_fetchers import ffxiv_cached_resources, get_fflogs_token, get_fflogs_character, cache, get_ffxiv_collect
+from api_fetchers import ffxiv_cached_resources, get_collectibles, get_fflogs_token, get_fflogs_character, cache
 from flask_bootstrap import Bootstrap5
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
@@ -174,7 +174,7 @@ def retrieve_char_details():
         # Character summary page data
         retrieved_data = get_lodestone_char_basic(lodestone_id)
         # Collectibles data (either from FFXIV Collect API or scrape name/id and use FFXIV Collect queries to populate)
-        retrieve_collectibles = get_ffxiv_collect(lodestone_id)
+        retrieve_collectibles = get_collectibles(lodestone_id)
         # Fetch FFLogs data and merge into single dict/json
         retrieve_token = get_fflogs_token()
         retrieved_logs = merge_raids(get_fflogs_character(

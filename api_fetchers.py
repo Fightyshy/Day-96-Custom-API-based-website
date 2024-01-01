@@ -46,7 +46,13 @@ FFXIV_COLLECT_EXTERNALS = "/%s/%s"
 # XIVAPI request funcs
 @cache.memoize(timeout=3600)
 def get_lodestone_char_basic(char_id: int) -> Character:
-    """Retrieve basic character data for AP summary/front plate. Lodestone data scrapeed via BS, as XIVApi endpoints are broken currently."""
+    """Scrapes and formats basic Lodestone data and class/job data for given char_id param.
+
+    :param char_id: Character's Lodestone retrieved ID.
+
+    :rtype: Character
+    :return: Character object containing requested data.
+    """
 
     # Soups scrape and parse
     char_summary_response = requests.get(META_LINKS.meta_links["applicableUris"]["profile/character.json"] % ("na", char_id))
@@ -102,7 +108,13 @@ def get_lodestone_char_basic(char_id: int) -> Character:
 
 # 0 is infinite cache
 @cache.cached(timeout=0, key_prefix="ffxiv_cached_resources")
-def ffxiv_cached_resources():
+def ffxiv_cached_resources() -> dict:
+    """Temp solution for storing ffxiv_collect api's queries for the entire list of collectibles based on name/id into dicts
+    Should only run once every 'cycle'
+    
+    :rtype:
+    :return: mounts/minion/achievement data
+    """
     print("executing cacher")
     cached_mounts = requests.get("https://ffxivcollect.com/api/mounts")
     cached_mounts.raise_for_status()
@@ -147,7 +159,14 @@ def ffxiv_cached_resources():
 # TODO there are ~68 categories to scrape
 @cache.memoize(timeout=3600)
 def get_collectibles(char_id: int) -> dict:
-    """Gets mount, minion, and achivevements of character using the char_id"""
+    """Scrapes mount, minion and achievement data from a character's Lodestone and uses a cached queries
+    made to FFXIV_Collect's API to convert names/ids into detailed information on those entities.
+
+    :param char_id: Character's Lodestone retrieved ID
+
+    :rtype: dict
+    :return: Character's owned mounts/minions/achievements
+    """
     # Bypass circular import restrictiion by importing on func execute
     from main import COLLECT_CACHE, LEN_MOUNTS, LEN_ACHIEVES, LEN_MINIONS
 
@@ -222,49 +241,15 @@ def get_collectibles(char_id: int) -> dict:
         "achievements": sortachieves
     }
 
-    # else:
-    #     owned_mounts = requests.get(owner_uri + FFXIV_COLLECT_EXTERNALS % ("mounts", "owned"),
-    #                                 params={"latest": True})
-    #     owned_mounts.raise_for_status()
-    #     owned_minions = requests.get(owner_uri + FFXIV_COLLECT_EXTERNALS % ("minions", "owned"),
-    #                                 params={"latest": True})
-    #     owned_minions.raise_for_status()
-    #     owned_achieves = requests.get(owner_uri + FFXIV_COLLECT_EXTERNALS % ("achievements", "owned"),
-    #                                 params={"latest": True})
-    #     owned_achieves.raise_for_status()
-
-    #     # grouping by
-    #     # type > categories > achievement
-    #     sortachieves = {}
-    #     for entry in owned_achieves.json():
-    #         _type = entry.get("type").get("name")
-    #         _category = entry.get("category").get("name")
-    #         if sortachieves.get(_type) is None:
-    #             sortachieves[_type] = {}
-    #         if sortachieves.get(_type).get(_category) is None:
-    #             sortachieves[_type][_category] = []
-    #         sortachieves[_type][_category].append(entry)
-
-    #     return {
-    #         "character": owner.json(),
-    #         "mounts": owned_mounts.json(),
-    #         "minions": owned_minions.json(),
-    #         "achievements": sortachieves
-    #     }
 
 # FFLogs request funcs
 @cache.cached(timeout=3600, key_prefix="fflogs_token")
 def get_fflogs_token() -> dict:
-    """Returns a new auth bearer token from fflogs as a dict ready to be used in a header"""
-
-    # token_params = {
-    #     "client_id":CLIENT_KEY,
-    #     "code_challenge":hashed,
-    #     "code_challenge_method": "S256",
-    #     "state":"",
-    #     "redirect_uri":AUTHORIZE_URI,
-    #     "response_type": 200
-    # }
+    """Returns a new auth bearer token from fflogs as a dict ready to be used in a header
+    
+    :rtype: dict
+    :return: Dict containing Authorization bearer token used for fflogs
+    """
 
     # Only public data with this method
     response = requests.post(TOKEN_URI, auth=HTTPBasicAuth(CLIENT_KEY,CLIENT_SECRET), data={"grant_type":"client_credentials"})
@@ -275,6 +260,17 @@ def get_fflogs_token() -> dict:
 @cache.memoize(timeout=3600)
 # TODO savage+ stats only, currently gets normal parse if it exists as well
 def get_fflogs_character(token:dict, name:str, server:str, region:str)->dict:
+    """Performs a GraphQL query to attempt to retrieve a character's raid logs from FFLogs,
+    :param token: Auth token as retrieved using get_fflogs_token()
+    :param name: Character's full name
+    :param server: Character's server
+    :param region: Character's region (not data-center)
+    
+    :rtype: dict
+    :Return: Results of GraphQL query for all savage and ultimate raids, else characterData: character: None.
+    
+    See comments for more details on request/response structure.
+    """
     #Form GraphQL query, structure each curly is a query layer deeper, accessed vars inside deepest query
     # Zone is tier
     # Encounter is fight
@@ -350,6 +346,12 @@ def get_fflogs_character(token:dict, name:str, server:str, region:str)->dict:
 # Helper funcs
 
 def scrape_and_format_jobs(classjob_soup:bs4.BeautifulSoup)->list:
+    """Scrapes and formats a character's class/job level information for use elsewhere
+
+    :param classjob_sout: A BeautifulSoup object containing the response of a request made to the Lodestone character levels page
+    :rtype: dict
+    :return: Class/job information
+    """
     jobs = []
     for key in CHARACTER_SELECTORS.classjob:
         if (key == "BOZJA") or (key == "EUREKA"):
@@ -369,6 +371,12 @@ def scrape_and_format_jobs(classjob_soup:bs4.BeautifulSoup)->list:
 
 
 def merge_raids(raidlogs:dict)->CharacterRaids:
+    """Merges requested raid logs from FFLogs into a singular dict and creates a CharacterRaids object to store them
+    
+    :param raidlogs: dictionary of multiple raid logs
+    :rtype: CharacterRaids
+    :return: Merged raidlogs stored inside object
+    """
     if raidlogs["characterData"]["character"] is None:
         return None
     else:
