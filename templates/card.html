@@ -2,7 +2,7 @@
 <html lang="en" class="h-100">
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
         <title>Adventure Plate generator</title>
         {{ bootstrap.load_css() }}
         {{ bootstrap.load_js() }}
@@ -14,11 +14,6 @@
     </head>
 
     <body>
-        <!-- Layout Switch -->
-        <div class="form-check form-switch mb-3">
-            <input class="form-check-input" type="checkbox" id="layoutSwitch" checked>
-            <label class="form-check-label" for="layoutSwitch">Switch to Roleplaying Profile</label>
-        </div>
         <div class="container main-container px-0 pb-2 h-100" style="border: 2px solid black; border-radius: 10px;">
             <header class="bg-dark text-white">
                 <!-- Navigation tabs -->
@@ -126,12 +121,7 @@
                 <div class="tab-pane fade h-100" id="roleplay">
                     {% include "roleplaying.html" %}
 
-                    <!-- Content for Business Card Layout -->
-                    <div id="businessCardLayout" style="display: none;">
-                        <!-- Include content for Business Card here -->
-                        <h3>Business Card</h3>
-                        <!-- Add your business card content here -->
-                    </div>
+                    {% include "business.html" %}
                 </div>
             </div>
 
@@ -139,6 +129,31 @@
                 <!-- Your footer content here -->
             </footer>
         </div>
+
+        <!-- New Container for Elements Outside main-container -->
+        {% if is_edit == True %}
+        <div class="editing" style="position: absolute; top:100%">
+        <div class="container px-0 pb-2 mt-2 w-75" style="border: 2px solid black; border-radius: 10px;">
+            <!-- Elements moved outside main-container go here -->
+            <!-- For example: -->
+            <div class="row m-auto">
+                <!-- Layout Switch -->
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="layoutSwitch" checked>
+                    <label class="form-check-label" for="layoutSwitch">Switch to Roleplaying Profile</label>
+                </div>
+                <!-- Layout State Selection -->
+                <label for="layoutState" class="form-label">Select Layout State:</label>
+                <select class="form-select" id="layoutState">
+                    <option value="imageOnly">Use 375x375px Logo Image Only</option>
+                    <option value="textOnly">No Image, 562x375px Space for H1 Text</option>
+                    <option value="imageAndText">Use Both Image and H1 Text</option>
+                </select>
+            </div>
+        </div>
+        </div>
+        {% endif %}
+
         <!-- Add Bootstrap JS and Popper.js scripts -->
         <script type="text/javascript">
             document.addEventListener('DOMContentLoaded', function () {
@@ -150,12 +165,15 @@
                 // Add an event listener to the switch
                 layoutSwitch.addEventListener('change', function () {
                     // Toggle the display of layouts based on the switch state
+                    // TODO ajax post to set db field for viewing rp/business state
                     if (layoutSwitch.checked) {
-                    roleplayingLayout.style.display = 'block';
-                    businessCardLayout.style.display = 'none';
+                        // Switch to Business layout
+                        document.getElementById('businessCardLayout').classList.add('d-none');
+                        document.getElementById('roleplayingLayout').classList.remove('d-none');
                     } else {
-                    roleplayingLayout.style.display = 'none';
-                    businessCardLayout.style.display = 'block';
+                        // Switch to Business layout
+                        document.getElementById('businessCardLayout').classList.remove('d-none');
+                        document.getElementById('roleplayingLayout').classList.add('d-none');
                     }
                 });
             });
