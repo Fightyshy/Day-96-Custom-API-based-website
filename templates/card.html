@@ -43,10 +43,10 @@
                         <div class="col-md-4 d-flex align-items-center">
                             <div class="avatar-container">
                                 <!-- Your dynamic avatar image -->
-                                {% if src == None %}
+                                {% if src["avatar"] == None %}
                                 <img class="avatar img-fluid" id="avatar" src="{{collectible['character']['portrait']}}" alt="Avatar">
                                 {% else %}
-                                <img class="avatar img-fluid" id="avatar" src="{{src}}" alt="Avatar">
+                                <img class="avatar img-fluid" id="avatar" src="{{src['avatar']}}" alt="Avatar">
                                 {% endif %}
                             </div>
                         </div>
@@ -135,8 +135,9 @@
                 <label class="form-check-label" for="layoutSwitch">Switch between layouts (On for venues)</label>
             </div>
             <div id="settings">
-                {{render_form(summaryform, id="portrait-form", novalidate=True)}}
-                {{summaryform.char_id_summary()}}
+                {{render_form(form, id="portrait-form", novalidate=True)}}
+                {{render_form(form, id="roleplay-settings", novalidate=True, extra_classes="form-check form-switch d-none")}}
+                {{render_form(bsform, id="business-settings", novalidate=True, extra_classes="form-check form-switch d-none")}}
              </div>
         </div>
         {% endif %}
@@ -147,8 +148,6 @@
                 // Get the switch and layout divs
                 const layoutSwitch = document.getElementById('layoutSwitch');
                 const layoutSwitchDiv = layoutSwitch.parentElement
-                const roleplayingLayout = document.getElementById('roleplayingLayout');
-                const businessCardLayout = document.getElementById('businessCardLayout');
                 const editingContainer = document.getElementById('settings')
 
                 const combinedImageSpace = document.getElementById('combinedImageSpace');
@@ -166,30 +165,27 @@
                         // Show elements related to the Summary tab
                         // jinja templating stronk
                         layoutSwitchDiv.classList.add('d-none')
-                        editingContainer.innerHTML = `
-                        {{render_form(summaryform, id="portrait-form", novalidate=True)}}
-                        {{summaryform.char_id_summary()}}
-                        `
+                        document.getElementById("portrait-form").classList.remove('d-none')
+                        document.getElementById("roleplay-settings").classList.add('d-none')
+                        document.getElementById("business-settings").classList.add('d-none')
                         // end of summary-tab settings
                     } else if (activeTabId === 'roleplay-tab') {
                         // Show elements related to the Roleplay tab
                         layoutSwitchDiv.classList.remove('d-none')
-                        editingContainer.innerHTML = `
-                        {{render_form(rpform, id="roleplay-settings", novalidate=True, extra_classes="form-check form-switch")}}
-                        {{rpform.char_id_rp()}}
-                        `;
+                        document.getElementById("portrait-form").classList.add('d-none')
+                        document.getElementById("roleplay-settings").classList.remove('d-none')
+                        document.getElementById("roleplayingLayout").classList.remove('d-none')
+                        document.getElementById("businessCardLayout").classList.add('d-none')
                         // Set listeners
                         layoutSwitch.addEventListener('change', function () {
                             // Toggle the display of layouts based on the switch state
                             // TODO ajax post to set db field for viewing rp/business state
                             if (layoutSwitch.checked) {
                                 // Switch to Business layout
-                                document.getElementById('businessCardLayout').classList.remove('d-none');
-                                document.getElementById('roleplayingLayout').classList.add('d-none');
-                                editingContainer.innerHTML = `
-                                {{render_form(bsform, id="business-settings", novalidate=True, extra_classes="form-check form-switch")}}
-                                {{bsform.char_id_bs()}}
-                                `; 
+                                document.getElementById('roleplay-settings').classList.add('d-none');
+                                document.getElementById('business-settings').classList.remove('d-none')
+                                document.getElementById("roleplayingLayout").classList.add('d-none')
+                                document.getElementById("businessCardLayout").classList.remove('d-none')
                                 const imageFields = [document.getElementById('logo'), document.getElementById('venue'), document.getElementById('big_venue')]
                                 layoutImageSwitcher(false, imageFields)
 
@@ -225,17 +221,12 @@
                                     }
                                 });
                             } else {
-                                // Switch to Business layout
-                                document.getElementById('businessCardLayout').classList.add('d-none');
-                                document.getElementById('roleplayingLayout').classList.remove('d-none');
-                                editingContainer.innerHTML = `
-                                {{render_form(rpform, id="roleplay-settings", novalidate=True, extra_classes="form-check form-switch")}}
-                                {{rpform.char_id_rp()}}
-                                `;
+                                // Switch to Roleplaying layout
 
-                                layoutSwitch.addEventListener('change', function() {
-
-                                })
+                                document.getElementById('roleplay-settings').classList.remove('d-none');
+                                document.getElementById('business-settings').classList.add('d-none');
+                                document.getElementById("roleplayingLayout").classList.remove('d-none');
+                                document.getElementById("businessCardLayout").classList.add('d-none');
                             }
                         });
                         // end of roleplay-tab settings
@@ -332,11 +323,32 @@
                 additionalTextDiv.innerHTML = `<p>${limitedText}</p><span id='edit-summary-button' onclick='enableEditing()'>📝</span>`;
             }
 
-            $("#submit").click(event=>{
+            // function updatePortrait(event) {
+            //     event.preventDefault();
+            //     let editForm = new FormData(document.getElementById("portrait-form"))
+
+            //     $.ajax({
+            //         url: "{{url_for('upload_portrait')}}",
+            //         data: editForm,
+            //         contentType: false,
+            //         processData: false,
+            //         type: "POST",
+            //         success: data=>{
+            //             document.getElementById("avatar").src=data["src"]
+            //         }
+            //     }).done(data=>{
+            //         imgurl=`${data["src"]}?timestamp=${Date.now()}`
+            //         document.getElementById("avatar").src=imgurl
+            //     })
+            // }
+
+            $("#portrait-form").submit(event=>{
                 console.log("here")
                 event.preventDefault();
+                console.log("portrait")
 
                 const editForm = new FormData(document.getElementById("portrait-form"))
+                editForm.append("source", "summary")
 
                 $.ajax({
                     url: "{{url_for('upload_portrait')}}",
@@ -350,6 +362,29 @@
                 }).done(data=>{
                     imgurl=`${data["src"]}?timestamp=${Date.now()}`
                     document.getElementById("avatar").src=imgurl
+                })
+            })
+
+            $("#roleplay-settings").submit(event=>{
+                console.log("here")
+                event.preventDefault();
+                console.log("roleplay")
+
+                const editForm = new FormData(document.getElementById("roleplay-settings"))
+                editForm.append("source", "roleplay")
+
+                $.ajax({
+                    url: "{{url_for('upload_portrait')}}",
+                    data: editForm,
+                    contentType: false,
+                    processData: false,
+                    type: "POST",
+                    success: data=>{
+                        document.getElementById("rp-avatar").src=data["src"]
+                    }
+                }).done(data=>{
+                    imgurl=`${data["src"]}?timestamp=${Date.now()}`
+                    document.getElementById("rp-avatar").src=imgurl
                 })
             })
         </script>

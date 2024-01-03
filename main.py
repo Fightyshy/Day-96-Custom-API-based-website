@@ -1,6 +1,20 @@
 import dotenv
-from flask import Flask, flash, jsonify, redirect, render_template, request, url_for
-from api_fetchers import ffxiv_cached_resources, get_collectibles, get_fflogs_token, get_fflogs_character, cache
+from flask import (
+    Flask,
+    flash,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
+from api_fetchers import (
+    ffxiv_cached_resources,
+    get_collectibles,
+    get_fflogs_token,
+    get_fflogs_character,
+    cache,
+)
 from flask_bootstrap import Bootstrap5
 import bs4
 from api_fetchers import (
@@ -15,7 +29,13 @@ from char_claim_token import generate_token, confirm_token
 import const_loader
 from werkzeug.utils import secure_filename
 
-from forms import BusinessImages, ClaimCharForm, LodestoneForm, RoleplayPortraitForm, UploadPortraitForm
+from forms import (
+    BusinessImages,
+    ClaimCharForm,
+    LodestoneForm,
+    RoleplayPortraitForm,
+    UploadPortraitForm,
+)
 
 # load selectors and helpers
 CHARACTER_SELECTORS = const_loader.CharacterData()
@@ -51,7 +71,7 @@ def test(char_id):
     #     for achieve in cached_achivements["results"]:
     #         if achieve["id"]==int(entry):
     #             final.append(achieve)
-    return jsonify({"test":cache.get("ffxiv_cached_resources")["mounts"]})
+    return jsonify({"test": cache.get("ffxiv_cached_resources")["mounts"]})
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -109,27 +129,80 @@ def claim_charid():
 
 @app.route("/character/portrait", methods=["POST"])
 def upload_portrait():
-    if request.method=="POST":
+    if request.method == "POST":
+        print(request.form["source"])
         portraitform = UploadPortraitForm()
         if portraitform.validate():
             image = portraitform.portrait.data
             extension = image.filename.split(".")[-1]
-             # TODO get char_id and check against filename sans extension
-             # TODO add new file using char_id as file name while preserving file format
-             # May have to change in the future because O(n) could get expensive on a server
-            for root, dirs, files in os.walk(os.path.join(app.root_path,r"static\assets\uploaded-img")):
-                for name in files:
-                    print(name, root)
-                    if int(name.split(".")[0])==int(portraitform.char_id.data):
-                        print("working")
-                        print(rf"{root}\{name}")
-                        os.remove(rf"{root}\{name}")
-            
-            image.save(os.path.join(app.root_path, "static/assets/uploaded-img/", secure_filename(portraitform.char_id.data)+f".{extension}"))
 
-        return jsonify({"src":url_for("static", filename="assets/uploaded-img/"+secure_filename(portraitform.char_id.data))+f".{extension}"})
+            if request.form["source"] == "summary":
+                # TODO get char_id and check against filename sans extension
+                # TODO add new file using char_id as file name while preserving file format
+                # May have to change in the future because O(n) could get expensive on a server
+                for root, dirs, files in os.walk(
+                    os.path.join(app.root_path, r"static\assets\uploaded-img")
+                ):
+                    for name in files:
+                        print(name, root)
+                        if name.split(".")[0] == str(
+                            portraitform.char_id_summary.data
+                        ):
+                            print("working")
+                            print(rf"{root}\{name}")
+                            os.remove(rf"{root}\{name}")
+
+                image.save(
+                    os.path.join(
+                        app.root_path,
+                        "static/assets/uploaded-img/",
+                        secure_filename(portraitform.char_id_summary.data)
+                        + f".{extension}",
+                    )
+                )
+                return jsonify(
+                    {
+                        "src": url_for(
+                            "static",
+                            filename="assets/uploaded-img/"
+                            + secure_filename(portraitform.char_id_summary.data),
+                        )
+                        + f".{extension}"
+                    }
+                )
+            elif request.form["source"] == "roleplay":
+                for root, dirs, files in os.walk(
+                    os.path.join(app.root_path, r"static\assets\uploaded-img")
+                ):
+                    for name in files:
+                        print(name, root)
+                        splitted = name.split(".")
+                        if splitted[0] == str(portraitform.char_id_summary.data)+"_rp":
+                            print("working")
+                            print(rf"{root}\{splitted[0]}.{splitted[1]}")
+                            os.remove(rf"{root}\{splitted[0]}.{splitted[1]}")
+
+                image.save(
+                    os.path.join(
+                        app.root_path,
+                        "static/assets/uploaded-img/",
+                        secure_filename(portraitform.char_id_summary.data)
+                        + f"_rp.{extension}",
+                    )
+                )
+                return jsonify(
+                    {
+                        "src": url_for(
+                            "static",
+                            filename="assets/uploaded-img/"
+                            + secure_filename(portraitform.char_id_summary.data),
+                        )
+                        + f"_rp.{extension}"
+                    }
+                )
     else:
-        return jsonify({"test":"error"})
+        return jsonify({"test": "error"})
+
 
 @app.route("/character")
 def retrieve_char_details():
@@ -141,15 +214,28 @@ def retrieve_char_details():
         # Character's lodestone id
         lodestone_id = int(request.args.get("charid"))
         portraitform.char_id_summary.data = lodestone_id
-        src = None
-        for root, dirs, files in os.walk(os.path.join(app.root_path,r"static\assets\uploaded-img")):
+        src = {}
+        for root, dirs, files in os.walk(
+            os.path.join(app.root_path, r"static\assets\uploaded-img")
+        ):
             for name in files:
                 print(name, root)
-                if int(name.split(".")[0]) == int(portraitform.char_id_summary.data):
-                    print("working")
+                splitted = name.split(".")
+                if splitted[0] == str(
+                    portraitform.char_id_summary.data
+                ):
+                    print("setting summary")
                     print(rf"{root}\{name}")
-                    src = url_for('static', filename=f"/assets/uploaded-img/{name}")
-        
+                    src["avatar"] = url_for(
+                        "static", filename=f"/assets/uploaded-img/{name}"
+                    )                  
+                elif splitted[0] == str(portraitform.char_id_summary.data)+"_rp":
+                    print("setting rp")
+                    print(rf"{root}\{splitted[0]}_rp.{splitted[1]}")
+                    src["roleplay"] = url_for(
+                        "static", filename=f"/assets/uploaded-img/{name}"
+                    ) 
+
         # GET reqs/Scraper funcs
         # Character summary page data
         retrieved_data = get_lodestone_char_basic(lodestone_id)
@@ -157,38 +243,62 @@ def retrieve_char_details():
         retrieve_collectibles = get_collectibles(lodestone_id)
         # Fetch FFLogs data and merge into single dict/json
         retrieve_token = get_fflogs_token()
-        retrieved_logs = merge_raids(get_fflogs_character(
-            retrieve_token,
-            retrieved_data.name,
-            retrieved_data.dcserver[0],
-            SERVERS.get_region(retrieved_data.dcserver[0]),
-        ))
-    except TypeError:
-        return {
-            "Status": "404",
-            "Type": "TypeError",
-            "Message": "Data input is incorrectly typed/formatted.",
-        }
+        retrieved_logs = merge_raids(
+            get_fflogs_character(
+                retrieve_token,
+                retrieved_data.name,
+                retrieved_data.dcserver[0],
+                SERVERS.get_region(retrieved_data.dcserver[0]),
+            )
+        )
+    # except TypeError as error:
+    #     return {
+    #         "Status": "404",
+    #         "Type": "TypeError",
+    #         "Message": "Data input is incorrectly typed/formatted.",
+    #     }
     except IndexError:
         return {
             "Status": "404",
             "Type": "IndexError",
             "Message": "Unable to acquire link from ID",
         }
-    except ValueError:
-        return {
-            "Status": "404",
-            "Type": "ValueError",
-            "Message": "Value of data input is incorrect",
-        }
+    # except ValueError:
+    #     return {
+    #         "Status": "404",
+    #         "Type": "ValueError",
+    #         "Message": "Value of data input is incorrect",
+    #     }
     else:
         # condition check edit mode or no
         nicknames = ["Test", "test", "test"]
         mode = request.args.get("mode")
-        if mode=="edit":
-            return render_template("card.html", character=retrieved_data.to_dict(), raid=retrieved_logs.to_dict() if retrieved_logs is not None else None, collectible=retrieve_collectibles, summaryform=portraitform, rpform=rpform, bsform=bsform, src=src, aliases=nicknames, is_edit=True)
-        elif mode=="view":
-            return render_template("card.html", character=retrieved_data.to_dict(), raid=retrieved_logs.to_dict() if retrieved_logs is not None else None, collectible=retrieve_collectibles, src=src, is_edit=False)
+        if mode == "edit":
+            return render_template(
+                "card.html",
+                character=retrieved_data.to_dict(),
+                raid=retrieved_logs.to_dict()
+                if retrieved_logs is not None
+                else None,
+                collectible=retrieve_collectibles,
+                form=portraitform,
+                bsform=bsform,
+                src=src,
+                aliases=nicknames,
+                is_edit=True,
+            )
+        elif mode == "view":
+            return render_template(
+                "card.html",
+                character=retrieved_data.to_dict(),
+                raid=retrieved_logs.to_dict()
+                if retrieved_logs is not None
+                else None,
+                collectible=retrieve_collectibles,
+                src=src,
+                is_edit=False,
+            )
+
 
 if __name__ == "__main__":
     app.run(debug=True)
