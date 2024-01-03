@@ -2,10 +2,6 @@ import dotenv
 from flask import Flask, flash, jsonify, redirect, render_template, request, url_for
 from api_fetchers import ffxiv_cached_resources, get_collectibles, get_fflogs_token, get_fflogs_character, cache
 from flask_bootstrap import Bootstrap5
-from flask_wtf import FlaskForm
-from flask_wtf.file import FileField, FileAllowed
-from wtforms import HiddenField, URLField, SubmitField
-from wtforms.validators import DataRequired, URL
 import bs4
 from api_fetchers import (
     get_fflogs_character,
@@ -18,6 +14,8 @@ import os
 from char_claim_token import generate_token, confirm_token
 import const_loader
 from werkzeug.utils import secure_filename
+
+from forms import BusinessImages, ClaimCharForm, LodestoneForm, RoleplayPortraitForm, UploadPortraitForm
 
 # load selectors and helpers
 CHARACTER_SELECTORS = const_loader.CharacterData()
@@ -33,26 +31,6 @@ app.config["CACHE_TYPE"] = "SimpleCache"
 app.config["CACHE_DEFAULT_TIMEOUT"] = 300
 Bootstrap5(app)
 cache.init_app(app)
-
-class LodestoneForm(FlaskForm):
-    lodestone_url = URLField(
-        "Lodestone URL: ", validators=[DataRequired(), URL()]
-    )
-    submit = SubmitField("Submit")
-
-
-class ClaimCharForm(FlaskForm):
-    submit = SubmitField(
-        "My token is in the character profile section on my Lodestone"
-    )
-
-
-class UploadPortraitForm(FlaskForm):
-    portrait = FileField("Upload custom portrait here (otherwise we use the lodestone one)", validators=[FileAllowed(["jpg", "png", "jpeg"], "JPG/PNG only")])
-    char_id = HiddenField(validators=[DataRequired()])
-    submit = SubmitField(
-        "Upload portrait"
-    )
 
 COLLECT_CACHE = ffxiv_cached_resources()
 LEN_MOUNTS = len(COLLECT_CACHE["mounts"])
@@ -156,16 +134,18 @@ def upload_portrait():
 @app.route("/character")
 def retrieve_char_details():
     """Get all details of char from booth XIVAPI/Lodestone and FFLogs"""
-    portraitform=UploadPortraitForm()
+    portraitform = UploadPortraitForm()
+    rpform = RoleplayPortraitForm()
+    bsform = BusinessImages()
     try:
         # Character's lodestone id
         lodestone_id = int(request.args.get("charid"))
-        portraitform.char_id.data = lodestone_id
+        portraitform.char_id_summary.data = lodestone_id
         src = None
         for root, dirs, files in os.walk(os.path.join(app.root_path,r"static\assets\uploaded-img")):
             for name in files:
                 print(name, root)
-                if int(name.split(".")[0])==int(portraitform.char_id.data):
+                if int(name.split(".")[0]) == int(portraitform.char_id_summary.data):
                     print("working")
                     print(rf"{root}\{name}")
                     src = url_for('static', filename=f"/assets/uploaded-img/{name}")
@@ -206,7 +186,7 @@ def retrieve_char_details():
         nicknames = ["Test", "test", "test"]
         mode = request.args.get("mode")
         if mode=="edit":
-            return render_template("card.html", character=retrieved_data.to_dict(), raid=retrieved_logs.to_dict() if retrieved_logs is not None else None, collectible=retrieve_collectibles, form=portraitform, src=src, aliases=nicknames, is_edit=True)
+            return render_template("card.html", character=retrieved_data.to_dict(), raid=retrieved_logs.to_dict() if retrieved_logs is not None else None, collectible=retrieve_collectibles, summaryform=portraitform, rpform=rpform, bsform=bsform, src=src, aliases=nicknames, is_edit=True)
         elif mode=="view":
             return render_template("card.html", character=retrieved_data.to_dict(), raid=retrieved_logs.to_dict() if retrieved_logs is not None else None, collectible=retrieve_collectibles, src=src, is_edit=False)
 

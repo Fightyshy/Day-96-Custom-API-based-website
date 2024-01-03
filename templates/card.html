@@ -48,10 +48,6 @@
                                 {% else %}
                                 <img class="avatar img-fluid" id="avatar" src="{{src}}" alt="Avatar">
                                 {% endif %}
-                                {% if is_edit == True %}
-                                {{render_form(form, id="portrait-form", novalidate=True)}}
-                                {{form.char_id()}}
-                                {% endif %}
                             </div>
                         </div>
     
@@ -130,27 +126,18 @@
             </footer>
         </div>
 
-        <!-- New Container for Elements Outside main-container -->
         {% if is_edit == True %}
-        <div class="editing" style="position: absolute; top:100%">
-        <div class="container px-0 pb-2 mt-2 w-75" style="border: 2px solid black; border-radius: 10px;">
-            <!-- Elements moved outside main-container go here -->
-            <!-- For example: -->
-            <div class="row m-auto">
-                <!-- Layout Switch -->
-                <div class="form-check form-switch mb-3">
-                    <input class="form-check-input" type="checkbox" id="layoutSwitch" checked>
-                    <label class="form-check-label" for="layoutSwitch">Switch to Roleplaying Profile</label>
-                </div>
-                <!-- Layout State Selection -->
-                <label for="layoutState" class="form-label">Select Layout State:</label>
-                <select class="form-select" id="layoutState">
-                    <option value="imageOnly">Use 375x375px Logo Image Only</option>
-                    <option value="textOnly">No Image, 562x375px Space for H1 Text</option>
-                    <option value="imageAndText">Use Both Image and H1 Text</option>
-                </select>
+        <!-- New Container for Elements Outside main-container -->
+        <!-- TODO fix 1080p -->
+        <div id="edit" class="container px-0 pb-2 mt-2 m-auto form-check form-switch" style="width:72rem; border: 2px solid black; border-radius: 10px; position: absolute; top:100%;">
+            <div id="layout_switch" class="form-check form-switch d-none">
+                <input class="form-check-input" type="checkbox" id="layoutSwitch">
+                <label class="form-check-label" for="layoutSwitch">Switch between layouts (On for venues)</label>
             </div>
-        </div>
+            <div id="settings">
+                {{render_form(summaryform, id="portrait-form", novalidate=True)}}
+                {{summaryform.char_id_summary()}}
+             </div>
         </div>
         {% endif %}
 
@@ -159,25 +146,145 @@
             document.addEventListener('DOMContentLoaded', function () {
                 // Get the switch and layout divs
                 const layoutSwitch = document.getElementById('layoutSwitch');
+                const layoutSwitchDiv = layoutSwitch.parentElement
                 const roleplayingLayout = document.getElementById('roleplayingLayout');
                 const businessCardLayout = document.getElementById('businessCardLayout');
+                const editingContainer = document.getElementById('settings')
 
+                const combinedImageSpace = document.getElementById('combinedImageSpace');
+                const venueImage = document.getElementById('venueImage');
+                const businessName = document.getElementById('businessName')
+                
                 // Add an event listener to the switch
-                layoutSwitch.addEventListener('change', function () {
-                    // Toggle the display of layouts based on the switch state
-                    // TODO ajax post to set db field for viewing rp/business state
-                    if (layoutSwitch.checked) {
-                        // Switch to Business layout
-                        document.getElementById('businessCardLayout').classList.add('d-none');
-                        document.getElementById('roleplayingLayout').classList.remove('d-none');
-                    } else {
-                        // Switch to Business layout
-                        document.getElementById('businessCardLayout').classList.remove('d-none');
-                        document.getElementById('roleplayingLayout').classList.add('d-none');
+
+                
+                document.getElementById('myTabs').addEventListener('shown.bs.tab', function (event) {
+                    const activeTabId = event.target.getAttribute('id');
+                    
+                        // Update editing container based on the active tab
+                    if (activeTabId === 'summary-tab') {
+                        // Show elements related to the Summary tab
+                        // jinja templating stronk
+                        layoutSwitchDiv.classList.add('d-none')
+                        editingContainer.innerHTML = `
+                        {{render_form(summaryform, id="portrait-form", novalidate=True)}}
+                        {{summaryform.char_id_summary()}}
+                        `
+                        // end of summary-tab settings
+                    } else if (activeTabId === 'roleplay-tab') {
+                        // Show elements related to the Roleplay tab
+                        layoutSwitchDiv.classList.remove('d-none')
+                        editingContainer.innerHTML = `
+                        {{render_form(rpform, id="roleplay-settings", novalidate=True, extra_classes="form-check form-switch")}}
+                        {{rpform.char_id_rp()}}
+                        `;
+                        // Set listeners
+                        layoutSwitch.addEventListener('change', function () {
+                            // Toggle the display of layouts based on the switch state
+                            // TODO ajax post to set db field for viewing rp/business state
+                            if (layoutSwitch.checked) {
+                                // Switch to Business layout
+                                document.getElementById('businessCardLayout').classList.remove('d-none');
+                                document.getElementById('roleplayingLayout').classList.add('d-none');
+                                editingContainer.innerHTML = `
+                                {{render_form(bsform, id="business-settings", novalidate=True, extra_classes="form-check form-switch")}}
+                                {{bsform.char_id_bs()}}
+                                `; 
+                                const imageFields = [document.getElementById('logo'), document.getElementById('venue'), document.getElementById('big_venue')]
+                                layoutImageSwitcher(false, imageFields)
+
+                                document.getElementById('layout').addEventListener('change', function () {
+                                    const selectedLayout = this.value;
+                                    // TODO set value of 1/2/3 or use actual values to display
+                                    // TODO form field disabling due to switching
+                                    switch (selectedLayout) {
+                                        case 'Two images only':
+                                            businessName.style.display = 'none'
+                                            combinedImageSpace.innerHTML=""
+                                            twoImages(combinedImageSpace)
+                                            layoutImageSwitcher(false, imageFields)
+                                            break;
+                                        case 'Large image with name':
+                                            // No Image, 562x375px Space for H1 Text
+                                            combinedImageSpace.style.removeProperty("display");
+                                            let fullImage = document.createElement("img")
+                                            fullImage.src = "https://via.placeholder.com/1140x375"
+                                            combinedImageSpace.innerHTML=""
+                                            combinedImageSpace.appendChild(fullImage)
+                                            businessName.style.display = 'block'
+                                            layoutImageSwitcher(true, imageFields)
+                                            break;
+                                        case 'Two images with name':
+                                            businessName.style.display = 'block'
+                                            combinedImageSpace.innerHTML=""
+                                            twoImages(combinedImageSpace)
+                                            layoutImageSwitcher(false, imageFields)
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                });
+                            } else {
+                                // Switch to Business layout
+                                document.getElementById('businessCardLayout').classList.add('d-none');
+                                document.getElementById('roleplayingLayout').classList.remove('d-none');
+                                editingContainer.innerHTML = `
+                                {{render_form(rpform, id="roleplay-settings", novalidate=True, extra_classes="form-check form-switch")}}
+                                {{rpform.char_id_rp()}}
+                                `;
+
+                                layoutSwitch.addEventListener('change', function() {
+
+                                })
+                            }
+                        });
+                        // end of roleplay-tab settings
                     }
                 });
             });
 
+            function layoutImageSwitcher(state, images){
+                // state bool is for big image, two images is inversed
+                images.forEach(ele=>{
+                    if(state) {
+                        if(ele.id === "big_venue"){
+                            ele.removeAttribute("disabled")
+                        }else{
+                            ele.setAttribute("disabled", true)
+                        }
+                    }else{
+                        if(ele.id === "big_venue"){
+                            ele.setAttribute("disabled", true)
+                        } else{
+                            ele.removeAttribute("disabled")
+                        }
+                    }
+                })
+            }
+
+            function twoImages(row){
+                let logoDiv = document.createElement("div")
+                let venueDiv = document.createElement("div")
+                let logoImg = document.createElement("img")
+                let venueImg = document.createElement("img")
+
+                logoDiv.classList.add("col-md-5")
+                venueDiv.classList.add("col-md-7")
+                venueDiv.classList.add("text-end")
+                
+                logoImg.id = "businessImg"
+                venueImg.id = "venueImg"
+
+                logoImg.src = "https://via.placeholder.com/375x375"
+                venueImg.src = "https://via.placeholder.com/650x375"
+                logoImg.classList.add("img-fluid")
+                venueImg.classList.add("img-fluid")
+                
+                logoDiv.appendChild(logoImg)
+                venueDiv.appendChild(venueImg)
+                row.appendChild(logoDiv)
+                row.appendChild(venueDiv)
+            }
 
             function enableEditing() {
                 // Get the existing text content
