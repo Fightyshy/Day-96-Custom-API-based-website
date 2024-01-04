@@ -263,6 +263,11 @@ p{
     height: 23.4375rem;
 }
 
+#bigImg{
+    width: 71.25rem;
+    height: 23.4375rem;
+}
+
 /* Custom scrollbar style */
 ::-webkit-scrollbar {
     width: 8px; /* Set the width of the scrollbar */

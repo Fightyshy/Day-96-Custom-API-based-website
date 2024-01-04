@@ -5,11 +5,24 @@
         <div class="col-md-12 pt-2">
             <!-- Combined Space for Image (Layout 2) -->
             <div id="combinedImageSpace" class="row g-0">
+                {% if "big" not in src %}
+                <img id="bigImg" src="https://via.placeholder.com/1140x375" class="img-fluid d-none">
+                {% else %}
+                <img id="bigImg" src="{{src['big']}}" class="img-fluid venueImg d-none">
+                {% endif %}
                 <div class="col-md-5">
+                    {% if "one" not in src %}
                     <img id="businessImg" src="https://via.placeholder.com/375x375" class="img-fluid">
+                    {% else %}
+                    <img id="businessImg" src="{{src['one']}}" class="img-fluid">
+                    {% endif %}
                 </div>
                 <div class="col-md-7 text-end">
+                    {% if "two" not in src %}
                     <img id="venueImg" src="https://via.placeholder.com/650x375" class="img-fluid">
+                    {% else %}
+                    <img id="venueImg" src="{{src['two']}}" class="img-fluid">
+                    {% endif %}
                 </div>
             </div>
         </div>

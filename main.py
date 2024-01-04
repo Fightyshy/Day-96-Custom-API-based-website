@@ -127,10 +127,100 @@ def claim_charid():
     return render_template("authentication.html", form=claimform, token=token)
 
 
+@app.route("/character/venue", methods=["POST"])
+def upload_venue_images():
+    if request.method == "POST":
+        bs_form = BusinessImages()
+        if bs_form.validate():
+            if bs_form.layout.data == "1" or bs_form.layout.data == "3":
+                img_one = bs_form.logo.data
+                img_two = bs_form.venue.data
+
+                extension_one = img_one.filename.split(".")[-1]
+                extension_two = img_two.filename.split(".")[-1]
+
+                # TODO upload both images and overwrite existing
+                for root, dirs, files in os.walk(
+                    os.path.join(app.root_path, r"static\assets\uploaded-img")
+                ):
+                    for name in files:
+                        splitted = name.split(".")
+                        print(name, root)
+                        if splitted[0] == str(bs_form.char_id_bs.data)+"_venue_1":
+                            print("working")
+                            print(rf"{root}\{name}")
+                            os.remove(rf"{root}\{name}")
+                        elif splitted[0] == str(bs_form.char_id_bs.data)+"_venue_2":
+                            print("working")
+                            print(rf"{root}\{name}")
+                            os.remove(rf"{root}\{name}")
+
+                # TODO images named name_venue_1.extension and name_venue_2.extension
+                # TODO save and name like in portrait updating
+                img_one.save(
+                    os.path.join(
+                        app.root_path,
+                        "static/assets/uploaded-img/",
+                        secure_filename(bs_form.char_id_bs.data)
+                        + f"_venue_1.{extension_one}",
+                    )
+                )
+
+                img_two.save(
+                    os.path.join(
+                        app.root_path,
+                        "static/assets/uploaded-img/",
+                        secure_filename(bs_form.char_id_bs.data)
+                        + f"_venue_2.{extension_two}",
+                    )
+                )
+
+                # TODO JSON response similar to portrait updating
+                return jsonify({
+                    "uploaded": "two",
+                    "src": {
+                        "one": url_for("static", filename="assets/uploaded-img/"+secure_filename(bs_form.char_id_bs.data)+ f"_venue_1.{extension_one}"),
+                        "two": url_for("static", filename="assets/uploaded-img/"+secure_filename(bs_form.char_id_bs.data)+ f"_venue_2.{extension_two}")
+                    }
+                })
+            elif bs_form.layout.data == "2":
+                # TODO upload big image and overwrite exising
+                img_big = bs_form.big_venue.data
+                extension = img_big.filename.split(".")[-1]
+
+                for root, dirs, files in os.walk(
+                    os.path.join(app.root_path, r"static\assets\uploaded-img")
+                ):
+                    for name in files:
+                        splitted = name.split(".")
+                        print(name, root)
+                        if splitted[0] == str(bs_form.char_id_bs.data)+"_venue_big":
+                            print("working")
+                            print(rf"{root}\{name}")
+                            os.remove(rf"{root}\{name}")
+
+                # TODO images named name_venue_big.extension
+                # TODO save and name like in portrait updating
+                img_big.save(
+                    os.path.join(
+                        app.root_path,
+                        "static/assets/uploaded-img/",
+                        secure_filename(bs_form.char_id_bs.data)
+                        + f"_venue_big.{extension}",
+                    )
+                )
+
+                # TODO JSON response similar to portrait updating
+                return jsonify({
+                    "uploaded": "big",
+                    "src": url_for("static", filename="assets/uploaded-img/"+secure_filename(bs_form.char_id_bs.data)+ f"_venue_big.{extension}")
+                })
+    return jsonify({"test": "error"})
+
+
 @app.route("/character/portrait", methods=["POST"])
 def upload_portrait():
     if request.method == "POST":
-        print(request.form["source"])
         portraitform = UploadPortraitForm()
         if portraitform.validate():
             image = portraitform.portrait.data
@@ -208,12 +298,12 @@ def upload_portrait():
 def retrieve_char_details():
     """Get all details of char from booth XIVAPI/Lodestone and FFLogs"""
     portraitform = UploadPortraitForm()
-    rpform = RoleplayPortraitForm()
     bsform = BusinessImages()
     try:
         # Character's lodestone id
         lodestone_id = int(request.args.get("charid"))
         portraitform.char_id_summary.data = lodestone_id
+        bsform.char_id_bs.data = lodestone_id
         src = {}
         for root, dirs, files in os.walk(
             os.path.join(app.root_path, r"static\assets\uploaded-img")
@@ -228,14 +318,31 @@ def retrieve_char_details():
                     print(rf"{root}\{name}")
                     src["avatar"] = url_for(
                         "static", filename=f"/assets/uploaded-img/{name}"
-                    )                  
+                    )         
                 elif splitted[0] == str(portraitform.char_id_summary.data)+"_rp":
                     print("setting rp")
-                    print(rf"{root}\{splitted[0]}_rp.{splitted[1]}")
+                    print(rf"{root}\{splitted[0]}{splitted[1]}")
                     src["roleplay"] = url_for(
                         "static", filename=f"/assets/uploaded-img/{name}"
-                    ) 
-
+                    )
+                elif splitted[0] == str(portraitform.char_id_summary.data)+"_venue_1":
+                    print("one of two")
+                    print(rf"{root}\{splitted[0]}{splitted[1]}")
+                    src["one"] = url_for(
+                        "static", filename=f"/assets/uploaded-img/{name}"
+                    )
+                elif splitted[0] == str(portraitform.char_id_summary.data)+"_venue_2":
+                    print("two of two")
+                    print(rf"{root}\{splitted[0]}{splitted[1]}")
+                    src["two"] = url_for(
+                        "static", filename=f"/assets/uploaded-img/{name}"
+                    )
+                elif splitted[0] == str(portraitform.char_id_summary.data)+"_venue_big":
+                    print("big")
+                    print(rf"{root}\{splitted[0]}{splitted[1]}")
+                    src["big"] = url_for(
+                        "static", filename=f"/assets/uploaded-img/{name}"
+                    )
         # GET reqs/Scraper funcs
         # Character summary page data
         retrieved_data = get_lodestone_char_basic(lodestone_id)

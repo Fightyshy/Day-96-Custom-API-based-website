@@ -43,7 +43,7 @@
                         <div class="col-md-4 d-flex align-items-center">
                             <div class="avatar-container">
                                 <!-- Your dynamic avatar image -->
-                                {% if src["avatar"] == None %}
+                                {% if "avatar" not in src %}
                                 <img class="avatar img-fluid" id="avatar" src="{{collectible['character']['portrait']}}" alt="Avatar">
                                 {% else %}
                                 <img class="avatar img-fluid" id="avatar" src="{{src['avatar']}}" alt="Avatar">
@@ -194,26 +194,28 @@
                                     // TODO set value of 1/2/3 or use actual values to display
                                     // TODO form field disabling due to switching
                                     switch (selectedLayout) {
-                                        case 'Two images only':
+                                        case '1':
+                                            // Two Images, 375x375px logo, 650x375px small venue img, no h1 name
+                                            document.getElementById("businessImg").classList.remove("d-none");
+                                            document.getElementById("venueImg").classList.remove("d-none");
+                                            document.getElementById("bigImg").classList.add("d-none");
                                             businessName.style.display = 'none'
-                                            combinedImageSpace.innerHTML=""
-                                            twoImages(combinedImageSpace)
                                             layoutImageSwitcher(false, imageFields)
                                             break;
-                                        case 'Large image with name':
-                                            // No Image, 562x375px Space for H1 Text
-                                            combinedImageSpace.style.removeProperty("display");
-                                            let fullImage = document.createElement("img")
-                                            fullImage.src = "https://via.placeholder.com/1140x375"
-                                            combinedImageSpace.innerHTML=""
-                                            combinedImageSpace.appendChild(fullImage)
+                                        case '2':
+                                            // No Image, 1140x375px Space for H1 Text
+                                            document.getElementById("businessImg").classList.add("d-none");
+                                            document.getElementById("venueImg").classList.add("d-none");
+                                            document.getElementById("bigImg").classList.remove("d-none");
                                             businessName.style.display = 'block'
                                             layoutImageSwitcher(true, imageFields)
                                             break;
-                                        case 'Two images with name':
+                                        case '3':
+                                            // Two Images, 375x375px logo, 650x375px small venue img, includes h1 name
+                                            document.getElementById("businessImg").classList.remove("d-none");
+                                            document.getElementById("venueImg").classList.remove("d-none");
+                                            document.getElementById("bigImg").classList.add("d-none");
                                             businessName.style.display = 'block'
-                                            combinedImageSpace.innerHTML=""
-                                            twoImages(combinedImageSpace)
                                             layoutImageSwitcher(false, imageFields)
                                             break;
                                         default:
@@ -323,25 +325,6 @@
                 additionalTextDiv.innerHTML = `<p>${limitedText}</p><span id='edit-summary-button' onclick='enableEditing()'>📝</span>`;
             }
 
-            // function updatePortrait(event) {
-            //     event.preventDefault();
-            //     let editForm = new FormData(document.getElementById("portrait-form"))
-
-            //     $.ajax({
-            //         url: "{{url_for('upload_portrait')}}",
-            //         data: editForm,
-            //         contentType: false,
-            //         processData: false,
-            //         type: "POST",
-            //         success: data=>{
-            //             document.getElementById("avatar").src=data["src"]
-            //         }
-            //     }).done(data=>{
-            //         imgurl=`${data["src"]}?timestamp=${Date.now()}`
-            //         document.getElementById("avatar").src=imgurl
-            //     })
-            // }
-
             $("#portrait-form").submit(event=>{
                 console.log("here")
                 event.preventDefault();
@@ -356,9 +339,9 @@
                     contentType: false,
                     processData: false,
                     type: "POST",
-                    success: data=>{
-                        document.getElementById("avatar").src=data["src"]
-                    }
+                    // success: data=>{
+                    //     document.getElementById("avatar").src=data["src"]
+                    // }
                 }).done(data=>{
                     imgurl=`${data["src"]}?timestamp=${Date.now()}`
                     document.getElementById("avatar").src=imgurl
@@ -379,12 +362,39 @@
                     contentType: false,
                     processData: false,
                     type: "POST",
-                    success: data=>{
-                        document.getElementById("rp-avatar").src=data["src"]
-                    }
+                    // success: data=>{
+                    //     document.getElementById("rp-avatar").src=data["src"]
+                    // }
                 }).done(data=>{
                     imgurl=`${data["src"]}?timestamp=${Date.now()}`
                     document.getElementById("rp-avatar").src=imgurl
+                })
+            })
+
+            $("#business-settings").submit(event=>{
+                console.log("here");
+                event.preventDefault();
+                console.log("business");
+
+                const editForm = new FormData(document.getElementById("business-settings"))
+
+                $.ajax({
+                    url: "{{url_for('upload_venue_images')}}",
+                    data: editForm,
+                    contentType: false,
+                    processData: false,
+                    type: "POST",
+                }).done(data=>{
+                    console.log(data)
+                    if(data["uploaded"] === "two"){
+                        imgOneUrl = `${data["src"]["one"]}?timestamp=${Date.now()}`
+                        imgTwoUrl = `${data["src"]["two"]}?timestamp=${Date.now()}`
+                        document.getElementById("businessImg").src = imgOneUrl != null ? imgOneUrl : "https://via.placeholder.com/375x375"
+                        document.getElementById("venueImg").src = imgTwoUrl != null ? imgTwoUrl : "https://via.placeholder.com/650x375"
+                    }else{
+                        imgBigUrl = `${data["src"]}?timestamp=${Date.now()}`
+                        document.getElementById("bigImg").src = imgBigUrl != null ? imgBigUrl : "https://via.placeholder.com/1140x375"
+                    }
                 })
             })
         </script>

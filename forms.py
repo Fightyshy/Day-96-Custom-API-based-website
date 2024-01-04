@@ -44,9 +44,9 @@ class BusinessImages(FlaskForm):
     layout = SelectField(
         "Layout setting",
         choices=[
-            "Two images only",
-            "Large image with name",
-            "Two images with name",
+            ("1", "Two images only"),
+            ("2", "Large image with name"),
+            ("3", "Two images with name"),
         ],
         default="Two images only",
     )

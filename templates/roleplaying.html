@@ -53,10 +53,10 @@
     <div class="col-md-4 py-2 px-0 h-100">
         <div class="row-auto h-100">
             <!-- Include an image or any other content for the character's portrait -->
-            {% if src["roleplay"] == None %}
+            {% if "roleplay" not in src %}
             <img class="img-fluid" id="rp-avatar" src="{{collectible['character']['portrait']}}" alt="RP-Avatar">
             {% else %}
-            <img class="img-fluid" id="rp-avatar" src="{{src['roleplay']}}" alt="rRP-Avatar">
+            <img class="img-fluid" id="rp-avatar" src="{{src['roleplay']}}" alt="RP-Avatar">
             {% endif %}
             <!-- 40 chars -->
             <h4 class="tagline mt-2 text-center">aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</h4>
