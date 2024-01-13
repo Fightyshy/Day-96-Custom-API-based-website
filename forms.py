@@ -2,11 +2,14 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import (
     HiddenField,
+    IntegerField,
     SelectField,
+    StringField,
+    TextAreaField,
     URLField,
-    SubmitField
+    SubmitField,
 )
-from wtforms.validators import DataRequired, URL
+from wtforms.validators import DataRequired, URL, Length, NumberRange
 
 
 class LodestoneForm(FlaskForm):
@@ -64,3 +67,98 @@ class BusinessImages(FlaskForm):
     )
     char_id_bs = HiddenField(validators=[DataRequired()])
     submit_business = SubmitField("Upload images and save layout")
+
+
+class RPHookForm(FlaskForm):
+    hook1_title = StringField(
+        "Hook one header", validators=[Length(min=0, max=35)]
+    )
+    hook1_body = StringField(
+        "Hook one content", validators=[Length(min=0, max=240)]
+    )
+
+    hook2_title = StringField(
+        "Hook two header", validators=[Length(min=0, max=35)]
+    )
+    hook2_body = StringField(
+        "Hook two content", validators=[Length(min=0, max=240)]
+    )
+
+    hook3_title = StringField(
+        "Hook three header", validators=[Length(min=0, max=35)]
+    )
+    hook3_body = StringField(
+        "Hook three content", validators=[Length(min=0, max=240)]
+    )
+
+    submit_hooks = SubmitField("Save hooks")
+
+
+class RPTraitsForm(FlaskForm):
+    pos_trait1 = StringField(
+        "Positive Trait one", validators=[Length(min=0, max=20)]
+    )
+    pos_trait2 = StringField(
+        "Positive Trait two", validators=[Length(min=0, max=20)]
+    )
+    pos_trait3 = StringField(
+        "Positive Trait three", validators=[Length(min=0, max=20)]
+    )
+    pos_trait4 = StringField(
+        "Positive Trait four", validators=[Length(min=0, max=20)]
+    )
+    pos_trait5 = StringField(
+        "Positive Trait five", validators=[Length(min=0, max=20)]
+    )
+
+    neg_trait1 = StringField(
+        "Negative Trait one", validators=[Length(min=0, max=20)]
+    )
+    neg_trait2 = StringField(
+        "Negative Trait two", validators=[Length(min=0, max=20)]
+    )
+    neg_trait3 = StringField(
+        "Negative Trait three", validators=[Length(min=0, max=20)]
+    )
+    neg_trait4 = StringField(
+        "Negative Trait four", validators=[Length(min=0, max=20)]
+    )
+    neg_trait5 = StringField(
+        "Negative Trait five", validators=[Length(min=0, max=20)]
+    )
+
+    submit_traits = SubmitField("Save traits")
+
+
+class RPCharSummary(FlaskForm):
+    age = IntegerField(
+        "Age:", validators=[DataRequired(), NumberRange(min=1, max=10000)]
+    )
+    gender = StringField(
+        "Gender:", validators=[DataRequired(), Length(max=20)]
+    )
+    sexuality = StringField(
+        "Sexuality:", validators=[DataRequired(), Length(max=35)]
+    )
+    relationship = StringField(
+        "Relationship Status:", validators=[DataRequired(), Length(max=20)]
+    )
+
+    submit_char_summary = SubmitField("Save summary")
+
+
+class RPOOCSocials(FlaskForm):
+    twitter = StringField("Twitter:", validators=[Length(max=15)])
+    website = StringField(
+        "Website (Please use a shortener it's over 40 characters!):",
+        validators=[Length(max=40)],
+    )
+    discord = StringField("Discord:", validators=[Length(max=32)])
+    notes = StringField("Notes:", validators=[Length(max=90)])
+
+    submit_socials = SubmitField("Save socials")
+
+
+class RPOOCAboutMe(FlaskForm):
+    aboutme = TextAreaField("About Me:", validators=[Length(max=290)])
+    submit_about_me = SubmitField("Save about me")

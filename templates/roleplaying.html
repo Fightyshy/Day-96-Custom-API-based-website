@@ -1,56 +1,61 @@
 <!-- roleplaying.html -->
 <div id="roleplayingLayout" class="row h-100 py-2">
     <!-- Character Details (Column One) -->
-    <div class="col-md-4 py-2">
+    <div class="col-md-4">
         <!-- Character Name with Tagline -->
-        <h3>Character Name</h3>
+        <!-- 20 chars max, pull from mains for now -->
+        <h3>Character Nameaaaaaa</h3>
 
 
         <!-- Aliases/Nicknames (Smaller text) -->
-        {% if aliases|length == 1 %}
-        <p class="aliases-text mb-2">AKA: {{ aliases[0] }}</p>
-        {% elif aliases|length > 1 %}
-        <p class="aliases-text mb-2">
-            AKA: {{ aliases[:-1]|join(', ') }}, or {{ aliases[-1] }}
-        </p>
+        {% if aliases|length >= 2 %}
+        <!-- Limit 2-40 chars -->
+        <p class="aliases-text mb-2">AKA: {{aliases}}</p>
         {% endif %}
         <!-- Character Box -->
         <div class="socials-box mt-0 px-1 py-2">
             <!-- Character Age -->
+            <!-- Enforce integer, limit 5 digits -->
             <p class="character-detail"><strong>Age:</strong> 25</p>
     
             <!-- Gender -->
+            <!-- Limit 20 -->
             <p class="character-detail"><strong>Gender:</strong> Female</p>
     
             <!-- Sexuality -->
-            <p class="character-detail"><strong>Sexuality:</strong> Bisexual</p>
+            <!-- Limit 35 -->
+            <p class="character-detail"><strong>Sexuality:</strong> aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</p>
     
             <!-- Relationship Status -->
+            <!-- Limit 20 -->
             <p class="character-detail"><strong>Relationship Status:</strong> Single</p>
         </div>
   
         <!-- Socials Box -->
-        <div class="socials-box px-1 py-2">
+        <div class="socials-box px-1 py-2 mt-2">
             <h4>Socials</h4>
             <ul>
-                <li><strong>Twitter:</strong> @CharacterTwitter</li>
-                <li><strong>Carrd/Tumblr:</strong> character-carrd</li>
-                <li><strong>Discord:</strong> CharacterName#1234</li>
+                <!-- Limit 15 (twitter handle maxlen) -->
+                <li><strong>Twitter:</strong> aaaaaaaaaaaaaaa</li>
+                <!-- Limit 40 url link, use shortener if needed -->
+                <li><strong>Website:</strong> aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</li>
+                <!-- Limit 32 (discord maxlen) -->
+                <li><strong>Discord:</strong> aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</li>
                 <!-- 90 chars -->
                 <li><strong>Notes:</strong><span class="px-0 py-0">aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</span></li>
             </ul>
         </div>
 
         <!-- About Me Box -->
-        <div class="socials-box px-1 py-2">
+        <div class="socials-box px-1 py-2 mt-2">
             <h4>About Me</h4>
-            <!-- 294 chars -->
+            <!-- 294 chars, limit 290 -->
             <p>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</p>
         </div>
     </div>
   
     <!-- Character Portrait (Column Two) -->
-    <div class="col-md-4 py-2 px-0 h-100">
+    <div class="col-md-4 px-0 h-100">
         <div class="row-auto h-100">
             <!-- Include an image or any other content for the character's portrait -->
             {% if "roleplay" not in src %}
@@ -58,20 +63,21 @@
             {% else %}
             <img class="img-fluid" id="rp-avatar" src="{{src['roleplay']}}" alt="RP-Avatar">
             {% endif %}
-            <!-- 40 chars -->
+            <!-- 50 chars -->
             <h4 class="tagline mt-2 text-center">aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</h4>
         </div>
       </div>
   
     <!-- Other Details (Column Three) -->
-    <div class="col-md-4 py-2 text-md-end">
+    <div class="col-md-4">
        <!-- Positive and Negative Traits Box -->
        <div class="socials-box mt-0 px-1 py-2 d-flex flex-row">
             <!-- Positive Traits List -->
             <div class="traits-list flex-fill text-center">
                 <h5>Positive Traits</h5>
                 <ul class="list-unstyled">
-                    <li>Positive Trait 1</li>
+                    <!-- Limit 20 chars each side-->
+                    <li>aaaaaaaaaaaaaaaaaaaa</li>
                     <li>Positive Trait 2</li>
                     <li>Positive Trait 3</li>
                     <li>Positive Trait 4</li>
@@ -83,7 +89,7 @@
             <div class="traits-list flex-fill text-center">
                 <h5>Negative Traits</h5>
                 <ul class="list-unstyled">
-                    <li>Negative Trait 1</li>
+                    <li>aaaaaaaaaaaaaaaaaaaa</li>
                     <li>Negative Trait 2</li>
                     <li>Negative Trait 3</li>
                     <li>Negative Trait 4</li>
@@ -93,12 +99,14 @@
             </div>
         </div>
         <!-- Hooks Box -->
-        <div class="socials-box px-1 py-1">
+        <div class="socials-box px-1 py-1 mt-2">
             <!-- Hooks List -->
             <ul class="list-unstyled">
-                <li><h4>Hook1</h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</li>
-                <li><h4>Hook1</h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</li>
-                <li><h4>Hook1</h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</li>
+                <!-- h4 30-35 chars -->
+                <!-- 240 chars text -->
+                <li><h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</li>
+                <li><h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</li>
+                <li><h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</li>
             </ul>
         </div>
     </div>
