@@ -315,7 +315,7 @@
                 editForm.append("source", "summary")
 
                 $.ajax({
-                    url: "{{url_for('upload_portrait')}}",
+                    url: "{{url_for('card_maker.upload_portrait')}}",
                     data: editForm,
                     contentType: false,
                     processData: false,
@@ -338,7 +338,7 @@
                 editForm.append("source", "roleplay")
 
                 $.ajax({
-                    url: "{{url_for('upload_portrait')}}",
+                    url: "{{url_for('card_maker.upload_portrait')}}",
                     data: editForm,
                     contentType: false,
                     processData: false,
@@ -360,7 +360,7 @@
                 const editForm = new FormData(document.getElementById("business-settings"))
 
                 $.ajax({
-                    url: "{{url_for('upload_venue_images')}}",
+                    url: "{{url_for('card_maker.upload_venue_images')}}",
                     data: editForm,
                     contentType: false,
                     processData: false,

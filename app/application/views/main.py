@@ -9,6 +9,8 @@ from flask import (
 )
 import bs4
 import requests
+
+from application.views.api_fetchers import ffxiv_cached_resources
 from ..objects.char_claim_token import generate_token, confirm_token
 from ..objects import const_loader
 
@@ -21,12 +23,9 @@ from ..objects.forms import (
 CHARACTER_SELECTORS = const_loader.CharacterData()
 SERVERS = const_loader.Servers()
 
-# COLLECT_CACHE = ffxiv_cached_resources()
-LEN_MOUNTS = len(current_app.COLLECT_CACHE["mounts"])
-LEN_MINIONS = len(current_app.COLLECT_CACHE["minions"])
-LEN_ACHIEVES = len(current_app.COLLECT_CACHE["achievements"])
+main_page = Blueprint("main_page", __name__, template_folder="templates")
 
-
+# Enable only for testing
 # @app.route("/test/<int:char_id>")
 # def test(char_id):
 #     # get_ffxiv_collect(5286865)
@@ -39,9 +38,6 @@ LEN_ACHIEVES = len(current_app.COLLECT_CACHE["achievements"])
 #     #         if achieve["id"]==int(entry):
 #     #             final.append(achieve)
 #     return jsonify({"test": cache.get("ffxiv_cached_resources")["mounts"]})
-
-main_page = Blueprint("main_page", __name__, template_folder="templates")
-
 
 @main_page.route("/", methods=["GET", "POST"])
 def get_charid():

@@ -166,7 +166,7 @@ def get_collectibles(char_id: int) -> dict:
     :return: Character's owned mounts/minions/achievements
     """
     # Bypass circular import restrictiion by importing on func execute
-    from app.application.views.main import COLLECT_CACHE, LEN_MOUNTS, LEN_ACHIEVES, LEN_MINIONS
+    from .. import COLLECT_CACHE, LEN_MOUNTS, LEN_ACHIEVES, LEN_MINIONS
 
     # query ffxiv_collect once to build cache of objects
     # scrape and match id/names once only, timeout every x

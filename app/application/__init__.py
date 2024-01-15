@@ -2,12 +2,15 @@ import os
 from dotenv import load_dotenv
 from flask import Flask
 from flask_bootstrap import Bootstrap5
+import requests
 
-from application.views.api_fetchers import ffxiv_cached_resources
+from application.views.api_fetchers import ffxiv_cached_resources, get_fflogs_character, merge_raids
 
 bs5 = Bootstrap5()
 COLLECT_CACHE = ""
-
+LEN_MOUNTS = ""
+LEN_MINIONS = ""
+LEN_ACHIEVES = ""
 
 def init_app():
     # Create app
@@ -26,6 +29,11 @@ def init_app():
     from .views.api_fetchers import cache
     cache.init_app(app)
 
+    # substitute with actual caching solution or cache to file later
+    COLLECT_CACHE = ffxiv_cached_resources()
+    LEN_MOUNTS = len(COLLECT_CACHE["mounts"])
+    LEN_MINIONS = len(COLLECT_CACHE["minions"])
+    LEN_ACHIEVES = len(COLLECT_CACHE["achievements"])
     # Set app blueprints
     from .views.main import main_page
     app.register_blueprint(main_page)
