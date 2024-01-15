@@ -150,7 +150,9 @@
                 <!-- Your footer content here -->
             </footer>
         </div>
-
+        {% if is_edit == True %}
+        {% include "modals.html" %}
+        {% endif %}
         <!-- Add Bootstrap JS and Popper.js scripts -->
         <script type="text/javascript">
             document.addEventListener('DOMContentLoaded', function () {

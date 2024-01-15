@@ -33,6 +33,13 @@ from forms import (
     BusinessImages,
     ClaimCharForm,
     LodestoneForm,
+    RPCharNicknames,
+    RPCharQuote,
+    RPCharSummary,
+    RPHookForm,
+    RPOOCAboutMe,
+    RPOOCSocials,
+    RPTraitsForm,
     RoleplayPortraitForm,
     UploadPortraitForm,
 )
@@ -299,6 +306,14 @@ def retrieve_char_details():
     """Get all details of char from booth XIVAPI/Lodestone and FFLogs"""
     portraitform = UploadPortraitForm()
     bsform = BusinessImages()
+    hookform = RPHookForm()
+    traitform = RPTraitsForm()
+    charsummaryform = RPCharSummary()
+    nicknamesform = RPCharNicknames()
+    charquoteform = RPCharQuote()
+    rpsocialsform = RPOOCSocials()
+    rpaboutmeform = RPOOCAboutMe()
+
     try:
         # Character's lodestone id
         lodestone_id = int(request.args.get("charid"))
@@ -358,27 +373,26 @@ def retrieve_char_details():
                 SERVERS.get_region(retrieved_data.dcserver[0]),
             )
         )
-    # except TypeError as error:
-    #     return {
-    #         "Status": "404",
-    #         "Type": "TypeError",
-    #         "Message": "Data input is incorrectly typed/formatted.",
-    #     }
+    except TypeError as error:
+        return {
+            "Status": "404",
+            "Type": "TypeError",
+            "Message": "Data input is incorrectly typed/formatted.",
+        }
     except IndexError:
         return {
             "Status": "404",
             "Type": "IndexError",
             "Message": "Unable to acquire link from ID",
         }
-    # except ValueError:
-    #     return {
-    #         "Status": "404",
-    #         "Type": "ValueError",
-    #         "Message": "Value of data input is incorrect",
-    #     }
+    except ValueError:
+        return {
+            "Status": "404",
+            "Type": "ValueError",
+            "Message": "Value of data input is incorrect",
+        }
     else:
         # condition check edit mode or no
-        nicknames = ["Test", "test", "test"]
         mode = request.args.get("mode")
         if mode == "edit":
             return render_template(
@@ -390,8 +404,15 @@ def retrieve_char_details():
                 collectible=retrieve_collectibles,
                 form=portraitform,
                 bsform=bsform,
+                hookform=hookform,
+                traitform=traitform,
+                charsummaryform=charsummaryform,
+                nicknamesform=nicknamesform,
+                charquoteform=charquoteform,
+                rpsocialsform=rpsocialsform,
+                rpaboutmeform=rpaboutmeform,
                 src=src,
-                aliases=nicknames,
+                aliases="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                 is_edit=True,
             )
         elif mode == "view":
