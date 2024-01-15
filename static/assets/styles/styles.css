@@ -26,14 +26,13 @@ p{
 /* Custom styles for the main container */
 .main-container {
     /* min is 1280x720 */
-    min-width: 72rem;
-    min-height: 45rem;
+    /* min-width: 72rem;
+    min-height: 45rem; */
     /* max */
     max-width: 72rem;
     max-height: 45rem;
-    width: 72rem;
-    height: 45rem;
-    /* height: 90vh; */
+    /* width: 72rem;
+    height: 45rem; */
     margin: auto;
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -266,6 +265,11 @@ p{
 #bigImg{
     width: 71.25rem;
     height: 23.4375rem;
+}
+
+.form-boxes {
+    resize: none;
+    height: 12rem;
 }
 
 /* Custom scrollbar style */

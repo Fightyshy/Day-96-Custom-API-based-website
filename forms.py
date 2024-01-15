@@ -71,23 +71,23 @@ class BusinessImages(FlaskForm):
 
 class RPHookForm(FlaskForm):
     hook1_title = StringField(
-        "Hook one header", validators=[Length(min=0, max=35)]
+        "Hook one header", validators=[DataRequired(), Length(min=0, max=35)]
     )
-    hook1_body = StringField(
-        "Hook one content", validators=[Length(min=0, max=240)]
+    hook1_body = TextAreaField(
+        "Hook one content", validators=[DataRequired(), Length(min=0, max=240)]
     )
 
     hook2_title = StringField(
         "Hook two header", validators=[Length(min=0, max=35)]
     )
-    hook2_body = StringField(
+    hook2_body = TextAreaField(
         "Hook two content", validators=[Length(min=0, max=240)]
     )
 
     hook3_title = StringField(
         "Hook three header", validators=[Length(min=0, max=35)]
     )
-    hook3_body = StringField(
+    hook3_body = TextAreaField(
         "Hook three content", validators=[Length(min=0, max=240)]
     )
 
@@ -96,7 +96,7 @@ class RPHookForm(FlaskForm):
 
 class RPTraitsForm(FlaskForm):
     pos_trait1 = StringField(
-        "Positive Trait one", validators=[Length(min=0, max=20)]
+        "Positive Trait one", validators=[DataRequired(), Length(min=0, max=20)]
     )
     pos_trait2 = StringField(
         "Positive Trait two", validators=[Length(min=0, max=20)]
@@ -112,7 +112,7 @@ class RPTraitsForm(FlaskForm):
     )
 
     neg_trait1 = StringField(
-        "Negative Trait one", validators=[Length(min=0, max=20)]
+        "Negative Trait one", validators=[DataRequired(), Length(min=0, max=20)]
     )
     neg_trait2 = StringField(
         "Negative Trait two", validators=[Length(min=0, max=20)]
@@ -132,33 +132,45 @@ class RPTraitsForm(FlaskForm):
 
 class RPCharSummary(FlaskForm):
     age = IntegerField(
-        "Age:", validators=[DataRequired(), NumberRange(min=1, max=10000)]
+        "Age", validators=[DataRequired(), NumberRange(min=1, max=10000)]
     )
     gender = StringField(
-        "Gender:", validators=[DataRequired(), Length(max=20)]
+        "Gender", validators=[DataRequired(), Length(max=20)]
     )
     sexuality = StringField(
-        "Sexuality:", validators=[DataRequired(), Length(max=35)]
+        "Sexuality", validators=[DataRequired(), Length(max=35)]
     )
     relationship = StringField(
-        "Relationship Status:", validators=[DataRequired(), Length(max=20)]
+        "Relationship Status", validators=[DataRequired(), Length(max=20)]
     )
 
     submit_char_summary = SubmitField("Save summary")
 
 
+class RPCharNicknames(FlaskForm):
+    nicknames = StringField("Nickname(s)", validators=[Length(min=0, max=20)])
+
+    submit_nicknames = SubmitField("Save nickname(s)")
+
+
+class RPCharQuote(FlaskForm):
+    quote = StringField("Quote/Tagline", validators=[Length(min=0, max=50)])
+
+    submit_char_quote = SubmitField("Save character quote")
+
+
 class RPOOCSocials(FlaskForm):
-    twitter = StringField("Twitter:", validators=[Length(max=15)])
+    twitter = StringField("Twitter", validators=[Length(max=15)])
     website = StringField(
         "Website (Please use a shortener it's over 40 characters!):",
         validators=[Length(max=40)],
     )
-    discord = StringField("Discord:", validators=[Length(max=32)])
-    notes = StringField("Notes:", validators=[Length(max=90)])
+    discord = StringField("Discord", validators=[Length(max=32)])
+    notes = StringField("Notes", validators=[Length(max=90)])
 
     submit_socials = SubmitField("Save socials")
 
 
 class RPOOCAboutMe(FlaskForm):
-    aboutme = TextAreaField("About Me:", validators=[Length(max=290)])
+    aboutme = TextAreaField("About Me", validators=[Length(max=290)])
     submit_about_me = SubmitField("Save about me")

@@ -4,8 +4,10 @@
     <div class="col-md-4">
         <!-- Character Name with Tagline -->
         <!-- 20 chars max, pull from mains for now -->
-        <h3>Character Nameaaaaaa</h3>
-
+        <h3>
+            Character Nameaaaaaa
+            <span data-bs-toggle="modal" data-bs-target="#RPCharNicknamesModal">📝</span>
+        </h3>
 
         <!-- Aliases/Nicknames (Smaller text) -->
         {% if aliases|length >= 2 %}
@@ -16,7 +18,9 @@
         <div class="socials-box mt-0 px-1 py-2">
             <!-- Character Age -->
             <!-- Enforce integer, limit 5 digits -->
-            <p class="character-detail"><strong>Age:</strong> 25</p>
+            <p class="character-detail"><strong>Age:</strong> 25
+                <span data-bs-toggle="modal" data-bs-target="#RPCharSummaryModal">📝</span>
+            </p>
     
             <!-- Gender -->
             <!-- Limit 20 -->
@@ -33,7 +37,10 @@
   
         <!-- Socials Box -->
         <div class="socials-box px-1 py-2 mt-2">
-            <h4>Socials</h4>
+            <h4>
+                Socials
+                <span data-bs-toggle="modal" data-bs-target="#RPSocialsModal">📝</span>
+            </h4>
             <ul>
                 <!-- Limit 15 (twitter handle maxlen) -->
                 <li><strong>Twitter:</strong> aaaaaaaaaaaaaaa</li>
@@ -48,7 +55,10 @@
 
         <!-- About Me Box -->
         <div class="socials-box px-1 py-2 mt-2">
-            <h4>About Me</h4>
+            <h4>
+                About Me            
+                <span data-bs-toggle="modal" data-bs-target="#RPAboutMeModal">📝</span>
+            </h4>
             <!-- 294 chars, limit 290 -->
             <p>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</p>
         </div>
@@ -64,7 +74,10 @@
             <img class="img-fluid" id="rp-avatar" src="{{src['roleplay']}}" alt="RP-Avatar">
             {% endif %}
             <!-- 50 chars -->
-            <h4 class="tagline mt-2 text-center">aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</h4>
+            <h4 class="tagline mt-2 text-center">
+                aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                <span data-bs-toggle="modal" data-bs-target="#RPCharQuoteModal">📝</span>
+            </h4>
         </div>
       </div>
   
@@ -72,6 +85,7 @@
     <div class="col-md-4">
        <!-- Positive and Negative Traits Box -->
        <div class="socials-box mt-0 px-1 py-2 d-flex flex-row">
+           <span data-bs-toggle="modal" data-bs-target="#RPTraitsModal">📝</span>
             <!-- Positive Traits List -->
             <div class="traits-list flex-fill text-center">
                 <h5>Positive Traits</h5>
@@ -102,16 +116,13 @@
         <div class="socials-box px-1 py-1 mt-2">
             <!-- Hooks List -->
             <ul class="list-unstyled">
-                <!-- h4 30-35 chars -->
+                <!-- h4 30 chars -->
                 <!-- 240 chars text -->
-                <li><h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</li>
-                <li><h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</li>
-                <li><h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</li>
+                <li><h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa<span data-bs-toggle="modal" data-bs-target="#RPHooksModal">📝</span></h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</li>
+                <li><h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</li>
+                <li><h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</li>
             </ul>
         </div>
     </div>
-  
-        <!-- Additional information for the character -->
-        <!-- Add more details about the character as needed -->
   </div>
   
