@@ -2,3 +2,5 @@
 /classjob-icons.zip
 /__pycache__
 /static/assets/uploaded-img
+/resources
+/.gitignore
