@@ -34,13 +34,13 @@
         <div class="col-md-5 py-2">
             <!-- Additional Business Card Details -->
             <h1 id="businessName" style="display: none;" class="mt-2">Business Text</h1>
-            <h4>Tagline</h4>
+            <h4>Tagline {% if is_edit == True %}<span data-bs-toggle="modal" data-bs-target="#VenueNameAndTaglineModal">📝</span>{% endif %}</h4>
             <!-- Contact Information/Socials Box -->
             <div class="socials-box mt-2 px-1 py-2">
-                <h4>Contact & Socials</h4>
+                <h4>Contact & Socials {% if is_edit == True %}<span data-bs-toggle="modal" data-bs-target="#VenueContactAndSocialsModal">📝</span>{% endif %}</h4>
                 <ul class="list-unstyled mb-0">
                     <li><strong>Address:</strong> The Firmament - Ward 25 - Plot 32 - Tonberry - Elemental</li>
-                    <li><strong>Venue website:</strong> https://testvenuewebsite.com</li>
+                    <li><strong>Venue website:</strong> <a href="https://testvenuewebsite.com">https://testvenuewebsite.com</a></li>
                     <li><strong>Operating times:</strong> Fridays-Sundays 2100-0100 hours GMT+8</li>
                     <li><strong>Discord:</strong> test#1234</li>
                     <li><strong>Twitter:</strong> @VenueTwitter</li>
@@ -52,16 +52,15 @@
         <!-- Character Details Column -->
         <div class="col-md-5 py-2 ps-0 text-md-end">
             <!-- Current Character's Details -->
-            <h3>Character Name</h3>
+            <h3>{{character["name"]}} {% if is_edit == True %}<span data-bs-toggle="modal" data-bs-target="#VenueStaffDetailsModal">📝</span>{% endif %}</h3>
             <p class="mb-0">Role at the Venue: Venue Role</p>
-            <p class="mb-0">Personal Website: <a href="https://www.characterwebsite.com" target="_blank">www.characterwebsite.com</a></p>
             <!-- Contact Information/Socials Box -->
             <div class="socials-box mt-2 px-1 py-2">
                 <h4>Contact & Socials</h4>
                 <ul class="list-unstyled mb-0">
                     <li><strong>Discord:</strong> test#1234</li>
                     <li><strong>Twitter:</strong> @VenueTwitter</li>
-                    <li><strong>Personal website:</strong> https://test.com</li>
+                    <li><strong>Personal website:</strong> <a href="https://test.com">https://test.com</a></li>
                     <!-- Additional socials or contact information can be added here -->
                 </ul>
             </div>

@@ -6,7 +6,7 @@
         <!-- 20 chars max, pull from mains for now -->
         <h3>
             Character Nameaaaaaa
-            <span data-bs-toggle="modal" data-bs-target="#RPCharNicknamesModal">📝</span>
+            {% if is_edit == True %}<span data-bs-toggle="modal" data-bs-target="#RPCharNicknamesModal">📝</span>{% endif %}
         </h3>
 
         <!-- Aliases/Nicknames (Smaller text) -->
@@ -19,7 +19,7 @@
             <!-- Character Age -->
             <!-- Enforce integer, limit 5 digits -->
             <p class="character-detail"><strong>Age:</strong> 25
-                <span data-bs-toggle="modal" data-bs-target="#RPCharSummaryModal">📝</span>
+                {% if is_edit == True %}<span data-bs-toggle="modal" data-bs-target="#RPCharSummaryModal">📝</span>{% endif %}
             </p>
     
             <!-- Gender -->
@@ -39,7 +39,7 @@
         <div class="socials-box px-1 py-2 mt-2">
             <h4>
                 Socials
-                <span data-bs-toggle="modal" data-bs-target="#RPSocialsModal">📝</span>
+                {% if is_edit == True %}<span data-bs-toggle="modal" data-bs-target="#RPSocialsModal">📝</span>{% endif %}
             </h4>
             <ul>
                 <!-- Limit 15 (twitter handle maxlen) -->
@@ -57,7 +57,7 @@
         <div class="socials-box px-1 py-2 mt-2">
             <h4>
                 About Me            
-                <span data-bs-toggle="modal" data-bs-target="#RPAboutMeModal">📝</span>
+                {% if is_edit == True %}<span data-bs-toggle="modal" data-bs-target="#RPAboutMeModal">📝</span>{% endif %}
             </h4>
             <!-- 294 chars, limit 290 -->
             <p>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</p>
@@ -76,7 +76,7 @@
             <!-- 50 chars -->
             <h4 class="tagline mt-2 text-center">
                 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                <span data-bs-toggle="modal" data-bs-target="#RPCharQuoteModal">📝</span>
+                {% if is_edit == True %}<span data-bs-toggle="modal" data-bs-target="#RPCharQuoteModal">📝</span>{% endif %}
             </h4>
         </div>
       </div>
@@ -85,7 +85,7 @@
     <div class="col-md-4">
        <!-- Positive and Negative Traits Box -->
        <div class="socials-box mt-0 px-1 py-2 d-flex flex-row">
-           <span data-bs-toggle="modal" data-bs-target="#RPTraitsModal">📝</span>
+        {% if is_edit == True %}<span data-bs-toggle="modal" data-bs-target="#RPTraitsModal">📝</span>{% endif %}
             <!-- Positive Traits List -->
             <div class="traits-list flex-fill text-center">
                 <h5>Positive Traits</h5>
@@ -118,7 +118,7 @@
             <ul class="list-unstyled">
                 <!-- h4 30 chars -->
                 <!-- 240 chars text -->
-                <li><h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa<span data-bs-toggle="modal" data-bs-target="#RPHooksModal">📝</span></h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</li>
+                <li><h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa{% if is_edit == True %}<span data-bs-toggle="modal" data-bs-target="#RPHooksModal">📝</span>{% endif %}</h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</li>
                 <li><h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</li>
                 <li><h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</li>
             </ul>
