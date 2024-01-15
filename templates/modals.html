@@ -50,7 +50,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="RPTraitsLabel">Edit RP Hooks</h1>
+                <h1 class="modal-title fs-5" id="RPTraitsLabel">Edit RP Traits</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="traitForm" action="#" method="post">
@@ -145,7 +145,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="RPCharSummaryModalLabel">Edit RP Hooks</h1>
+                <h1 class="modal-title fs-5" id="RPCharSummaryModalLabel">Edit Character Summary</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -163,7 +163,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="RPCharNicknamesModalLabel">Edit RP Hooks</h1>
+                <h1 class="modal-title fs-5" id="RPCharNicknamesModalLabel">Edit Character nickname(s)</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -181,7 +181,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="RPCharQuoteModalLabel">Edit RP Hooks</h1>
+                <h1 class="modal-title fs-5" id="RPCharQuoteModalLabel">Edit Character quote/tagline</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -199,7 +199,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="RPSocialsModalLabel">Edit RP Hooks</h1>
+                <h1 class="modal-title fs-5" id="RPSocialsModalLabel">Edit OOC Socials</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -217,7 +217,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="RPAboutMeModalLabel">Edit RP Hooks</h1>
+                <h1 class="modal-title fs-5" id="RPAboutMeModalLabel">Edit OOC About Me</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -236,7 +236,63 @@
     </div>
 </div>
 
+<!-- Business Modals -->
+<!-- VenueNameAndTagline -->
+<div class="modal fade" id="VenueNameAndTaglineModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="VenueNameAndTaglineModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="VenueNameAndTaglineModalLabel">Edit Venue Name and Tagline</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {{render_form(venuenameform, id="venuenameform", novalidate=True)}}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- VenueContactAndSocials -->
+<div class="modal fade" id="VenueContactAndSocialsModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="VenueContactAndSocialsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="VenueContactAndSocialsModalLabel">Edit Venue Contact and Socials</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {{render_form(venuecontactform, id="venuecontactform", novalidate=True)}}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- VenueStaffDetails -->
+<div class="modal fade" id="VenueStaffDetailsModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="VenueStaffDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="VenueStaffDetailsModalLabel">Edit Staffer Details</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {{render_form(venuestaffform, id="venuestaffform", novalidate=True)}}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script type="text/javascript">
+//Scripts - RP field handling
     document.addEventListener("DOMContentLoaded", ()=>{
         let hookCounter = 1;
         let posCounter = 1;
@@ -343,5 +399,7 @@
 
         //TODO handle submit ajax
         //TODO update hooks with response from server
-    })
+    });
+
+//business field handling
 </script>

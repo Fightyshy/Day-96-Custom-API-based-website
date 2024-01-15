@@ -42,6 +42,9 @@ from forms import (
     RPTraitsForm,
     RoleplayPortraitForm,
     UploadPortraitForm,
+    VenueContactAndSocials,
+    VenueNameAndTagline,
+    VenueStaffDetails,
 )
 
 # load selectors and helpers
@@ -306,6 +309,7 @@ def retrieve_char_details():
     """Get all details of char from booth XIVAPI/Lodestone and FFLogs"""
     portraitform = UploadPortraitForm()
     bsform = BusinessImages()
+
     hookform = RPHookForm()
     traitform = RPTraitsForm()
     charsummaryform = RPCharSummary()
@@ -313,6 +317,10 @@ def retrieve_char_details():
     charquoteform = RPCharQuote()
     rpsocialsform = RPOOCSocials()
     rpaboutmeform = RPOOCAboutMe()
+
+    venuenameform = VenueNameAndTagline()
+    venuecontactform = VenueContactAndSocials()
+    venuestaffform = VenueStaffDetails()
 
     try:
         # Character's lodestone id
@@ -411,6 +419,9 @@ def retrieve_char_details():
                 charquoteform=charquoteform,
                 rpsocialsform=rpsocialsform,
                 rpaboutmeform=rpaboutmeform,
+                venuenameform=venuenameform,
+                venuecontactform=venuecontactform,
+                venuestaffform=venuestaffform,
                 src=src,
                 aliases="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                 is_edit=True,

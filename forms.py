@@ -1,6 +1,8 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import (
+    BooleanField,
+    FormField,
     HiddenField,
     IntegerField,
     SelectField,
@@ -10,6 +12,11 @@ from wtforms import (
     SubmitField,
 )
 from wtforms.validators import DataRequired, URL, Length, NumberRange
+from api_fetchers import SERVERS
+
+MERGED_SERVERS = (
+    SERVERS.get_jp() + SERVERS.get_NA() + SERVERS.get_EU() + SERVERS.get_OC()
+)
 
 
 class LodestoneForm(FlaskForm):
@@ -96,7 +103,8 @@ class RPHookForm(FlaskForm):
 
 class RPTraitsForm(FlaskForm):
     pos_trait1 = StringField(
-        "Positive Trait one", validators=[DataRequired(), Length(min=0, max=20)]
+        "Positive Trait one",
+        validators=[DataRequired(), Length(min=0, max=20)],
     )
     pos_trait2 = StringField(
         "Positive Trait two", validators=[Length(min=0, max=20)]
@@ -112,7 +120,8 @@ class RPTraitsForm(FlaskForm):
     )
 
     neg_trait1 = StringField(
-        "Negative Trait one", validators=[DataRequired(), Length(min=0, max=20)]
+        "Negative Trait one",
+        validators=[DataRequired(), Length(min=0, max=20)],
     )
     neg_trait2 = StringField(
         "Negative Trait two", validators=[Length(min=0, max=20)]
@@ -134,9 +143,7 @@ class RPCharSummary(FlaskForm):
     age = IntegerField(
         "Age", validators=[DataRequired(), NumberRange(min=1, max=10000)]
     )
-    gender = StringField(
-        "Gender", validators=[DataRequired(), Length(max=20)]
-    )
+    gender = StringField("Gender", validators=[DataRequired(), Length(max=20)])
     sexuality = StringField(
         "Sexuality", validators=[DataRequired(), Length(max=35)]
     )
@@ -174,3 +181,71 @@ class RPOOCSocials(FlaskForm):
 class RPOOCAboutMe(FlaskForm):
     aboutme = TextAreaField("About Me", validators=[Length(max=290)])
     submit_about_me = SubmitField("Save about me")
+
+
+class VenueNameAndTagline(FlaskForm):
+    venue_name = StringField(
+        "Name", validators=[DataRequired(), Length(max=25)]
+    )
+    venue_tagline = StringField("Tagline", validators=[Length(max=40)])
+
+    submit_venue_name = SubmitField("Save venue name/tagline")
+
+
+class VenuePlotAddress(FlaskForm):
+    housing_zone = SelectField(
+        "Housing zone",
+        choices=[
+            (1, "The Mist"),
+            (2, "The Lavender Beds"),
+            (3, "The Goblet"),
+            (4, "Shirogane"),
+            (5, "The Firmament"),
+        ],
+        default="The Mist",
+    )
+
+    # Transform into switch frontend
+    is_appartment = BooleanField("Is it a apartment or plot?")
+
+    housing_ward = SelectField(
+        "Ward No.", choices=[(0, "Choose...")]+[(i, i) for i in range(1, 25)], default=0, validators=[NumberRange(min=1,max=25)]
+    )
+
+    # Either or for these ones
+    ward_plot = SelectField(
+        "Plot No.", choices=[(0, "Choose...")]+[(j, j) for j in range(1, 61)], default=0, validators=[NumberRange(min=1,max=60)]
+    )
+
+    apartment_num = SelectField(
+        "Apartment No.", choices=[(0, "Choose...")]+[(k, k) for k in range(1, 91)], default=0, validators=[NumberRange(min=1, max=90)]
+    )
+
+    server = SelectField(
+        "Data center",
+        choices=[(0, "Choose...")]+[
+            (i+1, item["server-name"]) for i, item in enumerate(MERGED_SERVERS)
+        ],
+        default="Balmung",
+        validators=[NumberRange(1, len(MERGED_SERVERS))]
+    )
+
+
+class VenueContactAndSocials(FlaskForm):
+    address = FormField(VenuePlotAddress)
+
+    venue_website = StringField("Website")
+    venue_opening_times = StringField("Operating hours")
+    venue_discord = StringField("Discord")
+    venue_twitter = StringField("Twitter")
+
+    submit_venue_contact = SubmitField("Save venue contacts and socials")
+
+
+class VenueStaffDetails(FlaskForm):
+    staff_role = StringField("Role at venue")
+    staff_discord = StringField("Own Discord")
+    staff_twitter = StringField("Own Twitter")
+    staff_website = StringField("Personal website (if any)")
+
+    submit_staff_details = SubmitField("Save own details")
