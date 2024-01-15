@@ -1,6 +1,6 @@
 /.env
 /classjob-icons.zip
-/__pycache__
-/static/assets/uploaded-img
+/uploaded-img
 /resources
 /.gitignore
+__pycache__

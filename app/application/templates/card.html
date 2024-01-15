@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+        <title>Adventure Plate generator</title>
+        {{ bootstrap.load_css() }}
+        {{ bootstrap.load_js() }}
+        <script src="https://code.createjs.com/1.0.0/createjs.min.js"></script>
+        <link rel="stylesheet" href="{{url_for('static', filename='assets/styles/styles.css')}}">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <!-- Desktop layout coded and styled against 1280x720 (720p) displays. Any smaller and maybe mobile format? -->
+        {% from 'bootstrap5/form.html' import render_form %}
+    </head>
+
+    <body>
+        <div class="container main-container px-0 pb-2 h-100" style="border: 2px solid black; border-radius: 10px;">
+            <header class="bg-dark text-white">
+                <!-- Navigation tabs -->
+                <ul class="nav nav-tabs" id="myTabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="summary-tab" data-bs-toggle="tab" href="#summary">Summary</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="raid-performance-tab" data-bs-toggle="tab" href="#raid-performance">Raid Performance</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="mounts-minions-tab" data-bs-toggle="tab" href="#collectibles">Collectibles</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="roleplay-tab" data-bs-toggle="tab" href="#roleplay">Roleplay</a>
+                    </li>
+                    {% if is_edit == True %}
+                    <li class="nav-item">
+                        <a class="nav-link" id="settings-tab" data-bs-toggle="tab" href="#settings">Settings</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </header>
+    
+            <!-- Avatar and text container -->
+            <!-- Content tabs -->
+            <div class="tab-content tab-containers px-3">
+                <!-- Summary tab content -->
+                <div class="tab-pane fade show active h-100" id="summary">
+                    <div class="row my-1 h-100">
+                        <!-- Avatar container with max dimensions and centered position -->
+                        <div class="col-md-4 d-flex align-items-center">
+                            <div class="avatar-container">
+                                <!-- Your dynamic avatar image -->
+                                {% if "avatar" not in src %}
+                                <img class="avatar img-fluid" id="avatar" src="{{collectible['character']['portrait']}}" alt="Avatar">
+                                {% else %}
+                                <img class="avatar img-fluid" id="avatar" src="{{src['avatar']}}" alt="Avatar">
+                                {% endif %}
+                            </div>
+                        </div>
+    
+                        <!-- Text container for right-aligned text -->
+                        <div class="col-md-8 text-container align-items-center">
+                            <div class="row h-100 justify-content-between">
+
+                                {% include "job-containers.html" %}
+                                <div class="col">
+                                    <div class="character-name"><h3>{{character["name"]}} / {{character["race"]["gender"]}} / <img class="icon" style="height: 2.5rem; width: 2.5rem;" src="static\assets\job_icons\weaver.png"></h3></div>
+                                    <div class="ingame-title"><h3>« {{character["title"]}} »</h3></div>
+                                    <div class="race-subrace"><h3>{{character["race"]["race"][0]}} - {{character["race"]["race"][1:]|join(" ")}}</h3></div>
+                                    <div class="twelve"><h2>{{character["twelve"]["name"]}} <img src="{{character['twelve']['icon']}}" /></h3></div>
+                                    <div class="server-info mb-0"><h3 class="mb-0">{{character["dcserver"][1]}} - {{character["dcserver"][0]}}</h3></div>
+                                    {% if character.get("freecompany") != None %}
+                                    <div class="free-company py-3 mt-0">
+                                        <div class="flex-container">
+                                            <!-- Three overlapping images -->
+                                            <img class="company-logo top-layer" src="{{character['freecompany']['top']}}" alt="Logo 1">
+                                            <img class="company-logo middle-layer" src="{{character['freecompany']['middle']}}" alt="Logo 2">
+                                            <img class="company-logo bottom-layer" src="{{character['freecompany']['bottom']}}" alt="Logo 3">
+                                            <!-- Text content -->
+                                            <div class="text-content">
+                                                <h3>{{character["freecompany"]["name"]}} - {{character["freecompany"]["tag"]}}</h3>
+                                            </div>
+                                
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    <!-- Additional element for displaying up to 500 characters of text -->
+                                    <div id="additional-text" class="additional-text text-wrap">
+                                        <p>China is where dead RTSs go to die</p>
+                                        {% if is_edit == True %}
+                                        <span id="edit-summary-button" onclick="enableEditing()">📝</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="activity-indicators" style="border: 1px solid black;" style="height: 10rem;">
+                                        <!-- possibly will naturally fill -->
+                                        <!-- possibly up to 8 icons -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Raid Performance tab content -->
+                <div class="tab-pane fade h-100" id="raid-performance">
+                    <div class="row h-100 py-2">
+                        {% if raid != none %}
+                        {% include "raids.html" %}
+                        {% else %}
+                        <!-- Another condition might be needed for fully private logs -->
+                        <h1>This character's raid logs either don't exist or are privated</h1>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Mounts/Minions tab content -->
+                <div class="tab-pane fade h-100" id="collectibles">
+                    <div class="row h-100 py-2">
+                        {% include "collectible-containers.html" %}
+                    </div>
+                </div>
+
+                <!-- Roleplay tab content -->
+                <div class="tab-pane fade h-100" id="roleplay">
+                    {% include "roleplaying.html" %}
+
+                    {% include "business.html" %}
+                </div>
+                
+                {% if is_edit == True %}
+                <!-- Settings tab content -->
+                <div class="tab-pane fade h-100" id="settings">
+                    <!-- New Container for Elements Outside main-container -->
+                    <!-- TODO fix 1080p -->
+                    <!-- style="width:72rem; border: 2px solid black; border-radius: 10px; position: absolute; top:100%;" -->
+                    <div id="edit" class="container px-0 pb-2 mt-2 m-auto form-check form-switch">
+                        <div id="settings">
+                            {{render_form(form, id="portrait-form", novalidate=True)}}
+                            <div id="layout_switch" class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="layoutSwitch">
+                                <label class="form-check-label" for="layoutSwitch">Switch between layouts (On for venues)</label>
+                            </div>
+                            {{render_form(form, id="roleplay-settings", novalidate=True, extra_classes="form-check form-switch px-0")}}
+                            {{render_form(bsform, id="business-settings", novalidate=True, extra_classes="form-check form-switch px-0 d-none")}}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <footer>
+                <!-- Your footer content here -->
+            </footer>
+        </div>
+        {% if is_edit == True %}
+        {% include "modals.html" %}
+        {% endif %}
+        <!-- Add Bootstrap JS and Popper.js scripts -->
+        <script type="text/javascript">
+            document.addEventListener('DOMContentLoaded', function () {
+                // Get the switch and layout divs
+                const layoutSwitch = document.getElementById('layoutSwitch');
+                const layoutSwitchDiv = layoutSwitch.parentElement
+                const editingContainer = document.getElementById('settings')
+
+                const combinedImageSpace = document.getElementById('combinedImageSpace');
+                const venueImage = document.getElementById('venueImage');
+                const businessName = document.getElementById('businessName')
+                const imageFields = [document.getElementById('logo'), document.getElementById('venue'), document.getElementById('big_venue')]
+                layoutImageSwitcher(document.getElementById("layout").value == 2 ? true : false, imageFields)
+                // Add an event listener to the switch
+
+                layoutSwitch.addEventListener("change", function(){
+                    if(layoutSwitch.checked){
+                        document.getElementById("roleplayingLayout").classList.add('d-none')
+                        document.getElementById("businessCardLayout").classList.remove('d-none')
+                        document.getElementById("roleplay-settings").classList.add('d-none')
+                        document.getElementById("business-settings").classList.remove('d-none')
+                    }else{
+                        document.getElementById("roleplayingLayout").classList.remove('d-none')
+                        document.getElementById("businessCardLayout").classList.add('d-none')
+                        document.getElementById("roleplay-settings").classList.remove('d-none')
+                        document.getElementById("business-settings").classList.add('d-none')
+                    }
+                })
+
+                document.getElementById('layout').addEventListener('change', function () {
+                    const selectedLayout = this.value;
+                    // TODO set value of 1/2/3 or use actual values to display
+                    // TODO form field disabling due to switching
+                    switch (selectedLayout) {
+                        case '1':
+                            // Two Images, 375x375px logo, 650x375px small venue img, no h1 name
+                            document.getElementById("businessImg").classList.remove("d-none");
+                            document.getElementById("venueImg").classList.remove("d-none");
+                            document.getElementById("bigImg").classList.add("d-none");
+                            businessName.style.display = 'none'
+                            layoutImageSwitcher(false, imageFields)
+                            break;
+                        case '2':
+                            // No Image, 1140x375px Space for H1 Text
+                            document.getElementById("businessImg").classList.add("d-none");
+                            document.getElementById("venueImg").classList.add("d-none");
+                            document.getElementById("bigImg").classList.remove("d-none");
+                            businessName.style.display = 'block'
+                            layoutImageSwitcher(true, imageFields)
+                            break;
+                        case '3':
+                            // Two Images, 375x375px logo, 650x375px small venue img, includes h1 name
+                            document.getElementById("businessImg").classList.remove("d-none");
+                            document.getElementById("venueImg").classList.remove("d-none");
+                            document.getElementById("bigImg").classList.add("d-none");
+                            businessName.style.display = 'block'
+                            layoutImageSwitcher(false, imageFields)
+                            break;
+                        default:
+                            break;
+                    }
+                });
+            });
+
+            function layoutImageSwitcher(state, images){
+                // state bool is for big image, two images is inversed
+                images.forEach(ele=>{
+                    if(state) {
+                        if(ele.id === "big_venue"){
+                            ele.removeAttribute("disabled")
+                        }else{
+                            ele.setAttribute("disabled", true)
+                        }
+                    }else{
+                        if(ele.id === "big_venue"){
+                            ele.setAttribute("disabled", true)
+                        } else{
+                            ele.removeAttribute("disabled")
+                        }
+                    }
+                })
+            }
+
+            function twoImages(row){
+                let logoDiv = document.createElement("div")
+                let venueDiv = document.createElement("div")
+                let logoImg = document.createElement("img")
+                let venueImg = document.createElement("img")
+
+                logoDiv.classList.add("col-md-5")
+                venueDiv.classList.add("col-md-7")
+                venueDiv.classList.add("text-end")
+                
+                logoImg.id = "businessImg"
+                venueImg.id = "venueImg"
+
+                logoImg.src = "https://via.placeholder.com/375x375"
+                venueImg.src = "https://via.placeholder.com/650x375"
+                logoImg.classList.add("img-fluid")
+                venueImg.classList.add("img-fluid")
+                
+                logoDiv.appendChild(logoImg)
+                venueDiv.appendChild(venueImg)
+                row.appendChild(logoDiv)
+                row.appendChild(venueDiv)
+            }
+
+            function enableEditing() {
+                // Get the existing text content
+                const existingText = document.querySelector('#additional-text p').innerText;
+
+                // Create an input element for editing
+                const inputElement = document.createElement('textarea');
+                // inputElement.type = 'text';
+                inputElement.value = existingText;
+                inputElement.maxLength = 200; // Set the maximum character limit
+                inputElement.classList.add("w-100")
+                inputElement.classList.add("form-control")
+                inputElement.style.height = "6.5rem"
+                inputElement.style.fontSize = "1rem"
+                inputElement.style.resize = "none"
+
+                // Create a button for confirmation
+                const confirmButton = document.createElement('button');
+                confirmButton.innerText = 'Confirm';
+                confirmButton.onclick = saveChanges;
+                confirmButton.classList.add("form-control")
+                confirmButton.classList.add("btn")
+                confirmButton.classList.add("btn-primary")
+
+                // Replace the existing div content with the input and button
+                document.getElementById("edit-summary-button").remove()
+                const additionalTextDiv = document.getElementById('additional-text');
+                additionalTextDiv.innerHTML = ''; // Clear existing content
+                additionalTextDiv.appendChild(inputElement);
+                additionalTextDiv.appendChild(confirmButton);
+
+                // Focus on the input field
+                inputElement.focus();
+            }
+
+            function saveChanges() {
+                // Get the input element and its value
+                const inputElement = document.querySelector('#additional-text textarea');
+                const newText = inputElement.value;
+                // Limit the text to 500 characters
+                const limitedText = newText.substring(0, 200);
+
+                // Replace the input and button with the updated text
+                const additionalTextDiv = document.getElementById('additional-text');
+                additionalTextDiv.innerHTML = `<p>${limitedText}</p><span id='edit-summary-button' onclick='enableEditing()'>📝</span>`;
+            }
+
+            $("#portrait-form").submit(event=>{
+                console.log("here")
+                event.preventDefault();
+                console.log("portrait")
+
+                const editForm = new FormData(document.getElementById("portrait-form"))
+                editForm.append("source", "summary")
+
+                $.ajax({
+                    url: "{{url_for('upload_portrait')}}",
+                    data: editForm,
+                    contentType: false,
+                    processData: false,
+                    type: "POST",
+                    // success: data=>{
+                    //     document.getElementById("avatar").src=data["src"]
+                    // }
+                }).done(data=>{
+                    imgurl=`${data["src"]}?timestamp=${Date.now()}`
+                    document.getElementById("avatar").src=imgurl
+                })
+            })
+
+            $("#roleplay-settings").submit(event=>{
+                console.log("here")
+                event.preventDefault();
+                console.log("roleplay")
+
+                const editForm = new FormData(document.getElementById("roleplay-settings"))
+                editForm.append("source", "roleplay")
+
+                $.ajax({
+                    url: "{{url_for('upload_portrait')}}",
+                    data: editForm,
+                    contentType: false,
+                    processData: false,
+                    type: "POST",
+                    // success: data=>{
+                    //     document.getElementById("rp-avatar").src=data["src"]
+                    // }
+                }).done(data=>{
+                    imgurl=`${data["src"]}?timestamp=${Date.now()}`
+                    document.getElementById("rp-avatar").src=imgurl
+                })
+            })
+
+            $("#business-settings").submit(event=>{
+                console.log("here");
+                event.preventDefault();
+                console.log("business");
+
+                const editForm = new FormData(document.getElementById("business-settings"))
+
+                $.ajax({
+                    url: "{{url_for('upload_venue_images')}}",
+                    data: editForm,
+                    contentType: false,
+                    processData: false,
+                    type: "POST",
+                }).done(data=>{
+                    console.log(data)
+                    if(data["uploaded"] === "two"){
+                        imgOneUrl = `${data["src"]["one"]}?timestamp=${Date.now()}`
+                        imgTwoUrl = `${data["src"]["two"]}?timestamp=${Date.now()}`
+                        document.getElementById("businessImg").src = imgOneUrl != null ? imgOneUrl : "https://via.placeholder.com/375x375"
+                        document.getElementById("venueImg").src = imgTwoUrl != null ? imgTwoUrl : "https://via.placeholder.com/650x375"
+                    }else{
+                        imgBigUrl = `${data["src"]}?timestamp=${Date.now()}`
+                        document.getElementById("bigImg").src = imgBigUrl != null ? imgBigUrl : "https://via.placeholder.com/1140x375"
+                    }
+                })
+            })
+        </script>
+        {{ bootstrap.load_js() }}
+    </body>
+</html>
