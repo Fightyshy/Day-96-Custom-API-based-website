@@ -12,7 +12,7 @@ from wtforms import (
     SubmitField,
 )
 from wtforms.validators import DataRequired, URL, Length, NumberRange
-from ..views.api_fetchers import SERVERS
+from .api_fetchers import SERVERS
 
 MERGED_SERVERS = (
     SERVERS.get_jp() + SERVERS.get_NA() + SERVERS.get_EU() + SERVERS.get_OC()
@@ -196,11 +196,11 @@ class VenuePlotAddress(FlaskForm):
     housing_zone = SelectField(
         "Housing zone",
         choices=[
-            (1, "The Mist"),
-            (2, "The Lavender Beds"),
-            (3, "The Goblet"),
-            (4, "Shirogane"),
-            (5, "The Firmament"),
+            "The Mist",
+            "The Lavender Beds",
+            "The Goblet",
+            "Shirogane",
+            "The Firmament",
         ],
         default="The Mist",
     )

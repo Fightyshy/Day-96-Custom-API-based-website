@@ -6,7 +6,8 @@ from flask import (
     request,
     url_for,
 )
-from .api_fetchers import (
+from ..objects.api_fetchers import (
+    SERVERS,
     get_collectibles,
     get_fflogs_token,
     get_fflogs_character,
@@ -31,8 +32,9 @@ from ..objects.forms import (
     VenueStaffDetails,
 )
 
-card_maker = Blueprint("card_maker", __name__, templates="templates")
+card_maker = Blueprint("card_maker", __name__, template_folder="templates")
 
+# TODO for uploaders, find object store service to send images too
 @card_maker.route("/character/venue", methods=["POST"])
 def upload_venue_images():
     if request.method == "POST":
@@ -123,7 +125,8 @@ def upload_venue_images():
                 })
     return jsonify({"test": "error"})
 
-
+# TODO for uploaders, find object store service to send images too
+# TODO revert to default Lodestone
 @card_maker.route("/character/portrait", methods=["POST"])
 def upload_portrait():
     if request.method == "POST":
@@ -133,8 +136,8 @@ def upload_portrait():
             extension = image.filename.split(".")[-1]
 
             if request.form["source"] == "summary":
-                # TODO get char_id and check against filename sans extension
-                # TODO add new file using char_id as file name while preserving file format
+                # get char_id and check against filename sans extension
+                # add new file using char_id as file name while preserving file format
                 # May have to change in the future because O(n) could get expensive on a server
                 for root, dirs, files in os.walk(
                     os.path.join(current_app.root_path, r"static\assets\uploaded-img")
