@@ -12,7 +12,7 @@ import requests
 
 from ..objects.char_claim_token import generate_token, confirm_token
 from ..objects import const_loader
-
+from ..models.models import PlayerCharacter, db
 from ..objects.forms import (
     ClaimCharForm,
     LodestoneForm,
@@ -77,10 +77,13 @@ def claim_charid():
         response.raise_for_status()
         soup = bs4.BeautifulSoup(response.text, "html.parser")
         char_prof = soup.select_one(".character__selfintroduction")
-        if char_prof.text == token:
-            print("Success")
-            return redirect(url_for("main_page.retrieve_char_details", charid=charid))
-        else:
+        retrieved = db.session.execute(db.select(PlayerCharacter).where(PlayerCharacter.char_id==charid)).scalar()
+
+        if retrieved:
+            print("Exists already")
+            flash("This character has already been claimed. If this was not done by you, please contact me to resolve this.")
+            return render_template("authentication.html", form=claimform, token=token)
+        elif char_prof.text != token:
             flash(
                 "Text in character profile does not match. Please try again removing any extra text/spaces from your character profile, and inserting your confirmation code again.",
                 "error",
@@ -88,4 +91,12 @@ def claim_charid():
             return render_template(
                 "authentication.html", form=claimform, token=token
             )
+        else:
+            print("Success")
+            new_char = PlayerCharacter()
+            new_char.char_id = charid
+            db.session.add(new_char)
+            db.session.commit()
+            return redirect(url_for("retrieve_char_details", charid=charid, mode="edit"))
+
     return render_template("authentication.html", form=claimform, token=token)

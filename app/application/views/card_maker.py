@@ -2,6 +2,7 @@ from flask import (
     Blueprint,
     current_app,
     jsonify,
+    redirect,
     render_template,
     request,
     url_for,
@@ -227,6 +228,8 @@ def retrieve_char_details():
         portraitform.char_id_summary.data = lodestone_id
         bsform.char_id_bs.data = lodestone_id
         src = {}
+
+        # TODO change to saving paths/links in database
         for root, dirs, files in os.walk(
             os.path.join(current_app.root_path, r"static\assets\uploaded-img")
         ):
@@ -300,7 +303,7 @@ def retrieve_char_details():
         }
     else:
         # condition check edit mode or no
-        mode = request.args.get("mode")
+        mode = request.args.get("mode", None)
         if mode == "edit":
             return render_template(
                 "card.html",
@@ -325,7 +328,7 @@ def retrieve_char_details():
                 aliases="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                 is_edit=True,
             )
-        elif mode == "view":
+        elif mode == "view" or mode is None:
             return render_template(
                 "card.html",
                 character=retrieved_data.to_dict(),
@@ -336,3 +339,4 @@ def retrieve_char_details():
                 src=src,
                 is_edit=False,
             )
+    return render_template("card.html")

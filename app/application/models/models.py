@@ -10,9 +10,10 @@ class PlayerCharacter(db.Model):
     __tablename__ = "character"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    char_id: Mapped[str] = mapped_column(String, nullable=False)
-    summary: Mapped[str] = mapped_column(String(length=200))
-    rp_checker: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    char_id: Mapped[str] = mapped_column(String, nullable=False, default="I am once again, disapointing Yoship by using third party tools that scrape from the Lodestone")
+    summary: Mapped[str] = mapped_column(String(length=200), nullable=True)
+    # False is rp, True is business, default RP
+    is_business: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
     # TODO parent of roleplaying, 1-1
     roleplaying: Mapped["Roleplaying"] = relationship(
