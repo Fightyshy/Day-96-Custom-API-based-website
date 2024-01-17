@@ -1,6 +1,7 @@
 from itertools import groupby
 import json
 import os
+from flask import url_for
 from flask_caching import Cache
 import requests
 from requests.auth import HTTPBasicAuth
@@ -8,8 +9,8 @@ from werkzeug.utils import secure_filename
 from gql import Client
 from gql.dsl import DSLQuery, DSLSchema, dsl_gql
 from gql.transport.requests import RequestsHTTPTransport
-from ..objects.character import Character, CharacterRaids
-from ..objects.const_loader import CharacterData, MetaLinks, Raidzones, Servers
+from .character import Character, CharacterRaids
+from .const_loader import CharacterData, MetaLinks, Raidzones, Servers
 # from dotenv import load_dotenv
 import bs4
 # from flask_caching import Cache
@@ -166,8 +167,12 @@ def get_collectibles(char_id: int) -> dict:
     :return: Character's owned mounts/minions/achievements
     """
     # Bypass circular import restrictiion by importing on func execute
-    from .. import COLLECT_CACHE, LEN_MOUNTS, LEN_ACHIEVES, LEN_MINIONS
-
+    # from .. import COLLECT_CACHE, LEN_MOUNTS, LEN_ACHIEVES, LEN_MINIONS
+    # print(COLLECT_CACHE, LEN_MINIONS, LEN_MOUNTS)
+    COLLECT_CACHE = ffxiv_cached_resources()
+    LEN_MOUNTS = len(COLLECT_CACHE["mounts"])
+    LEN_MINIONS = len(COLLECT_CACHE["minions"])
+    LEN_ACHIEVES = len(COLLECT_CACHE["achievements"])
     # query ffxiv_collect once to build cache of objects
     # scrape and match id/names once only, timeout every x
 
