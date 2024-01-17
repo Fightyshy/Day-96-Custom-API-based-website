@@ -4,13 +4,9 @@ from flask import Flask
 from flask_bootstrap import Bootstrap5
 import requests
 
-from application.views.api_fetchers import ffxiv_cached_resources, get_fflogs_character, merge_raids
+from .objects.api_fetchers import ffxiv_cached_resources
 
 bs5 = Bootstrap5()
-COLLECT_CACHE = ""
-LEN_MOUNTS = ""
-LEN_MINIONS = ""
-LEN_ACHIEVES = ""
 
 def init_app():
     # Create app
@@ -21,20 +17,27 @@ def init_app():
     # Config app
     app.config["SECRET_KEY"] = os.environ["CSRF"]
     app.config["SECURITY_PASSWORD_SALT"] = os.environ["TOKEN_SALT"]
-    app.config["CACHE_TYPE"] = "SimpleCache"
+    app.config["CACHE_TYPE"] = "FileSystemCache"
+    app.config["CACHE_DIR"] = "./temp"
     app.config["CACHE_DEFAULT_TIMEOUT"] = 300
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///store.db"
 
     # Apply app libraries
     bs5.init_app(app)
-    from .views.api_fetchers import cache
+    from .objects.api_fetchers import cache
     cache.init_app(app)
-
+    from .models.models import db
+    db.init_app(app)
+    
     # substitute with actual caching solution or cache to file later
-    COLLECT_CACHE = ffxiv_cached_resources()
-    LEN_MOUNTS = len(COLLECT_CACHE["mounts"])
-    LEN_MINIONS = len(COLLECT_CACHE["minions"])
-    LEN_ACHIEVES = len(COLLECT_CACHE["achievements"])
+    # for now, filesystem cache to temp folder
+    ffxiv_cached_resources()
+
     # Set app blueprints
-    from .views.main import main_page
+    from .views.char_get import main_page
+    from .views.card_maker import card_maker
     app.register_blueprint(main_page)
+    app.register_blueprint(card_maker)
+    with app.app_context():
+        db.create_all()
     return app
