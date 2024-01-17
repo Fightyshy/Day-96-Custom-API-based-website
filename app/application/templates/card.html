@@ -84,7 +84,7 @@
                                     {% endif %}
                                     <!-- Additional element for displaying up to 200 characters of text -->
                                     <div id="additional-text" class="additional-text text-wrap">
-                                        <p>China is where dead RTSs go to die</p>
+                                        <p>{{database.summary}}</p>
                                         {% if is_edit == True %}
                                         <span id="edit-summary-button" onclick="enableEditing()">📝</span>
                                         {% endif %}
@@ -298,12 +298,24 @@
                 // Get the input element and its value
                 const inputElement = document.querySelector('#additional-text textarea');
                 const newText = inputElement.value;
-                // Limit the text to 500 characters
+                // Force limit the text to 200 characters to send
                 const limitedText = newText.substring(0, 200);
 
+                // jQuery for now to show it's working, gonna figure out async fetch later
+                $.ajax({
+                    url: "{{url_for('card_maker.save_char_summary')}}",
+                    data: JSON.stringify({
+                        "char_id": "{{database.char_id}}",
+                        "summary": limitedText
+                    }),
+                    type: "POST",
+                    contentType: "application/json"
+                }).done(data=>{
+                    const additionalTextDiv = document.getElementById('additional-text');
+                    additionalTextDiv.innerHTML = `<p>${data["summary"]}</p><span id='edit-summary-button' onclick='enableEditing()'>📝</span>`;
+                })
+
                 // Replace the input and button with the updated text
-                const additionalTextDiv = document.getElementById('additional-text');
-                additionalTextDiv.innerHTML = `<p>${limitedText}</p><span id='edit-summary-button' onclick='enableEditing()'>📝</span>`;
             }
 
             $("#portrait-form").submit(event=>{

@@ -17,7 +17,7 @@ from ..objects.api_fetchers import (
 )
 import os
 from werkzeug.utils import secure_filename
-
+from ..models.models import PlayerCharacter, db
 from ..objects.forms import (
     BusinessImages,
     RPCharNicknames,
@@ -283,6 +283,7 @@ def retrieve_char_details():
                 SERVERS.get_region(retrieved_data.dcserver[0]),
             )
         )
+        retrieved_database = db.session.execute(db.select(PlayerCharacter).where(PlayerCharacter.char_id == lodestone_id)).scalar()
     except TypeError as error:
         return {
             "Status": "404",
@@ -312,6 +313,7 @@ def retrieve_char_details():
                 if retrieved_logs is not None
                 else None,
                 collectible=retrieve_collectibles,
+                database=retrieved_database,
                 form=portraitform,
                 bsform=bsform,
                 hookform=hookform,
@@ -336,7 +338,19 @@ def retrieve_char_details():
                 if retrieved_logs is not None
                 else None,
                 collectible=retrieve_collectibles,
+                database=retrieved_database,
                 src=src,
                 is_edit=False,
             )
     return render_template("card.html")
+
+@card_maker.route("/char-summary", methods=["POST"])
+def save_char_summary():
+    """Saves the Char Summary section of a Character's page."""
+
+    if request.method == "POST":
+        retrieved = request.get_json()
+        get_char = db.session.execute(db.select(PlayerCharacter).where(PlayerCharacter.char_id==retrieved["char_id"])).scalar()
+        get_char.summary = request.get_json()["summary"]
+        db.session.commit()
+        return jsonify({"summary": get_char.summary})
