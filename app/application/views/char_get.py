@@ -10,7 +10,6 @@ from flask import (
 import bs4
 import requests
 
-from application.views.api_fetchers import ffxiv_cached_resources
 from ..objects.char_claim_token import generate_token, confirm_token
 from ..objects import const_loader
 
