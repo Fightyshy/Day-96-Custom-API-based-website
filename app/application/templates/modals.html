@@ -339,7 +339,7 @@
             document.getElementById("nicknames").value = document.getElementById("char-alias").innerText.substring(5)
         });
 
-        $("#nicknames-form").submit(event=>{
+        document.getElementById("nicknames-form").addEventListener("submit", event=>{
             event.preventDefault();
             const formData = new FormData(document.getElementById("nicknames-form"));
             formData.append("char_id", "{{database.char_id}}");
@@ -351,9 +351,13 @@
                 processData: false,
                 type:"POST",
                 success: data=>{
-                    console.log(data)
-                    document.getElementById("char-alias").innerText = `AKA: ${data["alias"]}`
-                }
+                    if(data.status == "200"){
+                        document.getElementById("char-alias").innerText = `AKA: ${data["alias"]}`;
+                        modalCloseOnSuccess("RPCharNicknamesModal")
+                    } else{
+                        alert(`There's a error in your input ${data.error[0]}`);
+                    }
+                },
             })
         });
 
@@ -420,6 +424,14 @@
 
         //TODO handle submit ajax
         //TODO update hooks with response from server
+
+        // helper funcs for modals
+        function modalCloseOnSuccess(modal){
+            let toClose = bootstrap.Modal.getInstance(`#${modal}`);
+            toClose.hide();
+            // Manually delete static backdrop div
+            document.getElementsByClassName("modal-backdrop")[0].remove();
+        }
     });
 
 //business field handling

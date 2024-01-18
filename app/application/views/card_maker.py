@@ -360,11 +360,14 @@ def save_roleplaying_data():
     if request.method == "POST":
         char_id = request.form["char_id"]
         data = RPCharNicknames()
-        get_char = db.session.execute(db.select(PlayerCharacter).where(PlayerCharacter.char_id==char_id)).scalar()
-        char_rp = check_roleplaying(get_char)
-        char_rp.alias = data.nicknames.data
-        db.session.commit()
-        return jsonify({"alias": char_rp.alias})
+        if data.validate():
+            get_char = db.session.execute(db.select(PlayerCharacter).where(PlayerCharacter.char_id==char_id)).scalar()
+            char_rp = check_roleplaying(get_char)
+            char_rp.alias = data.nicknames.data
+            db.session.commit()
+            return jsonify({"status":"200", "alias": char_rp.alias})
+        else:
+            return jsonify({"status":"4xx", "error": data.errors})
 
 
 @card_maker.route("/rp-venue-mode", methods=["POST"])
