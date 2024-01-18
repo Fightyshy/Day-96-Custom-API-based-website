@@ -31,10 +31,10 @@ class Roleplaying(db.Model):
 
     # character ic
     alias: Mapped[str] = mapped_column(String(length=40))
-    age: Mapped[str] = mapped_column(String(length=5), nullable=False)
-    gender: Mapped[str] = mapped_column(String(length=20), nullable=False)
-    sexuality: Mapped[str] = mapped_column(String(length=30), nullable=False)
-    relationship_status: Mapped[str] = mapped_column(String(length=20))
+    age: Mapped[str] = mapped_column(String(length=5), nullable=False, default=18)
+    gender: Mapped[str] = mapped_column(String(length=20), nullable=False, default="Fill this in")
+    sexuality: Mapped[str] = mapped_column(String(length=30), nullable=False, default="Fill this in")
+    relationship_status: Mapped[str] = mapped_column(String(length=20), nullable=False, default="Single")
     tagline: Mapped[str] = mapped_column(String(length=50))
 
     # character ooc

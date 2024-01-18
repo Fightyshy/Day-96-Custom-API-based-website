@@ -10,9 +10,9 @@
         </h3>
 
         <!-- Aliases/Nicknames (Smaller text) -->
-        {% if aliases|length >= 2 %}
+        {% if database.roleplaying.alias|length >= 2 %}
         <!-- Limit 2-40 chars -->
-        <p class="aliases-text mb-2">AKA: {{aliases}}</p>
+        <p id="char-alias" class="aliases-text mb-2">AKA: {{database.roleplaying.alias}}</p>
         {% endif %}
         <!-- Character Box -->
         <div class="socials-box mt-0 px-1 py-2">

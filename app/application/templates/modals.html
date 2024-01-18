@@ -167,7 +167,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                {{render_form(nicknamesform, id="nicknamesform", novalidate=True)}}
+                {{render_form(nicknamesform, id="nicknames-form", novalidate=True)}}
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -335,6 +335,51 @@
 
         //TODO handle submit ajax
         //TODO update hooks with response from server
+        document.getElementById("RPCharNicknamesModal").addEventListener("show.bs.modal", event=>{
+            document.getElementById("nicknames").value = document.getElementById("char-alias").innerText.substring(5)
+        });
+
+        $("#nicknames-form").submit(event=>{
+            event.preventDefault();
+            const formData = new FormData(document.getElementById("nicknames-form"));
+            formData.append("char_id", "{{database.char_id}}");
+
+            $.ajax({
+                url:"{{url_for('card_maker.save_roleplaying_data')}}",
+                data: formData,
+                contentType: false,
+                processData: false,
+                type:"POST",
+                success: data=>{
+                    console.log(data)
+                    document.getElementById("char-alias").innerText = `AKA: ${data["alias"]}`
+                }
+            })
+
+            // $.post(
+            //     "{{url_for('card_maker.save_roleplaying_data')}}",
+            //     formData,
+            //     data => {
+            //         document.getElementById("char-alias").innerText = data["alias"]
+            //     },
+            //     "xml"
+            // )
+        });
+
+        // document.getElementById("nicknamesform").addEventListener("submit", event=>{
+        //     event.preventDefault();
+        //     const formData = new FormData(document.getElementById("nicknamesform"));
+        //     formData.append("char_id", "{{database.char_id}}");
+        //     console.log(formData)
+            
+        //     $.post(
+        //         "{{url_for('card_maker.save_roleplaying_data')}}",
+        //         formData,
+        //         data => {
+        //             document.getElementById("char-alias").innerText = data["alias"]
+        //         }
+        //     )
+        // })
 
         //rp trait field adders/removers
         //positive traits

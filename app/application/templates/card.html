@@ -319,9 +319,7 @@
             }
 
             $("#portrait-form").submit(event=>{
-                console.log("here")
                 event.preventDefault();
-                console.log("portrait")
 
                 const editForm = new FormData(document.getElementById("portrait-form"))
                 editForm.append("source", "summary")

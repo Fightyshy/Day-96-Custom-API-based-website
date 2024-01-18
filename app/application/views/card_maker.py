@@ -17,7 +17,7 @@ from ..objects.api_fetchers import (
 )
 import os
 from werkzeug.utils import secure_filename
-from ..models.models import PlayerCharacter, db
+from ..models.models import PlayerCharacter, Roleplaying, db
 from ..objects.forms import (
     BusinessImages,
     RPCharNicknames,
@@ -327,7 +327,6 @@ def retrieve_char_details():
                 venuecontactform=venuecontactform,
                 venuestaffform=venuestaffform,
                 src=src,
-                aliases="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                 is_edit=True,
             )
         elif mode == "view" or mode is None:
@@ -354,3 +353,28 @@ def save_char_summary():
         get_char.summary = request.get_json()["summary"]
         db.session.commit()
         return jsonify({"summary": get_char.summary})
+    
+
+@card_maker.route("/rp-alias", methods=["POST"])
+def save_roleplaying_data():
+    if request.method == "POST":
+        char_id = request.form["char_id"]
+        data = RPCharNicknames()
+        get_char = db.session.execute(db.select(PlayerCharacter).where(PlayerCharacter.char_id==char_id)).scalar()
+        char_rp = check_roleplaying(get_char)
+        char_rp.alias = data.nicknames.data
+        db.session.commit()
+        return jsonify({"alias": char_rp.alias})
+
+
+def check_roleplaying(character: PlayerCharacter)->Roleplaying:
+    """Checks if a Roleplaying child exists within a PlayerCharacter
+        :param character: A PlayerCharacter model
+        :rtype: Roleplaying
+        :return: The PlayerCharacter associated Roleplaying model
+    """
+    if character.roleplaying:
+        return character.roleplaying
+    else:
+        character.roleplaying = Roleplaying()
+        return character.roleplaying
