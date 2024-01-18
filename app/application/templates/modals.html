@@ -333,34 +333,6 @@
             }
         });
 
-        //TODO handle submit ajax
-        //TODO update hooks with response from server
-        document.getElementById("RPCharNicknamesModal").addEventListener("show.bs.modal", event=>{
-            document.getElementById("nicknames").value = document.getElementById("char-alias").innerText.substring(5)
-        });
-
-        document.getElementById("nicknames-form").addEventListener("submit", event=>{
-            event.preventDefault();
-            const formData = new FormData(document.getElementById("nicknames-form"));
-            formData.append("char_id", "{{database.char_id}}");
-
-            $.ajax({
-                url:"{{url_for('card_maker.save_roleplaying_data')}}",
-                data: formData,
-                contentType: false,
-                processData: false,
-                type:"POST",
-                success: data=>{
-                    if(data.status == "200"){
-                        document.getElementById("char-alias").innerText = `AKA: ${data["alias"]}`;
-                        modalCloseOnSuccess("RPCharNicknamesModal")
-                    } else{
-                        alert(`There's a error in your input ${data.error[0]}`);
-                    }
-                },
-            })
-        });
-
         //rp trait field adders/removers
         //positive traits
         document.getElementById("addPosTrait").addEventListener("click", (event)=>{
@@ -424,6 +396,37 @@
 
         //TODO handle submit ajax
         //TODO update hooks with response from server
+
+        document.getElementById("RPCharNicknamesModal").addEventListener("show.bs.modal", event=>{
+            $.get(
+                "{{url_for('card_maker.save_roleplaying_alias', char_id=database.char_id)}}",
+                data=>{
+                    document.getElementById("nicknames").value = data.alias
+                }
+            );
+        });
+
+        document.getElementById("nicknames-form").addEventListener("submit", event=>{
+            event.preventDefault();
+            const formData = new FormData(document.getElementById("nicknames-form"));
+            formData.append("char_id", "{{database.char_id}}");
+
+            $.ajax({
+                url:"{{url_for('card_maker.save_roleplaying_alias')}}",
+                data: formData,
+                contentType: false,
+                processData: false,
+                type:"POST",
+                success: data=>{
+                    if(data.status == "200"){
+                        document.getElementById("char-alias").innerText = `AKA: ${data["alias"]}`;
+                        modalCloseOnSuccess("RPCharNicknamesModal")
+                    } else{
+                        alert(`There's a error in your input ${data.error[0]}`);
+                    }
+                },
+            })
+        });
 
         // helper funcs for modals
         function modalCloseOnSuccess(modal){

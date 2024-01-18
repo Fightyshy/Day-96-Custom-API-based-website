@@ -355,19 +355,21 @@ def save_char_summary():
         return jsonify({"summary": get_char.summary})
     
 
-@card_maker.route("/rp-alias", methods=["POST"])
-def save_roleplaying_data():
+@card_maker.route("/rp-alias", methods=["GET", "POST"])
+def save_roleplaying_alias():
+    char_id = retrieve_char_id_from_ajax(request)
+    get_char = db.session.execute(db.select(PlayerCharacter).where(PlayerCharacter.char_id==char_id)).scalar()
     if request.method == "POST":
-        char_id = request.form["char_id"]
         data = RPCharNicknames()
         if data.validate():
-            get_char = db.session.execute(db.select(PlayerCharacter).where(PlayerCharacter.char_id==char_id)).scalar()
             char_rp = check_roleplaying(get_char)
             char_rp.alias = data.nicknames.data
             db.session.commit()
             return jsonify({"status":"200", "alias": char_rp.alias})
         else:
             return jsonify({"status":"4xx", "error": data.errors})
+    else:
+        return jsonify({"alias": get_char.roleplaying.alias})
 
 
 @card_maker.route("/rp-venue-mode", methods=["POST"])
@@ -383,7 +385,7 @@ def swtich_rp_venue():
         return jsonify({"state": get_char.is_business})
 
 
-def check_roleplaying(character: PlayerCharacter)->Roleplaying:
+def check_roleplaying(character: PlayerCharacter) -> Roleplaying:
     """Checks if a Roleplaying child exists within a PlayerCharacter
         :param character: A PlayerCharacter model
         :rtype: Roleplaying
@@ -394,3 +396,12 @@ def check_roleplaying(character: PlayerCharacter)->Roleplaying:
     else:
         character.roleplaying = Roleplaying()
         return character.roleplaying
+
+
+def retrieve_char_id_from_ajax(req: request) -> int:
+    """Retrieves the Char ID from an AJAX POST Request Body or URI Args
+        :param req: The request data
+        :rtype: int
+        :return: The char_id as an integer
+    """
+    return request.form.get("char_id") if request.form.get("char_id") is not None else request.args.get("char_id")
