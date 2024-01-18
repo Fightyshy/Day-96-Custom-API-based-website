@@ -355,31 +355,7 @@
                     document.getElementById("char-alias").innerText = `AKA: ${data["alias"]}`
                 }
             })
-
-            // $.post(
-            //     "{{url_for('card_maker.save_roleplaying_data')}}",
-            //     formData,
-            //     data => {
-            //         document.getElementById("char-alias").innerText = data["alias"]
-            //     },
-            //     "xml"
-            // )
         });
-
-        // document.getElementById("nicknamesform").addEventListener("submit", event=>{
-        //     event.preventDefault();
-        //     const formData = new FormData(document.getElementById("nicknamesform"));
-        //     formData.append("char_id", "{{database.char_id}}");
-        //     console.log(formData)
-            
-        //     $.post(
-        //         "{{url_for('card_maker.save_roleplaying_data')}}",
-        //         formData,
-        //         data => {
-        //             document.getElementById("char-alias").innerText = data["alias"]
-        //         }
-        //     )
-        // })
 
         //rp trait field adders/removers
         //positive traits

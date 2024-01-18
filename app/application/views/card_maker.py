@@ -367,6 +367,19 @@ def save_roleplaying_data():
         return jsonify({"alias": char_rp.alias})
 
 
+@card_maker.route("/rp-venue-mode", methods=["POST"])
+def swtich_rp_venue():
+    print(request.method)
+    if request.method == "POST":
+        print(request.get_json()["state"])
+        data = request.get_json()
+        char_id = data["char_id"]
+        get_char = db.session.execute(db.select(PlayerCharacter).where(PlayerCharacter.char_id==char_id)).scalar()
+        get_char.is_business = data["state"]
+        db.session.commit()
+        return jsonify({"state": get_char.is_business})
+
+
 def check_roleplaying(character: PlayerCharacter)->Roleplaying:
     """Checks if a Roleplaying child exists within a PlayerCharacter
         :param character: A PlayerCharacter model
