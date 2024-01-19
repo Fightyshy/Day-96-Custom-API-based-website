@@ -371,6 +371,34 @@ def save_roleplaying_alias():
     else:
         return jsonify({"alias": get_char.roleplaying.alias})
 
+@card_maker.route("/rp-summary", methods=["GET", "POST"])
+def save_roleplaying_summary():
+    char_id = retrieve_char_id_from_ajax(request)
+    get_char = retrieve_char_by_char_id(char_id)
+    if request.method == "POST":
+        data = RPCharSummary()
+        if data.validate():
+            try:
+                char_rp = check_roleplaying(get_char)
+                char_rp.age = data.age.data
+                char_rp.gender = data.gender.data
+                char_rp.sexuality = data.sexuality.data
+                char_rp.relationship_status = data.relationship.data
+                db.session.commit()
+            except Exception as e:
+                return jsonify({"status": "server-error", "msg": e})
+            else:
+                return jsonify({"test":"test"})
+        else:
+            return jsonify({"status":"error","errors":data.errors})
+    else:
+        return jsonify({
+            "age": get_char.roleplaying.age,
+            "gender": get_char.roleplaying.gender,
+            "sexuality": get_char.roleplaying.sexuality,
+            "relationship": get_char.roleplaying.relationship_status
+        })
+
 
 @card_maker.route("/rp-venue-mode", methods=["POST"])
 def swtich_rp_venue():
@@ -405,3 +433,13 @@ def retrieve_char_id_from_ajax(req: request) -> int:
         :return: The char_id as an integer
     """
     return request.form.get("char_id") if request.form.get("char_id") is not None else request.args.get("char_id")
+
+
+def retrieve_char_by_char_id(char_id: int) -> PlayerCharacter:
+    """Retrieves the PlayerCharacter using the char_id, returns the object if it exists, else it returns None
+
+        :param char_id: The char_id of a PlayerCharacter
+        :rtype: PlayerCharacter
+        :return: The PlayerCharacter associated with the char_id
+    """
+    return db.session.execute(db.select(PlayerCharacter).where(PlayerCharacter.char_id==char_id)).scalar()
