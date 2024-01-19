@@ -467,6 +467,33 @@ def save_roleplaying_about_me():
             "status": "ok",
             "about_me": get_char.roleplaying.about_me
         })
+    
+
+@card_maker.route("/rp-char-quote", methods=["GET", "POST"])
+def save_roleplaying_quote():
+    char_id = retrieve_char_id_from_ajax(request)
+    get_char = retrieve_char_by_char_id(char_id)
+    if request.method == "POST":
+        data = RPCharQuote()
+        if data.validate():
+            try:
+                char_rp = check_roleplaying(get_char)
+                char_rp.tagline = data.quote.data
+                db.session.commit()
+            except Exception as e:
+                return jsonify({"status": "server-error", "msg": str(e)})
+            else:
+                return jsonify({
+                    "status": "ok",
+                    "quote": char_rp.tagline
+                })
+        else:
+            return jsonify({"status":"error","errors":data.errors})
+    else:
+        return jsonify({
+            "status": "ok",
+            "quote": get_char.roleplaying.tagline
+        })
 
 
 @card_maker.route("/rp-venue-mode", methods=["POST"])

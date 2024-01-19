@@ -402,7 +402,7 @@
                 "{{url_for('card_maker.save_roleplaying_alias', char_id=database.char_id)}}",
                 data=>{
                     if(data.status==="ok"){
-                        populateFields(data)
+                        populateFields(data);
                     }
                 }
             );
@@ -420,9 +420,9 @@
                 processData: false,
                 type:"POST",
                 success: data=>{
-                    serverValidateForm(data, document.getElementById("nicknames-form"), "RPCharNicknamesModal")
+                    serverValidateForm(data, document.getElementById("nicknames-form"), "RPCharNicknamesModal");
                 },
-            })
+            });
         });
 
         document.getElementById("RPCharSummaryModal").addEventListener("show.bs.modal", event=>{
@@ -430,7 +430,7 @@
                 "{{url_for('card_maker.save_roleplaying_summary', char_id=database.char_id)}}",
                 data=>{
                     if(data.status==="ok"){
-                        populateFields(data)
+                        populateFields(data);
                     }
                 }
             );
@@ -462,7 +462,7 @@
                         populateFields(data);
                     }
                 }
-            )
+            );
         });
 
         document.getElementById("rpsocialsform").addEventListener("submit", event=>{
@@ -479,7 +479,7 @@
                 success: data=>{
                     serverValidateForm(data, document.getElementById("rpsocialsform"), "RPSocialsModal");
                 }
-            })
+            });
         });
 
         document.getElementById("RPAboutMeModal").addEventListener("show.bs.modal", event=>{
@@ -487,10 +487,10 @@
                 "{{url_for('card_maker.save_roleplaying_about_me', char_id=database.char_id)}}",
                 data=>{
                     if(data.status==="ok"){
-                        populateFields(data)
+                        populateFields(data);
                     }
                 }
-            )
+            );
         })
 
         document.getElementById("rpaboutmeform").addEventListener("submit", event=>{
@@ -505,7 +505,35 @@
                 processData: false,
                 type: "POST",
                 success: data=>{
-                    serverValidateForm(data, document.getElementById("rpaboutmeform"), "RPAboutMeModal")
+                    serverValidateForm(data, document.getElementById("rpaboutmeform"), "RPAboutMeModal");
+                }
+            });
+        });
+
+        document.getElementById("RPCharQuoteModal").addEventListener("show.bs.modal", event=>{
+            $.get(
+                "{{url_for('card_maker.save_roleplaying_quote', char_id=database.char_id)}}",
+                data=>{
+                    if(data.status==="ok"){
+                        populateFields(data);
+                    }
+                }
+            );
+        });
+
+        document.getElementById("charquoteform").addEventListener("submit", event=>{
+            event.preventDefault();
+
+            const formData = new FormData(document.getElementById("charquoteform"));
+            formData.append("char_id", "{{database.char_id}}")
+            $.ajax({
+                url: "{{url_for('card_maker.save_roleplaying_quote')}}",
+                data: formData,
+                contentType: false,
+                processData: false,
+                type: "POST",
+                success: data=>{
+                    serverValidateForm(data, document.getElementById("charquoteform"), "RPCharQuoteModal");
                 }
             });
         });
@@ -532,7 +560,7 @@
                 formField.parentElement.contains(errorFeedback)?errorFeedback.remove():undefined;
                 // populate
                 formField.value = data[k];
-            })
+            });
         }
 
         function serverValidateForm(data, form, modalName){
