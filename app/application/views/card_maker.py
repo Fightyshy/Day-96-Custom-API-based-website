@@ -442,6 +442,33 @@ def save_roleplaying_socials():
         })
 
 
+@card_maker.route("/rp-about-me", methods=["GET", "POST"])
+def save_roleplaying_about_me():
+    char_id = retrieve_char_id_from_ajax(request)
+    get_char = retrieve_char_by_char_id(char_id)
+    if request.method == "POST":
+        data = RPOOCAboutMe()
+        if data.validate():
+            try:
+                char_rp = check_roleplaying(get_char)
+                char_rp.about_me = data.about_me.data
+                db.session.commit()
+            except Exception as e:
+                return jsonify({"status": "server-error", "msg": str(e)})
+            else:
+                return jsonify({
+                    "status": "ok",
+                    "about_me": char_rp.about_me
+                })
+        else:
+            return jsonify({"status":"error","errors":data.errors})
+    else:
+        return jsonify({
+            "status": "ok",
+            "about_me": get_char.roleplaying.about_me
+        })
+
+
 @card_maker.route("/rp-venue-mode", methods=["POST"])
 def swtich_rp_venue():
     print(request.method)

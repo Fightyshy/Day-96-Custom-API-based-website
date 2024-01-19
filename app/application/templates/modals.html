@@ -224,8 +224,8 @@
                 <form id="rpaboutmeform" method="post" action="#">
                 {{rpaboutmeform.csrf_token}}
                 <!-- {{render_form(rpaboutmeform, id="rpaboutmeform", novalidate=True)}} -->
-                {{rpaboutmeform.aboutme.label}}
-                {{rpaboutmeform.aboutme(class="form-control form-boxes")}}
+                {{rpaboutmeform.about_me.label}}
+                {{rpaboutmeform.about_me(class="form-control form-boxes")}}
                 {{rpaboutmeform.submit_about_me(class="btn btn-primary")}}
                 </form>
             </div>
@@ -463,7 +463,7 @@
                     }
                 }
             )
-        })
+        });
 
         document.getElementById("rpsocialsform").addEventListener("submit", event=>{
             event.preventDefault();
@@ -480,7 +480,35 @@
                     serverValidateForm(data, document.getElementById("rpsocialsform"), "RPSocialsModal");
                 }
             })
+        });
+
+        document.getElementById("RPAboutMeModal").addEventListener("show.bs.modal", event=>{
+            $.get(
+                "{{url_for('card_maker.save_roleplaying_about_me', char_id=database.char_id)}}",
+                data=>{
+                    if(data.status==="ok"){
+                        populateFields(data)
+                    }
+                }
+            )
         })
+
+        document.getElementById("rpaboutmeform").addEventListener("submit", event=>{
+            event.preventDefault();
+
+            const formData = new FormData(document.getElementById("rpaboutmeform"));
+            formData.append("char_id", "{{database.char_id}}");
+            $.ajax({
+                url: "{{url_for('card_maker.save_roleplaying_about_me')}}",
+                data: formData,
+                contentType: false,
+                processData: false,
+                type: "POST",
+                success: data=>{
+                    serverValidateForm(data, document.getElementById("rpaboutmeform"), "RPAboutMeModal")
+                }
+            });
+        });
 
         // helper funcs for modals
         // https://stackoverflow.com/questions/71903920/how-to-hide-bootstrap-5-modal-on-button-click

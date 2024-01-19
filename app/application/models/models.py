@@ -42,6 +42,7 @@ class Roleplaying(db.Model):
     website: Mapped[str] = mapped_column(String(length=40), nullable=True, default="Fill this in if you want!")
     discord: Mapped[str] = mapped_column(String(length=32), nullable=True, default="Fill this in if you want!")
     oc_notes: Mapped[str] = mapped_column(String(length=90), nullable=True, default="Fill this in if you want!")
+    about_me: Mapped[str] = mapped_column(String(length=290), nullable=True, default="Say something about yourself (or your character)")
 
     # relationships
     # TODO parent of hooks, 1-many

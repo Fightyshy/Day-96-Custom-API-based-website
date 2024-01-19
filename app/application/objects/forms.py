@@ -203,7 +203,7 @@ class RPOOCSocials(FlaskForm):
 
 
 class RPOOCAboutMe(FlaskForm):
-    aboutme = TextAreaField("About Me", validators=[Length(max=290)])
+    about_me = TextAreaField("About Me", validators=[Length(max=290)])
     submit_about_me = SubmitField("Save about me")
 
 
