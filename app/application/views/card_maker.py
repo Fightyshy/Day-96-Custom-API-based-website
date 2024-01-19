@@ -2,7 +2,6 @@ from flask import (
     Blueprint,
     current_app,
     jsonify,
-    redirect,
     render_template,
     request,
     url_for,
@@ -20,7 +19,7 @@ from werkzeug.utils import secure_filename
 from ..models.models import PlayerCharacter, Roleplaying, db
 from ..objects.forms import (
     BusinessImages,
-    RPCharNicknames,
+    RPCharAlias,
     RPCharQuote,
     RPCharSummary,
     RPHookForm,
@@ -213,7 +212,7 @@ def retrieve_char_details():
     hookform = RPHookForm()
     traitform = RPTraitsForm()
     charsummaryform = RPCharSummary()
-    nicknamesform = RPCharNicknames()
+    nicknamesform = RPCharAlias()
     charquoteform = RPCharQuote()
     rpsocialsform = RPOOCSocials()
     rpaboutmeform = RPOOCAboutMe()
@@ -360,16 +359,16 @@ def save_roleplaying_alias():
     char_id = retrieve_char_id_from_ajax(request)
     get_char = db.session.execute(db.select(PlayerCharacter).where(PlayerCharacter.char_id==char_id)).scalar()
     if request.method == "POST":
-        data = RPCharNicknames()
+        data = RPCharAlias()
         if data.validate():
             char_rp = check_roleplaying(get_char)
-            char_rp.alias = data.nicknames.data
+            char_rp.alias = data.alias.data
             db.session.commit()
-            return jsonify({"status":"200", "alias": char_rp.alias})
+            return jsonify({"status":"ok", "alias": char_rp.alias})
         else:
-            return jsonify({"status":"4xx", "error": data.errors})
+            return jsonify({"status":"error", "errors": data.errors})
     else:
-        return jsonify({"alias": get_char.roleplaying.alias})
+        return jsonify({"status":"ok", "alias": get_char.roleplaying.alias})
 
 @card_maker.route("/rp-summary", methods=["GET", "POST"])
 def save_roleplaying_summary():
@@ -399,6 +398,7 @@ def save_roleplaying_summary():
             return jsonify({"status":"error","errors":data.errors})
     else:
         return jsonify({
+            "status": "ok",
             "age": get_char.roleplaying.age,
             "gender": get_char.roleplaying.gender,
             "sexuality": get_char.roleplaying.sexuality,

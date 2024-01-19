@@ -401,7 +401,9 @@
             $.get(
                 "{{url_for('card_maker.save_roleplaying_alias', char_id=database.char_id)}}",
                 data=>{
-                    document.getElementById("nicknames").value = data.alias
+                    if(data.status==="ok"){
+                        populateFields(data)
+                    }
                 }
             );
         });
@@ -418,12 +420,7 @@
                 processData: false,
                 type:"POST",
                 success: data=>{
-                    if(data.status == "200"){
-                        document.getElementById("char-alias").innerText = `AKA: ${data["alias"]}`;
-                        modalCloseOnSuccess("RPCharNicknamesModal")
-                    } else{
-                        alert(`There's a error in your input ${data.error[0]}`);
-                    }
+                    serverValidateForm(data, document.getElementById("nicknames-form"))
                 },
             })
         });
@@ -432,7 +429,9 @@
             $.get(
                 `{{url_for('card_maker.save_roleplaying_summary', char_id=database.char_id)}}`,
                 data=>{
-                    populateFields(data)
+                    if(data.status==="ok"){
+                        populateFields(data)
+                    }
                 }
             );
         })
@@ -468,7 +467,7 @@
         }
 
         function populateFields(data){
-            Object.keys(data).forEach(k=>{
+            Object.keys(data).filter(k=>k!=="status").forEach(k=>{
                 //reset field state
                 let formField = document.getElementById(k);
                 let errorFeedback = document.getElementById(`${k}-invalid-feedback`);
@@ -518,7 +517,7 @@
                 modalCloseOnSuccess("RPCharSummaryModal");
 
                 //populate spans
-                Object.keys(data).forEach(k => {
+                Object.keys(data).filter(k=>k!=="status").forEach(k => {
                         document.getElementById(`character-${k}`).innerText = data[k];
                 });
             }

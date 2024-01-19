@@ -178,10 +178,10 @@ class RPCharSummary(FlaskForm):
     submit_char_summary = SubmitField("Save summary")
 
 
-class RPCharNicknames(FlaskForm):
-    nicknames = StringField("Nickname(s)", validators=[Length(min=0, max=20)])
+class RPCharAlias(FlaskForm):
+    alias = StringField("Nickname(s)", validators=[Length(min=0, max=20)])
 
-    submit_nicknames = SubmitField("Save nickname(s)")
+    submit_alias = SubmitField("Save nickname(s)")
 
 
 class RPCharQuote(FlaskForm):
