@@ -78,10 +78,10 @@ class BusinessImages(FlaskForm):
 
 class RPHookForm(FlaskForm):
     hook1_title = StringField(
-        "Hook one header", validators=[DataRequired(), Length(min=0, max=35)]
+        "Hook one header", validators=[DataRequired(message="You need to enter atleast the first set"), Length(min=0, max=35)]
     )
     hook1_body = TextAreaField(
-        "Hook one content", validators=[DataRequired(), Length(min=0, max=240)]
+        "Hook one content", validators=[DataRequired(message="You need to enter atleast the first set"), Length(min=0, max=240)]
     )
 
     hook2_title = StringField(
@@ -104,7 +104,7 @@ class RPHookForm(FlaskForm):
 class RPTraitsForm(FlaskForm):
     pos_trait1 = StringField(
         "Positive Trait one",
-        validators=[DataRequired(), Length(min=0, max=20)],
+        validators=[DataRequired(message="You need to enter atleast the first set"), Length(min=0, max=20)],
     )
     pos_trait2 = StringField(
         "Positive Trait two", validators=[Length(min=0, max=20)]
@@ -121,7 +121,7 @@ class RPTraitsForm(FlaskForm):
 
     neg_trait1 = StringField(
         "Negative Trait one",
-        validators=[DataRequired(), Length(min=0, max=20)],
+        validators=[DataRequired(message="You need to enter atleast the first set"), Length(min=0, max=20)],
     )
     neg_trait2 = StringField(
         "Negative Trait two", validators=[Length(min=0, max=20)]
