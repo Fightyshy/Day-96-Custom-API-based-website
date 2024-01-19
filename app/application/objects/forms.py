@@ -141,14 +141,38 @@ class RPTraitsForm(FlaskForm):
 
 class RPCharSummary(FlaskForm):
     age = IntegerField(
-        "Age", validators=[DataRequired(), NumberRange(min=1, max=10000)]
+        "Age",
+        validators=[
+            DataRequired(message="Please enter the character's age"),
+            NumberRange(
+                min=1,
+                max=10000,
+                message="Age should be between 1-10000 (Don't be stupid)",
+            ),
+        ],
     )
-    gender = StringField("Gender", validators=[DataRequired(), Length(max=20)])
+    gender = StringField(
+        "Gender",
+        validators=[
+            DataRequired(message="Please enter the character's gender"),
+            Length(max=20),
+        ],
+    )
     sexuality = StringField(
-        "Sexuality", validators=[DataRequired(), Length(max=35)]
+        "Sexuality",
+        validators=[
+            DataRequired(message="Please enter the character's sexuality"),
+            Length(max=35),
+        ],
     )
     relationship = StringField(
-        "Relationship Status", validators=[DataRequired(), Length(max=20)]
+        "Relationship Status",
+        validators=[
+            DataRequired(
+                message="Please enter the character's relationship status"
+            ),
+            Length(max=20),
+        ],
     )
 
     submit_char_summary = SubmitField("Save summary")
@@ -209,25 +233,36 @@ class VenuePlotAddress(FlaskForm):
     is_appartment = BooleanField("Is it a apartment or plot?")
 
     housing_ward = SelectField(
-        "Ward No.", choices=[(0, "Choose...")]+[(i, i) for i in range(1, 25)], default=0, validators=[NumberRange(min=1,max=25)]
+        "Ward No.",
+        choices=[(0, "Choose...")] + [(i, i) for i in range(1, 25)],
+        default=0,
+        validators=[NumberRange(min=1, max=25)],
     )
 
     # Either or for these ones
     ward_plot = SelectField(
-        "Plot No.", choices=[(0, "Choose...")]+[(j, j) for j in range(1, 61)], default=0, validators=[NumberRange(min=1,max=60)]
+        "Plot No.",
+        choices=[(0, "Choose...")] + [(j, j) for j in range(1, 61)],
+        default=0,
+        validators=[NumberRange(min=1, max=60)],
     )
 
     apartment_num = SelectField(
-        "Apartment No.", choices=[(0, "Choose...")]+[(k, k) for k in range(1, 91)], default=0, validators=[NumberRange(min=1, max=90)]
+        "Apartment No.",
+        choices=[(0, "Choose...")] + [(k, k) for k in range(1, 91)],
+        default=0,
+        validators=[NumberRange(min=1, max=90)],
     )
 
     server = SelectField(
         "Data center",
-        choices=[(0, "Choose...")]+[
-            (i+1, item["server-name"]) for i, item in enumerate(MERGED_SERVERS)
+        choices=[(0, "Choose...")]
+        + [
+            (i + 1, item["server-name"])
+            for i, item in enumerate(MERGED_SERVERS)
         ],
         default="Balmung",
-        validators=[NumberRange(1, len(MERGED_SERVERS))]
+        validators=[NumberRange(1, len(MERGED_SERVERS))],
     )
 
 

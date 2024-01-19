@@ -4,10 +4,7 @@
     <div class="col-md-4">
         <!-- Character Name with Tagline -->
         <!-- 20 chars max, pull from mains for now -->
-        <h3>
-            Character Nameaaaaaa
-            {% if is_edit == True %}<span data-bs-toggle="modal" data-bs-target="#RPCharNicknamesModal">📝</span>{% endif %}
-        </h3>
+        <h3>Character Nameaaaaaa {% if is_edit == True %}<span data-bs-toggle="modal" data-bs-target="#RPCharNicknamesModal">📝</span>{% endif %}</h3>
 
         <!-- Aliases/Nicknames (Smaller text) -->
         {% if database.roleplaying.alias|length >= 2 %}
@@ -18,21 +15,21 @@
         <div class="socials-box mt-0 px-1 py-2">
             <!-- Character Age -->
             <!-- Enforce integer, limit 5 digits -->
-            <p class="character-detail"><strong>Age:</strong> 25
+            <p class="character-detail"><strong>Age:</strong> {{ database.roleplaying.age }}
                 {% if is_edit == True %}<span data-bs-toggle="modal" data-bs-target="#RPCharSummaryModal">📝</span>{% endif %}
             </p>
     
             <!-- Gender -->
             <!-- Limit 20 -->
-            <p class="character-detail"><strong>Gender:</strong> Female</p>
+            <p class="character-detail"><strong>Gender:</strong> {{ database.roleplaying.gender }}</p>
     
             <!-- Sexuality -->
             <!-- Limit 35 -->
-            <p class="character-detail"><strong>Sexuality:</strong> aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</p>
+            <p class="character-detail"><strong>Sexuality:</strong> {{ database.roleplaying.sexuality }}</p>
     
             <!-- Relationship Status -->
             <!-- Limit 20 -->
-            <p class="character-detail"><strong>Relationship Status:</strong> Single</p>
+            <p class="character-detail"><strong>Relationship Status:</strong> {{ database.roleplaying.relationship_status }}</p>
         </div>
   
         <!-- Socials Box -->

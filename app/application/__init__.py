@@ -2,7 +2,6 @@ import os
 from dotenv import load_dotenv
 from flask import Flask
 from flask_bootstrap import Bootstrap5
-import requests
 
 from .objects.api_fetchers import ffxiv_cached_resources
 
