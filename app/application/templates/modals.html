@@ -420,14 +420,14 @@
                 processData: false,
                 type:"POST",
                 success: data=>{
-                    serverValidateForm(data, document.getElementById("nicknames-form"))
+                    serverValidateForm(data, document.getElementById("nicknames-form"), "RPCharNicknamesModal")
                 },
             })
         });
 
         document.getElementById("RPCharSummaryModal").addEventListener("show.bs.modal", event=>{
             $.get(
-                `{{url_for('card_maker.save_roleplaying_summary', char_id=database.char_id)}}`,
+                "{{url_for('card_maker.save_roleplaying_summary', char_id=database.char_id)}}",
                 data=>{
                     if(data.status==="ok"){
                         populateFields(data)
@@ -449,10 +449,38 @@
                 type: "POST",
                 success: data=>{
                     // Do validation and handle data
-                    serverValidateForm(data, document.getElementById("charsummary"));
+                    serverValidateForm(data, document.getElementById("charsummary"), "RPCharSummaryModal");
                 }
             });
         });
+
+        document.getElementById("RPSocialsModal").addEventListener("show.bs.modal", event=>{
+            $.get(
+                "{{url_for('card_maker.save_roleplaying_socials', char_id=database.char_id)}}",
+                data=>{
+                    if(data.status==="ok"){
+                        populateFields(data);
+                    }
+                }
+            )
+        })
+
+        document.getElementById("rpsocialsform").addEventListener("submit", event=>{
+            event.preventDefault();
+
+            const formData = new FormData(document.getElementById("rpsocialsform"));
+            formData.append("char_id", "{{database.char_id}}")
+            $.ajax({
+                url: "{{url_for('card_maker.save_roleplaying_socials')}}",
+                data: formData,
+                contentType: false,
+                processData: false,
+                type: "POST",
+                success: data=>{
+                    serverValidateForm(data, document.getElementById("rpsocialsform"), "RPSocialsModal");
+                }
+            })
+        })
 
         // helper funcs for modals
         // https://stackoverflow.com/questions/71903920/how-to-hide-bootstrap-5-modal-on-button-click
@@ -479,9 +507,11 @@
             })
         }
 
-        function serverValidateForm(data, form){
+        function serverValidateForm(data, form, modalName){
             // data status can only be error or ok
             // TODO proper error coding and handle malformed data
+            // TODO user-friendly response to server-error
+                // FORMAT -> Error type, Error code, Error desc, render as dismissable field on top of modal
             if(data.status === "error"){
                 [...form.elements].filter(input=> input != "submit" && input != "hidden").forEach(input=>{
                     let formField =document.getElementById(input.id)
@@ -505,7 +535,7 @@
                 });
             } else{
                 // Go through form and make everything valid, remove feedback if present
-                Array.from(document.getElementById("charsummary").elements).filter(input=>input.type!="hidden" && input.type!="submit").forEach(input=>{
+                [...form.elements].filter(input=>input.type!="hidden" && input.type!="submit").forEach(input=>{
                     let formField = document.getElementById(input.id);
                     let errorFeedback = document.getElementById(`${input.id}-invalid-feedback`);
                     formField.classList.remove("is-invalid");
@@ -514,11 +544,12 @@
                 });
 
                 //close modal after 1.5s
-                modalCloseOnSuccess("RPCharSummaryModal");
+                modalCloseOnSuccess(modalName);
 
                 //populate spans
                 Object.keys(data).filter(k=>k!=="status").forEach(k => {
-                        document.getElementById(`character-${k}`).innerText = data[k];
+                    // TODO empty field handling, both here and in jinja render
+                    document.getElementById(`character-${k}`).innerText = data[k];
                 });
             }
         }

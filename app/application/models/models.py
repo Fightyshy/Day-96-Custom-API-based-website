@@ -38,10 +38,10 @@ class Roleplaying(db.Model):
     tagline: Mapped[str] = mapped_column(String(length=50))
 
     # character ooc
-    twitter: Mapped[str] = mapped_column(String(length=15))
-    website: Mapped[str] = mapped_column(String(length=40))
-    discord: Mapped[str] = mapped_column(String(length=32))
-    oc_notes: Mapped[str] = mapped_column(String(length=90))
+    twitter: Mapped[str] = mapped_column(String(length=15), nullable=True, default="Fill this in if you want!")
+    website: Mapped[str] = mapped_column(String(length=40), nullable=True, default="Fill this in if you want!")
+    discord: Mapped[str] = mapped_column(String(length=32), nullable=True, default="Fill this in if you want!")
+    oc_notes: Mapped[str] = mapped_column(String(length=90), nullable=True, default="Fill this in if you want!")
 
     # relationships
     # TODO parent of hooks, 1-many

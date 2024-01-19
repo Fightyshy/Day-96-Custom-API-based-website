@@ -384,8 +384,9 @@ def save_roleplaying_summary():
                 char_rp.sexuality = data.sexuality.data
                 char_rp.relationship_status = data.relationship.data
                 db.session.commit()
+            # TODO server-side error exception handling, respond with error code
             except Exception as e:
-                return jsonify({"status": "server-error", "msg": e})
+                return jsonify({"status": "server-error", "msg": str(e)})
             else:
                 return jsonify({
                     "status": "ok",
@@ -403,6 +404,41 @@ def save_roleplaying_summary():
             "gender": get_char.roleplaying.gender,
             "sexuality": get_char.roleplaying.sexuality,
             "relationship": get_char.roleplaying.relationship_status
+        })
+    
+@card_maker.route("/rp-socials", methods=["GET", "POST"])
+def save_roleplaying_socials():
+    char_id = retrieve_char_id_from_ajax(request)
+    get_char = retrieve_char_by_char_id(char_id)
+    if request.method == "POST":
+        data = RPOOCSocials()
+        if data.validate():
+            try:
+                char_rp = check_roleplaying(get_char)
+                char_rp.twitter = data.twitter.data
+                char_rp.website = data.website.data
+                char_rp.discord = data.discord.data
+                char_rp.oc_notes = data.oc_notes.data
+                db.session.commit()
+            except Exception as e:
+                return jsonify({"status": "server-error", "msg": str(e)})
+            else:
+                return jsonify({
+                    "status": "ok",
+                    "twitter": char_rp.twitter,
+                    "website": char_rp.website,
+                    "discord": char_rp.discord,
+                    "oc_notes": char_rp.oc_notes
+                })
+        else:
+            return jsonify({"status":"error","errors":data.errors})
+    else:
+        return jsonify({
+            "status": "ok",
+            "twitter": get_char.roleplaying.twitter,
+            "website": get_char.roleplaying.website,
+            "discord": get_char.roleplaying.discord,
+            "oc_notes": get_char.roleplaying.oc_notes
         })
 
 

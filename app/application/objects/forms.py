@@ -197,7 +197,7 @@ class RPOOCSocials(FlaskForm):
         validators=[Length(max=40)],
     )
     discord = StringField("Discord", validators=[Length(max=32)])
-    notes = StringField("Notes", validators=[Length(max=90)])
+    oc_notes = StringField("Notes", validators=[Length(max=90)])
 
     submit_socials = SubmitField("Save socials")
 
