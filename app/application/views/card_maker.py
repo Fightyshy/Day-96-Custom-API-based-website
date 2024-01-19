@@ -388,7 +388,13 @@ def save_roleplaying_summary():
             except Exception as e:
                 return jsonify({"status": "server-error", "msg": e})
             else:
-                return jsonify({"test":"test"})
+                return jsonify({
+                    "status": "ok",
+                    "age": char_rp.age,
+                    "gender": char_rp.gender,
+                    "sexuality": char_rp.sexuality,
+                    "relationship": char_rp.relationship_status
+                })
         else:
             return jsonify({"status":"error","errors":data.errors})
     else:

@@ -432,9 +432,9 @@
             $.get(
                 `{{url_for('card_maker.save_roleplaying_summary', char_id=database.char_id)}}`,
                 data=>{
-                    populate_fields(data)
+                    populateFields(data)
                 }
-            )
+            );
         })
 
         document.getElementById("charsummary").addEventListener("submit", event=>{
@@ -449,37 +449,8 @@
                 processData: false,
                 type: "POST",
                 success: data=>{
-                    if(data.status === "error"){
-                        event.preventDefault();
-
-                        Array.from(document.getElementById("charsummary").elements).forEach(input=>{
-                            if(data.errors[input.id]!==undefined){
-                                document.getElementById(input.id).parentElement.contains(document.getElementById(`${input.id}-invalid-feedback`))?document.getElementById(`${input.id}-invalid-feedback`).remove():0
-                                let invalidField = document.getElementById(input.id);
-                                invalidField.classList.add("is-invalid")
-                                let invalidMsg = document.createElement("div")
-                                invalidMsg.id = `${input.id}-invalid-feedback`
-                                invalidMsg.classList.add("invalid-feedback")
-                                invalidMsg.innerText = data.errors[input.id][0];
-                                invalidField.parentElement.appendChild(invalidMsg);
-                            } else if(input.type != "hidden" && input.type != "submit"){
-                                // clear errors
-                                let validField = document.getElementById(input.id)
-                                validField.classList.remove("is-invalid")
-                                validField.classList.add("is-valid")
-                                document.getElementById(input.id).parentElement.contains(document.getElementById(`${input.id}-invalid-feedback`))?document.getElementById(`${input.id}-invalid-feedback`).remove():0
-                            }
-                        });
-                    }else{
-                        Array.from(document.getElementById("charsummary").elements).filter(input=>input.type!="hidden" && input.type!="submit").forEach(input=>{
-                            document.getElementById(input.id).classList.remove("is-invalid");
-                            document.getElementById(input.id).parentElement.contains(document.getElementById(`${input.id}-invalid-feedback`))?document.getElementById(`${input.id}-invalid-feedback`).remove():0
-                            document.getElementById(input.id).classList.add("is-valid");
-                            
-                        });
-
-                        modalCloseOnSuccess("RPCharSummaryModal")
-                    }
+                    // Do validation and handle data
+                    serverValidateForm(data, document.getElementById("charsummary"));
                 }
             });
         });
@@ -496,10 +467,61 @@
             }, 1500);
         }
 
-        function populate_fields(data){
+        function populateFields(data){
             Object.keys(data).forEach(k=>{
-                document.getElementById(k).value = data[k]
+                //reset field state
+                let formField = document.getElementById(k);
+                let errorFeedback = document.getElementById(`${k}-invalid-feedback`);
+                formField.classList.remove("is-valid");
+                formField.classList.remove("is-invalid");
+                formField.parentElement.contains(errorFeedback)?errorFeedback.remove():undefined;
+                // populate
+                formField.value = data[k];
             })
+        }
+
+        function serverValidateForm(data, form){
+            // data status can only be error or ok
+            // TODO proper error coding and handle malformed data
+            if(data.status === "error"){
+                [...form.elements].filter(input=> input != "submit" && input != "hidden").forEach(input=>{
+                    let formField =document.getElementById(input.id)
+                    let errorFeedback = document.getElementById(`${input.id}-invalid-feedback`);
+                    if(data.errors[input.id] !== undefined){
+                        formField.parentElement.contains(errorFeedback)?errorFeedback.remove():undefined;
+                        let invalidFeedback = document.createElement("div");
+                        // let invalidField = formField;
+                        invalidFeedback.id = `${input.id}-invalid-feedback`;
+                        invalidFeedback.classList.add("invalid-feedback");
+                        invalidFeedback.innerText = data.errors[input.id][0];
+
+                        formField.classList.add("is-invalid");
+                        formField.parentElement.appendChild(invalidFeedback);
+                    } else{
+                        // let validField = formField;
+                        formField.classList.remove("is-invalid");
+                        formField.classList.add("is-valid");
+                        formField.parentElement.contains(errorFeedback)?errorFeedback.remove():undefined;
+                    }
+                });
+            } else{
+                // Go through form and make everything valid, remove feedback if present
+                Array.from(document.getElementById("charsummary").elements).filter(input=>input.type!="hidden" && input.type!="submit").forEach(input=>{
+                    let formField = document.getElementById(input.id);
+                    let errorFeedback = document.getElementById(`${input.id}-invalid-feedback`);
+                    formField.classList.remove("is-invalid");
+                    formField.parentElement.contains(errorFeedback)?errorFeedback.remove():undefined;
+                    formField.classList.add("is-valid");
+                });
+
+                //close modal after 1.5s
+                modalCloseOnSuccess("RPCharSummaryModal");
+
+                //populate spans
+                Object.keys(data).forEach(k => {
+                        document.getElementById(`character-${k}`).innerText = data[k];
+                });
+            }
         }
     });
 
