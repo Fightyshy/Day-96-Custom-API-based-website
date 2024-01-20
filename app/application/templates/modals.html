@@ -294,11 +294,15 @@
 <script type="text/javascript">
 //Scripts - RP field handling
     document.addEventListener("DOMContentLoaded", ()=>{
-        let hookCounter = parseInt("{{database.roleplaying.hooks|length}}");
-        let posCounter = 1;
-        let negCounter = 1;
-
+        let hookCounter = "{{database.roleplaying.hooks|length}}"==="0" ? 1 : parseInt("{{database.roleplaying.hooks|length}}");
+        // https://stackoverflow.com/questions/40006617/get-count-of-list-items-that-meet-a-condition-with-jinja2
+        // list|select element on condition type == "pos"/"neg"|cast list|length
+        // set 1 if returns 0, otherwise it breaks add/remove mechanism
+        let posCounter = "{{database.roleplaying.traits|selectattr('type','equalto','pos')|list|length}}"==="0" ? 1 : parseInt("{{database.roleplaying.traits|selectattr('type','equalto','pos')|list|length}}");
+        let negCounter = "{{database.roleplaying.traits|selectattr('type','equalto','neg')|list|length}}"==="0" ? 1 : parseInt("{{database.roleplaying.traits|selectattr('type','equalto','pos')|list|length}}");
+        
         initHookForm();
+        initTraitForm();
 
         function initHookForm(){
             // initial form state
@@ -307,6 +311,18 @@
                 document.getElementById(`hook${i+1}_body`).classList.remove("d-none");
                 document.getElementById(`hook${i+1}_title_label`).classList.remove("d-none");
                 document.getElementById(`hook${i+1}_body_label`).classList.remove("d-none");
+            }
+        }
+
+        function initTraitForm(){
+            // It's literally 10 data points at worst, just loop twice
+            for(let i=0;i<posCounter;i++){
+                document.getElementById(`pos_trait${i+1}`).classList.remove("d-none");
+                document.getElementById(`pos_trait${i+1}_label`).classList.remove("d-none");
+            }
+            for(let j=0;j<negCounter;j++){
+                document.getElementById(`neg_trait${j+1}`).classList.remove("d-none");
+                document.getElementById(`neg_trait${j+1}_label`).classList.remove("d-none");
             }
         }
         
@@ -629,6 +645,21 @@
 
                 }
             });
+        });
+
+        document.getElementById("RPTraitsModal").addEventListener("show.bs.modal", event=>{
+            $.get(
+                "{{url_for('card_maker.save_roleplaying_traits', char_id=database.char_id)}}",
+                data=>{
+                    if(data.status==="ok"){
+                        //Forcing modal to show via js seems to work
+                        //Form request data is not compromised
+                        let toOpen = bootstrap.Modal.getInstance("#RPTraitsModal");
+                        toOpen.show();
+                        populateFields(data);
+                    }
+                }
+            );
         });
 
         // helper funcs for modals

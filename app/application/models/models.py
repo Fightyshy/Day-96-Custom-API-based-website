@@ -76,7 +76,7 @@ class Trait(db.Model):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
 
-    # positive or negative
+    # pos(itive) or neg(ative)
     type: Mapped[int] = mapped_column(String(length=8), nullable=False)
     number: Mapped[int] = mapped_column(Integer, nullable=False)
     trait: Mapped[int] = mapped_column(String(length=20), nullable=False)

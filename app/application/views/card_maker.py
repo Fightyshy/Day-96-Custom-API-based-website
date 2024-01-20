@@ -522,7 +522,6 @@ def save_roleplaying_hooks():
                                                     .where(and_(Hook.number==i+1, Hook.roleplaying==char_rp))).scalar()
                 # if both exist (len data_dict>=1, retrieved_hook is not None), update it
                 if retrieved_hook and len(current_hook_title) >= 1:
-                    print("update", current_hook_title)
                     retrieved_hook.title = data_dict.get(f"hook{i+1}_title")
                     retrieved_hook.body = data_dict.get(f"hook{i+1}_body")
                     db.session.commit()
@@ -530,7 +529,6 @@ def save_roleplaying_hooks():
                     response[f"hook{i+1}_body"] = retrieved_hook.body
                 # if it's not in the db but it's in the data_dict (new entry), add it
                 elif not retrieved_hook and len(current_hook_title) >= 1:
-                    print("create", current_hook_title)
                     new_hook = Hook(title=current_hook_title,
                                     body=data_dict.get(f"hook{i+1}_body"),
                                     number=i+1,
@@ -541,13 +539,11 @@ def save_roleplaying_hooks():
                     response[f"hook{i+1}_body"] = new_hook.body
                 # if it's in the db but doesn't exst in data_dict, (was removed), delete it
                 elif current_hook_title == "" and retrieved_hook:
-                    print("delete", i+1)
                     db.session.delete(retrieved_hook)
                     db.session.commit()
 
             return jsonify(response)
         else:
-            print(data.errors)
             return jsonify({"status": "error", "errors": data.errors})
     else:
         # TODO if hook is empty respond with defaults
@@ -556,6 +552,21 @@ def save_roleplaying_hooks():
             hooks[f"hook{hook.number}_title"] = hook.title
             hooks[f"hook{hook.number}_body"] = hook.body
         return jsonify(hooks)
+
+
+@card_maker.route("/rp-traits", methods=["GET", "POST"])
+def save_roleplaying_traits():
+    char_id = retrieve_char_id_from_ajax(request)
+    get_char = retrieve_char_by_char_id(char_id)
+    if request.method == "POST":
+        pass
+    else:
+        traits = {"status": "ok"}
+        print(get_char.roleplaying.traits)
+        for trait in get_char.roleplaying.traits:
+            traits[f"{trait.type}_trait{trait.number}"] = trait.trait
+        print(traits)
+        return jsonify(traits)
 
 
 @card_maker.route("/rp-venue-mode", methods=["POST"])
