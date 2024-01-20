@@ -546,6 +546,9 @@ def save_roleplaying_hooks():
                     db.session.commit()
 
             return jsonify(response)
+        else:
+            print(data.errors)
+            return jsonify({"status": "error", "errors": data.errors})
     else:
         # TODO if hook is empty respond with defaults
         hooks = {"status": "ok"}

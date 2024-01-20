@@ -10,6 +10,7 @@ from wtforms import (
     TextAreaField,
     URLField,
     SubmitField,
+    ValidationError,
 )
 from wtforms.validators import DataRequired, URL, Length, NumberRange
 from .api_fetchers import SERVERS
@@ -99,6 +100,23 @@ class RPHookForm(FlaskForm):
     )
 
     submit_hooks = SubmitField("Save hooks")
+
+    # dual field checkers, if one is filled but the other isn't, throw
+    def validate_hook2_title(self, field):
+        if len(field.data) >= 1 and len(self.hook2_body.data) == 0:
+            raise ValidationError("You need to fill in the content for hook 2 as well")
+
+    def validate_hook2_body(self, field):
+        if len(field.data) >= 1 and len(self.hook2_title.data) == 0:
+            raise ValidationError("You need to fill in the title for hook 2 as well")
+
+    def validate_hook3_title(self, field):
+        if len(field.data) >= 1 and len(self.hook3_body.data) == 0:
+            raise ValidationError("You need to fill in the content for hook 3 as well")
+
+    def validate_hook3_body(self, field):
+        if len(field.data) >= 1 and len(self.hook3_title.data) == 0:
+            raise ValidationError("You need to fill in the title for hook 3 as well")
 
 
 class RPTraitsForm(FlaskForm):
