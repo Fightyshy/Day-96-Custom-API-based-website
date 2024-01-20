@@ -18,7 +18,7 @@ from ..objects.api_fetchers import (
 )
 import os
 from werkzeug.utils import secure_filename
-from ..models.models import Hook, PlayerCharacter, Roleplaying, db
+from ..models.models import Hook, PlayerCharacter, Roleplaying, Trait, db
 from ..objects.forms import (
     BusinessImages,
     RPCharAlias,
@@ -559,13 +559,71 @@ def save_roleplaying_traits():
     char_id = retrieve_char_id_from_ajax(request)
     get_char = retrieve_char_by_char_id(char_id)
     if request.method == "POST":
-        pass
+        data = RPTraitsForm(request.form)
+        if data.validate():
+            char_rp = check_roleplaying(get_char)
+            data_dict = data.data
+            data_dict.pop("submit_traits")
+            data_dict.pop("csrf_token")
+            
+            response = {"status": "ok"}
+
+            # loop 5 times, we use 2 pointers to get pos and neg traits
+            for i in range(5):
+                # loop both types simultaenously
+                current_pos_trait = data_dict.get(f"pos_trait{i+1}")
+                current_neg_trait = data_dict.get(f"neg_trait{i+1}")
+                # get both at the same time as well, 10 queries worst case
+                retrieved_pos_trait = db.session.execute(
+                    db.select(Trait).where(and_(Trait.number == i+1,
+                                                Trait.roleplaying == char_rp,
+                                                Trait.type == "pos"))).scalar()
+                retrieved_neg_trait = db.session.execute(
+                    db.select(Trait).where(and_(Trait.number == i+1,
+                                                Trait.roleplaying == char_rp,
+                                                Trait.type == "neg"))).scalar()
+
+                # Works for now, separate ifs, same function for each
+                # Also 10 queries worst case
+                if retrieved_pos_trait and len(current_pos_trait) >= 1:
+                    retrieved_pos_trait.trait = current_pos_trait
+                    db.session.commit()
+                    response[f"pos_trait{i+1}"] = retrieved_pos_trait.trait
+                elif not retrieved_pos_trait and len(current_pos_trait) >= 1:
+                    new_trait = Trait(number=i+1,
+                                      type="pos",
+                                      trait=current_pos_trait,
+                                      roleplaying=char_rp)
+                    db.session.add(new_trait)
+                    db.session.commit()
+                    response[f"pos_trait{i+1}"] = new_trait.trait
+                elif current_pos_trait == "" and retrieved_pos_trait:
+                    db.session.delete(retrieved_pos_trait)
+                    db.session.commit()
+
+                if retrieved_neg_trait and len(current_neg_trait) >= 1:
+                    retrieved_neg_trait.trait = current_neg_trait
+                    db.session.commit()
+                    response[f"neg_trait{i+1}"] = retrieved_neg_trait.trait
+                elif not retrieved_neg_trait and len(current_neg_trait) >= 1:
+                    new_trait = Trait(number=i+1,
+                                      type="neg",
+                                      trait=current_neg_trait,
+                                      roleplaying=char_rp)
+                    db.session.add(new_trait)
+                    db.session.commit()
+                    response[f"neg_trait{i+1}"] = new_trait.trait
+                elif current_neg_trait == "" and retrieved_neg_trait:
+                    db.session.delete(retrieved_neg_trait)
+                    db.session.commit()
+            # 20 queries at worst
+            return jsonify(response)
+        else:
+            return jsonify({"status": "error", "errors": data.errors})
     else:
         traits = {"status": "ok"}
-        print(get_char.roleplaying.traits)
         for trait in get_char.roleplaying.traits:
             traits[f"{trait.type}_trait{trait.number}"] = trait.trait
-        print(traits)
         return jsonify(traits)
 
 

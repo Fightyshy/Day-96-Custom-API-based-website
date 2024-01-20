@@ -86,25 +86,21 @@
             <!-- Positive Traits List -->
             <div class="traits-list flex-fill text-center">
                 <h5>Positive Traits</h5>
-                <ul class="list-unstyled">
+                <ul id="positive-traits-list" class="list-unstyled">
                     <!-- Limit 20 chars each side-->
-                    <li>aaaaaaaaaaaaaaaaaaaa</li>
-                    <li>Positive Trait 2</li>
-                    <li>Positive Trait 3</li>
-                    <li>Positive Trait 4</li>
-                    <li>Positive Trait 5</li>
+                    {% for trait in database.roleplaying.traits|selectattr('type','equalto','pos') %}
+                    <li>{{trait.trait}}</li>
+                    {% endfor %}
                     <!-- Add more positive traits -->
                 </ul>
             </div>
             <!-- Negative Traits List -->
             <div class="traits-list flex-fill text-center">
                 <h5>Negative Traits</h5>
-                <ul class="list-unstyled">
-                    <li>aaaaaaaaaaaaaaaaaaaa</li>
-                    <li>Negative Trait 2</li>
-                    <li>Negative Trait 3</li>
-                    <li>Negative Trait 4</li>
-                    <li>Negative Trait 5</li>
+                <ul id="negative-traits-list" class="list-unstyled">
+                    {% for trait in database.roleplaying.traits|selectattr('type','equalto','neg') %}
+                    <li>{{trait.trait}}</li>
+                    {% endfor %}
                     <!-- Add more negative traits -->
                 </ul>
             </div>

@@ -299,7 +299,7 @@
         // list|select element on condition type == "pos"/"neg"|cast list|length
         // set 1 if returns 0, otherwise it breaks add/remove mechanism
         let posCounter = "{{database.roleplaying.traits|selectattr('type','equalto','pos')|list|length}}"==="0" ? 1 : parseInt("{{database.roleplaying.traits|selectattr('type','equalto','pos')|list|length}}");
-        let negCounter = "{{database.roleplaying.traits|selectattr('type','equalto','neg')|list|length}}"==="0" ? 1 : parseInt("{{database.roleplaying.traits|selectattr('type','equalto','pos')|list|length}}");
+        let negCounter = "{{database.roleplaying.traits|selectattr('type','equalto','neg')|list|length}}"==="0" ? 1 : parseInt("{{database.roleplaying.traits|selectattr('type','equalto','neg')|list|length}}");
         
         initHookForm();
         initTraitForm();
@@ -660,6 +660,51 @@
                     }
                 }
             );
+        });
+
+        document.getElementById("traitForm").addEventListener("submit", event=>{
+            event.preventDefault();
+
+            const formData = new FormData(document.getElementById("traitForm"));
+            formData.append("char_id", "{{database.char_id}}")
+            $.ajax({
+                url: "{{url_for('card_maker.save_roleplaying_traits')}}",
+                data: formData,
+                contentType: false,
+                processData: false,
+                type: "POST",
+                success: data=>{
+                    // WARN potential modal issue when re-opening modal after refresh>remove hook>submit
+                    console.log(data)
+                    const errorState = serverValidateForm(data, document.getElementById("hookForm"));
+                    if(errorState){
+                        let posNo = 0;
+                        let negNo = 0;
+                        let posList = document.getElementById("positive-traits-list");
+                        let negList = document.getElementById("negative-traits-list");
+                        posList.innerHTML = "";
+                        negList.innerHTML = "";
+
+                        Object.keys(data).filter(k=>k!=="status").forEach(k=>{
+                            let listField = document.createElement("li");
+                            if(k.slice(0,3) === "pos"){
+                                listField.innerText = data[k];
+                                posList.appendChild(listField);
+                                posNo++;
+                            } else{
+                                listField.innerText = data[k];
+                                negList.appendChild(listField);
+                                negNo++;
+                            }
+                        })
+
+                        posCounter = posNo;
+                        negCounter = negNo;
+                        initTraitForm();
+                        modalCloseOnSuccess("RPTraitsModal")
+                    }
+                }
+            });
         });
 
         // helper funcs for modals
