@@ -79,10 +79,18 @@ class BusinessImages(FlaskForm):
 
 class RPHookForm(FlaskForm):
     hook1_title = StringField(
-        "Hook one header", validators=[DataRequired(message="You need to enter atleast the first set"), Length(min=0, max=35)]
+        "Hook one header",
+        validators=[
+            DataRequired(message="You need to enter atleast the first set"),
+            Length(min=0, max=35),
+        ],
     )
     hook1_body = TextAreaField(
-        "Hook one content", validators=[DataRequired(message="You need to enter atleast the first set"), Length(min=0, max=240)]
+        "Hook one content",
+        validators=[
+            DataRequired(message="You need to enter atleast the first set"),
+            Length(min=0, max=240),
+        ],
     )
 
     hook2_title = StringField(
@@ -104,25 +112,36 @@ class RPHookForm(FlaskForm):
     # dual field checkers, if one is filled but the other isn't, throw
     def validate_hook2_title(self, field):
         if len(field.data) >= 1 and len(self.hook2_body.data) == 0:
-            raise ValidationError("You need to fill in the content for hook 2 as well")
+            raise ValidationError(
+                "You need to fill in the content for hook 2 as well"
+            )
 
     def validate_hook2_body(self, field):
         if len(field.data) >= 1 and len(self.hook2_title.data) == 0:
-            raise ValidationError("You need to fill in the title for hook 2 as well")
+            raise ValidationError(
+                "You need to fill in the title for hook 2 as well"
+            )
 
     def validate_hook3_title(self, field):
         if len(field.data) >= 1 and len(self.hook3_body.data) == 0:
-            raise ValidationError("You need to fill in the content for hook 3 as well")
+            raise ValidationError(
+                "You need to fill in the content for hook 3 as well"
+            )
 
     def validate_hook3_body(self, field):
         if len(field.data) >= 1 and len(self.hook3_title.data) == 0:
-            raise ValidationError("You need to fill in the title for hook 3 as well")
+            raise ValidationError(
+                "You need to fill in the title for hook 3 as well"
+            )
 
 
 class RPTraitsForm(FlaskForm):
     pos_trait1 = StringField(
         "Positive Trait one",
-        validators=[DataRequired(message="You need to enter atleast the first set"), Length(min=0, max=20)],
+        validators=[
+            DataRequired(message="You need to enter atleast the first set"),
+            Length(min=0, max=20),
+        ],
     )
     pos_trait2 = StringField(
         "Positive Trait two", validators=[Length(min=0, max=20)]
@@ -139,7 +158,10 @@ class RPTraitsForm(FlaskForm):
 
     neg_trait1 = StringField(
         "Negative Trait one",
-        validators=[DataRequired(message="You need to enter atleast the first set"), Length(min=0, max=20)],
+        validators=[
+            DataRequired(message="You need to enter atleast the first set"),
+            Length(min=0, max=20),
+        ],
     )
     neg_trait2 = StringField(
         "Negative Trait two", validators=[Length(min=0, max=20)]
@@ -296,9 +318,17 @@ class VenueContactAndSocials(FlaskForm):
 
 
 class VenueStaffDetails(FlaskForm):
-    staff_role = StringField("Role at venue")
-    staff_discord = StringField("Own Discord")
-    staff_twitter = StringField("Own Twitter")
-    staff_website = StringField("Personal website (if any)")
+    staff_role = StringField(
+        "Role at venue",
+        validators=[
+            DataRequired(
+                message="Please enter your role at the venue you work/own at"
+            ),
+            Length(min=1, max=50),
+        ],
+    )
+    staff_discord = StringField("Own Discord", validators=[Length(min=2, max=32)])
+    staff_twitter = StringField("Own Twitter", validators=[Length(max=15)])
+    staff_website = StringField("Personal website (if any)", validator=[Length(max=40)])
 
     submit_staff_details = SubmitField("Save own details")

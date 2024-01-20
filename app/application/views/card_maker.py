@@ -18,7 +18,7 @@ from ..objects.api_fetchers import (
 )
 import os
 from werkzeug.utils import secure_filename
-from ..models.models import Business, Hook, PlayerCharacter, Roleplaying, Trait, db
+from ..models.models import Business, Hook, PlayerCharacter, Roleplaying, Trait, VenueStaff, db
 from ..objects.forms import (
     BusinessImages,
     RPCharAlias,
@@ -625,7 +625,7 @@ def save_roleplaying_traits():
         for trait in get_char.roleplaying.traits:
             traits[f"{trait.type}_trait{trait.number}"] = trait.trait
         return jsonify(traits)
-    
+
 
 @card_maker.route("/rp-venue-names", methods=["GET", "POST"])
 def save_venue_names():
@@ -639,7 +639,7 @@ def save_venue_names():
             char_business.venue_name = data.venue_name.data
             char_business.venue_tagline = data.venue_tagline.data
             db.session.commit()
-            return jsonify({"status":"OK",
+            return jsonify({"status":"ok",
                             "venue_name":char_business.venue_name,
                             "venue_tagline":char_business.venue_tagline})
         else:
@@ -648,11 +648,54 @@ def save_venue_names():
                 "errors": data.errors
             })
     else:
-        print(get_char.business.venue_name)
         return jsonify({
             "status": "ok",
             "venue_name": get_char.business.venue_name,
             "venue_tagline": get_char.business.venue_tagline
+        })
+
+
+@card_maker.route("/rp-venue-staff", methods=["GET", "POST"])
+def save_venue_staff_details():
+    char_id = retrieve_char_id_from_ajax(request)
+    get_char = retrieve_char_by_char_id(char_id)
+
+    if request.method == "POST":
+        data = VenueStaffDetails()
+        if data.validate():
+            char_business = check_business(get_char)
+            if char_business.venue_staff:
+                char_business.venue_staff.staff_role = data.staff_role.data
+                char_business.venue_staff.staff_discord = data.staff_discord.data
+                char_business.venue_staff.staff_twitter = data.staff_twitter.data
+                char_business.venue_staff.staff_website = data.staff_website.data
+            else:
+                new_staff = VenueStaff(staff_role=data.staff_role.data,
+                                       staff_discord=data.staff_discord.data,
+                                       staff_twitter=data.staff_twitter.data,
+                                       staff_website=data.staff_website.data,
+                                       business=char_business)
+                db.session.add(new_staff)
+            db.session.commit()
+            return jsonify({
+                "status": "ok",
+                "staff_role": get_char.business.venue_staff.staff_role,
+                "staff_discord": get_char.business.venue_staff.staff_discord,
+                "staff_twitter": get_char.business.venue_staff.staff_twitter,
+                "staff_website": get_char.business.venue_staff.staff_website
+            })
+        else:
+            return jsonify({
+                "status": "error",
+                "errors": data.errors
+            })
+    else:
+        return jsonify({
+            "status": "ok",
+            "staff_role": get_char.business.venue_staff.staff_role,
+            "staff_discord": get_char.business.venue_staff.staff_discord,
+            "staff_twitter": get_char.business.venue_staff.staff_twitter,
+            "staff_website": get_char.business.venue_staff.staff_website
         })
 
 

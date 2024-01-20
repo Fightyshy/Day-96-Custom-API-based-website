@@ -662,7 +662,6 @@
                         let toOpen = bootstrap.Modal.getInstance("#RPTraitsModal");
                         toOpen.show();
                         populateFields(data);
-                        console.log("here")
                     }
                 }
             );
@@ -720,7 +719,7 @@
                     }
                 }
             );
-        })
+        });
 
 
         document.getElementById("venuenameform").addEventListener("submit", event=>{
@@ -735,7 +734,6 @@
                 processData: false,
                 type: "POST",
                 success: data=>{
-                    console.log(data)
                     const errorState = serverValidateForm(data, document.getElementById("venuenameform"));
                     if(errorState){
                         updatePageFields(data);
@@ -743,7 +741,40 @@
                     }
                 }
             });
-        })
+        });
+
+        
+        document.getElementById("VenueStaffDetailsModal").addEventListener("show.bs.modal", event=>{
+            $.get(
+                "{{url_for('card_maker.save_venue_staff_details', char_id=database.char_id)}}",
+                data=>{
+                    if(data.status==="ok"){
+                        populateFields(data);
+                    }
+                }
+            );
+        });
+
+        document.getElementById("venuestaffform").addEventListener("submit", event=>{
+            event.preventDefault();
+
+            const formData = new FormData(document.getElementById("venuestaffform"));
+            formData.append("char_id", "{{database.char_id}}");
+            $.ajax({
+                url: "{{url_for('card_maker.save_venue_staff_details')}}",
+                data: formData,
+                contentType: false,
+                processData: false,
+                type: "POST",
+                success: data=>{
+                    const errorState = serverValidateForm(data, document.getElementById("venuestaffform"));
+                    if(errorState){
+                        updatePageFields(data);
+                        modalCloseOnSuccess("VenueStaffDetailsModal");
+                    }
+                }
+            });
+        });
         // helper funcs for modals
         // https://stackoverflow.com/questions/71903920/how-to-hide-bootstrap-5-modal-on-button-click
         function modalCloseOnSuccess(modal){
@@ -778,7 +809,6 @@
             if(data.status === "error"){
                 [...form.elements].filter(input=> input.tagName==="TEXTAREA" || input.type==="text" || input.type=="number").forEach(input=>{
                     let formField =document.getElementById(input.id)
-                    console.log(formField)
                     let errorFeedback = document.getElementById(`${input.id}-invalid-feedback`);
                     if(data.errors[input.id] !== undefined){
                         formField.parentElement.contains(errorFeedback)?errorFeedback.remove():undefined;
@@ -814,8 +844,6 @@
             //populate spans
             Object.keys(data).filter(k=>k!=="status").forEach(k => {
                 // TODO empty field handling, both here and in jinja render
-                console.log(document.getElementById(`character-${k}`))
-                console.log(data[k])
                 data[k]===""?undefined:document.getElementById(`character-${k}`).innerText = data[k];
             });
         }

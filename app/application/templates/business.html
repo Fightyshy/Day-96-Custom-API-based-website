@@ -53,14 +53,14 @@
         <div class="col-md-5 py-2 ps-0 text-md-end">
             <!-- Current Character's Details -->
             <h3>{{character["name"]}} {% if is_edit == True %}<span data-bs-toggle="modal" data-bs-target="#VenueStaffDetailsModal">📝</span>{% endif %}</h3>
-            <p class="mb-0">Role at the Venue: Venue Role</p>
+            <p id="character-staff_role" class="mb-0">{{database.business.venue_staff.staff_role}}</p>
             <!-- Contact Information/Socials Box -->
             <div class="socials-box mt-2 px-1 py-2">
-                <h4>Contact & Socials</h4>
+                <!-- <h4>You can reach m</h4> -->
                 <ul class="list-unstyled mb-0">
-                    <li><strong>Discord:</strong> test#1234</li>
-                    <li><strong>Twitter:</strong> @VenueTwitter</li>
-                    <li><strong>Personal website:</strong> <a href="https://test.com">https://test.com</a></li>
+                    <li><strong>Discord:</strong> <span id="character-staff_discord">{{database.business.venue_staff.staff_discord}}</span></li>
+                    <li><strong>Twitter:</strong> <span id="character-staff_twitter">{{database.business.venue_staff.staff_twitter}}</li>
+                    <li><strong>Personal website:</strong> <span id="character-staff_website"><a href="{{database.business.venue_staff.staff_website}}">{{database.business.venue_staff.staff_website}}</a></span></li>
                     <!-- Additional socials or contact information can be added here -->
                 </ul>
             </div>

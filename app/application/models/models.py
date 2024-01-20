@@ -142,7 +142,7 @@ class VenueStaff(db.Model):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
 
-    staff_role: Mapped[str] = mapped_column(String)
+    staff_role: Mapped[str] = mapped_column(String(length=50))
     staff_discord: Mapped[str] = mapped_column(
         String(length=32), nullable=False
     )
