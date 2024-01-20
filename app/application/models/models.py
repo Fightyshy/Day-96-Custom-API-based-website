@@ -63,8 +63,8 @@ class Hook(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
 
     number: Mapped[int] = mapped_column(Integer, nullable=False)
-    title: Mapped[str] = mapped_column(String(length=30), nullable=False)
-    body: Mapped[str] = mapped_column(String(length=240), nullable=False)
+    title: Mapped[str] = mapped_column(String(length=30), nullable=False, default="Title here")
+    body: Mapped[str] = mapped_column(String(length=240), nullable=False, default="Add content here")
 
     # TODO child of roleplaying, many(3)-1
     roleplay_id: Mapped[int] = mapped_column(ForeignKey("roleplaying.id"))
@@ -76,6 +76,7 @@ class Trait(db.Model):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
 
+    # positive or negative
     type: Mapped[int] = mapped_column(String(length=8), nullable=False)
     number: Mapped[int] = mapped_column(Integer, nullable=False)
     trait: Mapped[int] = mapped_column(String(length=20), nullable=False)

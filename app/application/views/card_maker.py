@@ -1,3 +1,4 @@
+import itertools
 from flask import (
     Blueprint,
     current_app,
@@ -6,6 +7,7 @@ from flask import (
     request,
     url_for,
 )
+from sqlalchemy import and_
 from ..objects.api_fetchers import (
     SERVERS,
     get_collectibles,
@@ -16,7 +18,7 @@ from ..objects.api_fetchers import (
 )
 import os
 from werkzeug.utils import secure_filename
-from ..models.models import PlayerCharacter, Roleplaying, db
+from ..models.models import Hook, PlayerCharacter, Roleplaying, db
 from ..objects.forms import (
     BusinessImages,
     RPCharAlias,
@@ -494,6 +496,63 @@ def save_roleplaying_quote():
             "status": "ok",
             "quote": get_char.roleplaying.tagline
         })
+
+
+@card_maker.route("/rp-hooks", methods=["GET", "POST"])
+def save_roleplaying_hooks():
+    char_id = retrieve_char_id_from_ajax(request)
+    get_char = retrieve_char_by_char_id(char_id)
+    if request.method == "POST":
+        data = RPHookForm()
+        if data.validate():
+            # variable setup, get roleplaying, hooks, and sanitised data_dict from data
+            char_rp = check_roleplaying(get_char)
+            data_dict = data.data
+            data_dict.pop("submit_hooks")
+            data_dict.pop("csrf_token")
+
+            # init response dict
+            response = {"status": "ok"}
+
+            # setup loop that does 3 iterations, for the 3 hooks per char
+            for i in range(3):
+                # check if data exists
+                current_hook_title = data_dict.get(f"hook{i+1}_title")
+                retrieved_hook = db.session.execute(db.select(Hook)
+                                                    .where(and_(Hook.number==i+1, Hook.roleplaying==char_rp))).scalar()
+                # if both exist (len data_dict>=1, retrieved_hook is not None), update it
+                if retrieved_hook and len(current_hook_title) >= 1:
+                    print("update", current_hook_title)
+                    retrieved_hook.title = data_dict.get(f"hook{i+1}_title")
+                    retrieved_hook.body = data_dict.get(f"hook{i+1}_body")
+                    db.session.commit()
+                    response[f"hook{i+1}_title"] = retrieved_hook.title
+                    response[f"hook{i+1}_body"] = retrieved_hook.body
+                # if it's not in the db but it's in the data_dict (new entry), add it
+                elif not retrieved_hook and len(current_hook_title) >= 1:
+                    print("create", current_hook_title)
+                    new_hook = Hook(title=current_hook_title,
+                                    body=data_dict.get(f"hook{i+1}_body"),
+                                    number=i+1,
+                                    roleplaying=char_rp)
+                    db.session.add(new_hook)
+                    db.session.commit()
+                    response[f"hook{i+1}_title"] = new_hook.title
+                    response[f"hook{i+1}_body"] = new_hook.body
+                # if it's in the db but doesn't exst in data_dict, (was removed), delete it
+                elif current_hook_title == "" and retrieved_hook:
+                    print("delete", i+1)
+                    db.session.delete(retrieved_hook)
+                    db.session.commit()
+
+            return jsonify(response)
+    else:
+        # TODO if hook is empty respond with defaults
+        hooks = {"status": "ok"}
+        for hook in get_char.roleplaying.hooks:
+            hooks[f"hook{hook.number}_title"] = hook.title
+            hooks[f"hook{hook.number}_body"] = hook.body
+        return jsonify(hooks)
 
 
 @card_maker.route("/rp-venue-mode", methods=["POST"])

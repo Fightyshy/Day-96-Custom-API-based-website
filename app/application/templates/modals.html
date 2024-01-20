@@ -21,7 +21,7 @@
                         {{hookform.hook2_body.label(id="hook2_body_label", class="form-control d-none")}}
                         {{hookform.hook2_body(class="form-control form-boxes d-none")}}
                     </div>
-                    <div id="hook2" class="mb-3 gap-2">
+                    <div id="hook3" class="mb-3 gap-2">
                         {{hookform.hook3_title.label(id="hook3_title_label", class="form-control d-none")}}
                         {{hookform.hook3_title(class="form-control d-none")}}
                         {{hookform.hook3_body.label(id="hook3_body_label", class="form-control d-none")}}
@@ -294,9 +294,19 @@
 <script type="text/javascript">
 //Scripts - RP field handling
     document.addEventListener("DOMContentLoaded", ()=>{
-        let hookCounter = 1;
+        let hookCounter = parseInt("{{database.roleplaying.hooks|length}}");
         let posCounter = 1;
         let negCounter = 1;
+
+        // initial form state
+        for(let i=0;i<hookCounter;i++){
+            document.getElementById(`hook${i+1}_title`).classList.remove("d-none");
+            document.getElementById(`hook${i+1}_body`).classList.remove("d-none");
+            document.getElementById(`hook${i+1}_title_label`).classList.remove("d-none");
+            document.getElementById(`hook${i+1}_body_label`).classList.remove("d-none");
+        }
+        
+        // TODO initial add hook fields
 
         //rp hook field adders/removers
         document.getElementById("addHook").addEventListener("click", (event)=>{
@@ -309,7 +319,10 @@
                 let revealedHookBodyLabel = document.getElementById(`hook${hookCounter}_body_label`);
     
                 revealedHookTitle.classList.remove("d-none");
+                revealedHookTitle.classList.remove("is-valid");
                 revealedHookBody.classList.remove("d-none");
+                revealedHookBody.classList.remove("is-valid");
+
                 revealedHookTitleLabel.classList.remove("d-none");
                 revealedHookBodyLabel.classList.remove("d-none");
             }
@@ -420,7 +433,9 @@
                 processData: false,
                 type:"POST",
                 success: data=>{
-                    serverValidateForm(data, document.getElementById("nicknames-form"), "RPCharNicknamesModal");
+                    serverValidateForm(data, document.getElementById("nicknames-form"));
+                    updatePageFields(data);
+                    modalCloseOnSuccess("RPCharNicknamesModal")
                 },
             });
         });
@@ -449,7 +464,9 @@
                 type: "POST",
                 success: data=>{
                     // Do validation and handle data
-                    serverValidateForm(data, document.getElementById("charsummary"), "RPCharSummaryModal");
+                    serverValidateForm(data, document.getElementById("charsummary"));
+                    updatePageFields(data);
+                    modalCloseOnSuccess("RPCharSummaryModal");
                 }
             });
         });
@@ -477,7 +494,9 @@
                 processData: false,
                 type: "POST",
                 success: data=>{
-                    serverValidateForm(data, document.getElementById("rpsocialsform"), "RPSocialsModal");
+                    serverValidateForm(data, document.getElementById("rpsocialsform"));
+                    updatePageFields(data);
+                    modalCloseOnSuccess("RPSocialsModal");
                 }
             });
         });
@@ -505,7 +524,9 @@
                 processData: false,
                 type: "POST",
                 success: data=>{
-                    serverValidateForm(data, document.getElementById("rpaboutmeform"), "RPAboutMeModal");
+                    serverValidateForm(data, document.getElementById("rpaboutmeform"));
+                    updatePageFields(data);
+                    modalCloseOnSuccess("RPAboutMeModal");
                 }
             });
         });
@@ -533,7 +554,52 @@
                 processData: false,
                 type: "POST",
                 success: data=>{
-                    serverValidateForm(data, document.getElementById("charquoteform"), "RPCharQuoteModal");
+                    serverValidateForm(data, document.getElementById("charquoteform"));
+                    updatePageFields(data);
+                    modalCloseOnSuccess("RPCharQuoteModal");
+                }
+            });
+        });
+
+        document.getElementById("RPHooksModal").addEventListener("shown.bs.modal", event=>{
+            $.get(
+                "{{url_for('card_maker.save_roleplaying_hooks', char_id=database.char_id)}}",
+                data=>{
+                    if(data.status==="ok"){
+                        populateFields(data);
+                    }
+                }
+            );
+        });
+
+        document.getElementById("hookForm").addEventListener("submit", event=>{
+            event.preventDefault();
+
+            const formData = new FormData(document.getElementById("hookForm"));
+            formData.append("char_id", "{{database.char_id}}")
+            $.ajax({
+                url: "{{url_for('card_maker.save_roleplaying_hooks')}}",
+                data: formData,
+                contentType: false,
+                processData: false,
+                type: "POST",
+                success: data=>{
+                    serverValidateForm(data, document.getElementById("hookForm"));
+                    const keys = Object.keys(data).filter(k=>k!=="status");
+                    let hookList = document.getElementById("hooks-list");
+                    hookList.innerHTML=""; //delete
+                    for(let i=0; i<keys.length/2; i++){
+                        let listField = document.createElement("li");
+                        let hookTitle = document.createElement("h4");
+                        let hookBody = document.createElement("span");
+                        hookTitle.innerHTML = `hook${i+1}_title`==="hook1_title" ? `${data[`hook${i+1}_title`]} <span data-bs-toggle="modal" data-bs-target="#RPHooksModal">📝</span></h4>` : data[`hook${i+1}_title`];
+                        hookBody = data[`hook${i+1}_body`];
+                        listField.append(hookTitle);
+                        listField.append(hookBody);
+                        hookList.append(listField);
+                    }
+
+                    modalCloseOnSuccess("RPHooksModal");
                 }
             });
         });
@@ -563,13 +629,13 @@
             });
         }
 
-        function serverValidateForm(data, form, modalName){
+        function serverValidateForm(data, form){
             // data status can only be error or ok
             // TODO proper error coding and handle malformed data
             // TODO user-friendly response to server-error
                 // FORMAT -> Error type, Error code, Error desc, render as dismissable field on top of modal
             if(data.status === "error"){
-                [...form.elements].filter(input=> input != "submit" && input != "hidden").forEach(input=>{
+                [...form.elements].filter(input=> input.tagName==="TEXTAREA" || input.type==="text" || input.type=="number").forEach(input=>{
                     let formField =document.getElementById(input.id)
                     let errorFeedback = document.getElementById(`${input.id}-invalid-feedback`);
                     if(data.errors[input.id] !== undefined){
@@ -591,23 +657,22 @@
                 });
             } else{
                 // Go through form and make everything valid, remove feedback if present
-                [...form.elements].filter(input=>input.type!="hidden" && input.type!="submit").forEach(input=>{
+                [...form.elements].filter(input=> input.tagName==="TEXTAREA" || input.type==="text" || input.type=="number").forEach(input=>{
                     let formField = document.getElementById(input.id);
                     let errorFeedback = document.getElementById(`${input.id}-invalid-feedback`);
                     formField.classList.remove("is-invalid");
                     formField.parentElement.contains(errorFeedback)?errorFeedback.remove():undefined;
                     formField.classList.add("is-valid");
                 });
-
-                //close modal after 1.5s
-                modalCloseOnSuccess(modalName);
-
-                //populate spans
-                Object.keys(data).filter(k=>k!=="status").forEach(k => {
-                    // TODO empty field handling, both here and in jinja render
-                    document.getElementById(`character-${k}`).innerText = data[k];
-                });
             }
+        }
+
+        function updatePageFields(data){
+            //populate spans
+            Object.keys(data).filter(k=>k!=="status").forEach(k => {
+                // TODO empty field handling, both here and in jinja render
+                data[k]===""?undefined:document.getElementById(`character-${k}`).innerText = data[k];
+            });
         }
     });
 

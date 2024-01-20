@@ -112,12 +112,19 @@
         <!-- Hooks Box -->
         <div class="socials-box px-1 py-1 mt-2">
             <!-- Hooks List -->
-            <ul class="list-unstyled">
+            <ul id="hooks-list" class="list-unstyled">
                 <!-- h4 30 chars -->
                 <!-- 240 chars text -->
-                <li><h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa{% if is_edit == True %}<span data-bs-toggle="modal" data-bs-target="#RPHooksModal">📝</span>{% endif %}</h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</li>
-                <li><h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</li>
-                <li><h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</h4>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</li>
+                
+                {% for hook in database.roleplaying.hooks %}
+                {% if hook.title|length > 0 and hook.body|length > 0 %}
+                    {% if hook.number == 1 %}
+                    <li><h4>{{hook.title}} {% if is_edit == True %}<span data-bs-toggle="modal" data-bs-target="#RPHooksModal">📝</span>{% endif %}</h4><span>{{hook.body}}</span></li>
+                    {% else %}
+                    <li><h4>{{hook.title}}</h4><span>{{hook.body}}</span></li>
+                    {% endif %}
+                {% endif %}
+                {% endfor %}
             </ul>
         </div>
     </div>
