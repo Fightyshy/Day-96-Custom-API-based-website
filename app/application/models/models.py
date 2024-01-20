@@ -93,12 +93,12 @@ class Business(db.Model):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
 
-    venue_name: Mapped[str] = mapped_column(String, nullable=False)
-    venue_tagline: Mapped[str] = mapped_column(String)
-    venue_website: Mapped[str] = mapped_column(String)
-    venue_operating_times: Mapped[str] = mapped_column(String)
-    venue_discord: Mapped[str] = mapped_column(String)
-    venue_twitter: Mapped[str] = mapped_column(String)
+    venue_name: Mapped[str] = mapped_column(String(length=25), nullable=False, default="Test venue")
+    venue_tagline: Mapped[str] = mapped_column(String(length=40), nullable=True)
+    venue_website: Mapped[str] = mapped_column(String(length=40), nullable=True)
+    venue_operating_times: Mapped[str] = mapped_column(String, nullable=True)
+    venue_discord: Mapped[str] = mapped_column(String(length=40), nullable=True)
+    venue_twitter: Mapped[str] = mapped_column(String, nullable=True)
 
     # TODO parent of VenueAddress, 1-1
     # TODO parent of staff, 1-1

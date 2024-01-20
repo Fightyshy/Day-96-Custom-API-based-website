@@ -382,6 +382,7 @@
                 let revealedPosTraitLabel = document.getElementById(`pos_trait${posCounter}_label`);
 
                 revealedPosTrait.classList.remove("d-none");
+                revealedPosTrait.classList.remove("is-valid");
                 revealedPosTraitLabel.classList.remove("d-none");
             }
         });
@@ -394,6 +395,7 @@
                 let revealedPosTraitLabel = document.getElementById(`pos_trait${posCounter}_label`);
 
                 revealedPosTrait.classList.add("d-none");
+                revealedPosTrait.classList.remove("is-valid");
                 revealedPosTrait.value = ""
                 revealedPosTraitLabel.classList.add("d-none");
 
@@ -408,11 +410,12 @@
             if(negCounter < 5){
                 negCounter++;
 
-                let revealedPosTrait = document.getElementById(`neg_trait${negCounter}`);
-                let revealedPosTraitLabel = document.getElementById(`neg_trait${negCounter}_label`);
+                let revealedNegTrait = document.getElementById(`neg_trait${negCounter}`);
+                let revealedNegTraitLabel = document.getElementById(`neg_trait${negCounter}_label`);
 
-                revealedPosTrait.classList.remove("d-none");
-                revealedPosTraitLabel.classList.remove("d-none");
+                revealedNegTrait.classList.remove("d-none");
+                revealedNegTrait.classList.remove("is-valid");
+                revealedNegTraitLabel.classList.remove("d-none");
             }
         });
 
@@ -420,12 +423,13 @@
             event.preventDefault();
 
             if(negCounter > 1){
-                let revealedPosTrait = document.getElementById(`neg_trait${negCounter}`);
-                let revealedPosTraitLabel = document.getElementById(`neg_trait${negCounter}_label`);
+                let revealedNegTrait = document.getElementById(`neg_trait${negCounter}`);
+                let revealedNegTraitLabel = document.getElementById(`neg_trait${negCounter}_label`);
 
-                revealedPosTrait.classList.add("d-none");
-                revealedPosTrait.value = ""
-                revealedPosTraitLabel.classList.add("d-none");
+                revealedNegTrait.classList.add("d-none");
+                revealedNegTrait.classList.remove("is-valid");
+                revealedNegTrait.value = ""
+                revealedNegTraitLabel.classList.add("d-none");
 
                 negCounter--;
             }
@@ -593,8 +597,10 @@
             });
         });
 
-        // WARN certain sequences of actions (eg. add>delete hook) will cause the modal to refuse
-        // to launch when selected again, static backdrop appears but modal does not
+        // WARN/BUG - Certain action sequences with the HookModal and TraitsModal seem to "break" the modal display
+        // afterwards. Backdrop will be summoned while modal remains hidden.
+        // WARN/TODO - All modal show.bs.modal calls seem to run twice. Using once: true seems to break them
+        // TODO - read up on how js event lifecycle should work.
         document.getElementById("RPHooksModal").addEventListener("show.bs.modal", event=>{
             $.get(
                 "{{url_for('card_maker.save_roleplaying_hooks', char_id=database.char_id)}}",
@@ -622,7 +628,6 @@
                 processData: false,
                 type: "POST",
                 success: data=>{
-                    // WARN potential modal issue when re-opening modal after refresh>remove hook>submit
                     const errorState = serverValidateForm(data, document.getElementById("hookForm"));
                     if(errorState){
                         const keys = Object.keys(data).filter(k=>k!=="status");
@@ -657,6 +662,7 @@
                         let toOpen = bootstrap.Modal.getInstance("#RPTraitsModal");
                         toOpen.show();
                         populateFields(data);
+                        console.log("here")
                     }
                 }
             );
@@ -674,9 +680,7 @@
                 processData: false,
                 type: "POST",
                 success: data=>{
-                    // WARN potential modal issue when re-opening modal after refresh>remove hook>submit
-                    console.log(data)
-                    const errorState = serverValidateForm(data, document.getElementById("hookForm"));
+                    const errorState = serverValidateForm(data, document.getElementById("traitForm"));
                     if(errorState){
                         let posNo = 0;
                         let negNo = 0;
@@ -707,6 +711,39 @@
             });
         });
 
+        document.getElementById("VenueNameAndTaglineModal").addEventListener("show.bs.modal", event=>{
+            $.get(
+                "{{url_for('card_maker.save_venue_names', char_id=database.char_id)}}",
+                data=>{
+                    if(data.status==="ok"){
+                        populateFields(data);
+                    }
+                }
+            );
+        })
+
+
+        document.getElementById("venuenameform").addEventListener("submit", event=>{
+            event.preventDefault();
+
+            const formData = new FormData(document.getElementById("venuenameform"));
+            formData.append("char_id", "{{database.char_id}}");
+            $.ajax({
+                url: "{{url_for('card_maker.save_venue_names')}}",
+                data: formData,
+                contentType: false,
+                processData: false,
+                type: "POST",
+                success: data=>{
+                    console.log(data)
+                    const errorState = serverValidateForm(data, document.getElementById("venuenameform"));
+                    if(errorState){
+                        updatePageFields(data);
+                        modalCloseOnSuccess("VenueNameAndTaglineModal");
+                    }
+                }
+            });
+        })
         // helper funcs for modals
         // https://stackoverflow.com/questions/71903920/how-to-hide-bootstrap-5-modal-on-button-click
         function modalCloseOnSuccess(modal){
@@ -741,6 +778,7 @@
             if(data.status === "error"){
                 [...form.elements].filter(input=> input.tagName==="TEXTAREA" || input.type==="text" || input.type=="number").forEach(input=>{
                     let formField =document.getElementById(input.id)
+                    console.log(formField)
                     let errorFeedback = document.getElementById(`${input.id}-invalid-feedback`);
                     if(data.errors[input.id] !== undefined){
                         formField.parentElement.contains(errorFeedback)?errorFeedback.remove():undefined;
@@ -776,6 +814,8 @@
             //populate spans
             Object.keys(data).filter(k=>k!=="status").forEach(k => {
                 // TODO empty field handling, both here and in jinja render
+                console.log(document.getElementById(`character-${k}`))
+                console.log(data[k])
                 data[k]===""?undefined:document.getElementById(`character-${k}`).innerText = data[k];
             });
         }

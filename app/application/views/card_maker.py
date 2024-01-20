@@ -18,7 +18,7 @@ from ..objects.api_fetchers import (
 )
 import os
 from werkzeug.utils import secure_filename
-from ..models.models import Hook, PlayerCharacter, Roleplaying, Trait, db
+from ..models.models import Business, Hook, PlayerCharacter, Roleplaying, Trait, db
 from ..objects.forms import (
     BusinessImages,
     RPCharAlias,
@@ -625,11 +625,39 @@ def save_roleplaying_traits():
         for trait in get_char.roleplaying.traits:
             traits[f"{trait.type}_trait{trait.number}"] = trait.trait
         return jsonify(traits)
+    
+
+@card_maker.route("/rp-venue-names", methods=["GET", "POST"])
+def save_venue_names():
+    char_id = retrieve_char_id_from_ajax(request)
+    get_char = retrieve_char_by_char_id(char_id)
+
+    if request.method == "POST":
+        data = VenueNameAndTagline()
+        if data.validate():
+            char_business = check_business(get_char)
+            char_business.venue_name = data.venue_name.data
+            char_business.venue_tagline = data.venue_tagline.data
+            db.session.commit()
+            return jsonify({"status":"OK",
+                            "venue_name":char_business.venue_name,
+                            "venue_tagline":char_business.venue_tagline})
+        else:
+            return jsonify({
+                "status": "error",
+                "errors": data.errors
+            })
+    else:
+        print(get_char.business.venue_name)
+        return jsonify({
+            "status": "ok",
+            "venue_name": get_char.business.venue_name,
+            "venue_tagline": get_char.business.venue_tagline
+        })
 
 
 @card_maker.route("/rp-venue-mode", methods=["POST"])
 def swtich_rp_venue():
-    print(request.method)
     if request.method == "POST":
         print(request.get_json()["state"])
         data = request.get_json()
@@ -651,6 +679,19 @@ def check_roleplaying(character: PlayerCharacter) -> Roleplaying:
     else:
         character.roleplaying = Roleplaying()
         return character.roleplaying
+
+
+def check_business(character: PlayerCharacter) -> Business:
+    """Checks if a Business child exists within a PlayerCharacter
+        :param character: A PlayerCharacter model
+        :rtype: Business
+        :return: The PlayerCharacter associated Business model
+    """
+    if character.business:
+        return character.business
+    else:
+        character.business = Business()
+        return character.business
 
 
 def retrieve_char_id_from_ajax(req: request) -> int:
