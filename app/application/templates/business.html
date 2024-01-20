@@ -33,13 +33,13 @@
         <!-- Business Card Column -->
         <div class="col-md-5 py-2">
             <!-- Additional Business Card Details -->
-            <h1 id="businessName" style="display: none;" class="mt-2">Business Text</h1>
-            <h4>Tagline {% if is_edit == True %}<span data-bs-toggle="modal" data-bs-target="#VenueNameAndTaglineModal">📝</span>{% endif %}</h4>
+            <h3 id="character-venue_name" style="display: none;" class="mt-2">{{database.business.venue_name}}</h1>
+            <h5 id="character-venue_tagline">{{database.business.venue_tagline}} {% if is_edit == True %}<span data-bs-toggle="modal" data-bs-target="#VenueNameAndTaglineModal">📝</span>{% endif %}</h4>
             <!-- Contact Information/Socials Box -->
             <div class="socials-box mt-2 px-1 py-2">
-                <h4>Contact & Socials {% if is_edit == True %}<span data-bs-toggle="modal" data-bs-target="#VenueContactAndSocialsModal">📝</span>{% endif %}</h4>
+                <!-- <h4>Contact & Socials </h4> -->
                 <ul class="list-unstyled mb-0">
-                    <li><strong>Address:</strong> The Firmament - Ward 25 - Plot 32 - Tonberry - Elemental</li>
+                    <li><strong>Address:</strong> The Firmament - Ward 25 - Plot 32 - Tonberry - Elemental {% if is_edit == True %}<span data-bs-toggle="modal" data-bs-target="#VenueContactAndSocialsModal">📝</span>{% endif %}</li>
                     <li><strong>Venue website:</strong> <a href="https://testvenuewebsite.com">https://testvenuewebsite.com</a></li>
                     <li><strong>Operating times:</strong> Fridays-Sundays 2100-0100 hours GMT+8</li>
                     <li><strong>Discord:</strong> test#1234</li>
