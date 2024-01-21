@@ -707,37 +707,7 @@ def save_business_contacts():
         data = VenueContactAndSocials()
         if data.validate():
             char_business = check_business(get_char)
-            # Check for preoccupied plot/apartment, immediately respond error if not conflict
-            housing_conflict = False
-            if data.is_apartment:
-                checker = db.session.execute(db.
-                                            select(Business).
-                                            join(VenueAddress).
-                                            where(and_(
-                                                VenueAddress.housing_zone == data.housing_zone.data,
-                                                VenueAddress.housing_ward == data.housing_ward.data,
-                                                VenueAddress.apartment_num == data.apartment_num.data,
-                                                VenueAddress.server == data.server.data,
-                                                VenueAddress.business != char_business
-                                            ))).scalar()
-                housing_conflict = True if checker else False
-            else:
-                checker = db.session.execute(db.
-                                            select(VenueAddress).
-                                            join(VenueAddress).
-                                            where(and_(
-                                                VenueAddress.housing_zone == data.housing_zone.data,
-                                                VenueAddress.housing_ward == data.housing_ward.data,
-                                                VenueAddress.ward_plot == data.ward_plot.data,
-                                                VenueAddress.server == data.server.data,
-                                                VenueAddress.business != char_business
-                                            ))).scalar()
-                housing_conflict = True if checker else False
-            if housing_conflict:
-                print("debug")
-                return jsonify({
-                    "status": "conflict-error", "error": "Plot is already claimed. If this was not done by you in good faith, please contact us."
-                })
+            
             # preload data into char_business first
             char_business.venue_website = data.venue_website.data
             char_business.venue_operating_times = data.venue_operating_times.data

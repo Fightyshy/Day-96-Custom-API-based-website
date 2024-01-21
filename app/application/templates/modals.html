@@ -838,12 +838,6 @@
                         if(data.status==="ok"){
                             updatePageFields(data);
                             modalCloseOnSuccess("VenueContactAndSocialsModal");
-                        }else if(data.status=="conflict-error"){
-                            let conflictWarning = document.createElement("div");
-                            conflictWarning.classList.add("alert alert-danger");
-                            conflictWarning.role = "alert";
-                            conflictWarning.innerText = data.error;
-                            document.getElementById("venuecontactform").parentElement.prepend(conflictWarning);
                         }
                     }
                 }
