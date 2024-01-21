@@ -39,11 +39,21 @@
             <div class="socials-box mt-2 px-1 py-2">
                 <!-- <h4>Contact & Socials </h4> -->
                 <ul class="list-unstyled mb-0">
-                    <li><strong>Address:</strong> The Firmament - Ward 25 - Plot 32 - Tonberry - Elemental {% if is_edit == True %}<span data-bs-toggle="modal" data-bs-target="#VenueContactAndSocialsModal">📝</span>{% endif %}</li>
-                    <li><strong>Venue website:</strong> <a href="https://testvenuewebsite.com">https://testvenuewebsite.com</a></li>
-                    <li><strong>Operating times:</strong> Fridays-Sundays 2100-0100 hours GMT+8</li>
-                    <li><strong>Discord:</strong> test#1234</li>
-                    <li><strong>Twitter:</strong> @VenueTwitter</li>
+                    <li><strong>Address:</strong> 
+                        <span id="character-housing_zone">{{database.business.venue_address.housing_zone}}</span> - 
+                        Ward <span id="character-housing_ward">{{database.business.venue_address.housing_ward}}</span> - 
+                        {% if database.business.venue_address.is_apartment == true %}
+                        Apartment no. <span id="character-apartment_num">{{database.business.venue_address.apartment_num}}</span> - 
+                        {% else %}
+                        Plot no.  <span id="character-ward_plot">{{database.business.venue_address.ward_plot}}</span> - 
+                        {% endif %}
+                        <!-- TODO server and dc can't be numbers, convert them -->
+                        <span id="character-server">{{database.business.venue_address.server}}</span> - 
+                        <span id="character-data_center">Elemental</span> {% if is_edit == True %}<span data-bs-toggle="modal" data-bs-target="#VenueContactAndSocialsModal">📝</span>{% endif %}</li>
+                    <li><strong>Venue website:</strong> <span id="character-venue_website"><a href="{{database.business.venue_website}}">{{database.business.venue_website}}</a></span></li>
+                    <li><strong>Operating times:</strong> <span id="character-venue_operating_times">{{database.business.operating_times}}</span></li>
+                    <li><strong>Discord:</strong> <span id="character_venue_discord">{{database.business.discord}}</span></li>
+                    <li><strong>Twitter:</strong> <span id="character_venue_twitter">{{database.business.twitter}}</span></li>
                     <!-- Additional socials or contact information can be added here -->
                 </ul>
             </div>
