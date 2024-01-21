@@ -707,9 +707,40 @@ def save_business_contacts():
         data = VenueContactAndSocials()
         if data.validate():
             char_business = check_business(get_char)
+            # Check for preoccupied plot/apartment, immediately respond error if not conflict
+            housing_conflict = False
+            if data.is_apartment:
+                checker = db.session.execute(db.
+                                            select(Business).
+                                            join(VenueAddress).
+                                            where(and_(
+                                                VenueAddress.housing_zone == data.housing_zone.data,
+                                                VenueAddress.housing_ward == data.housing_ward.data,
+                                                VenueAddress.apartment_num == data.apartment_num.data,
+                                                VenueAddress.server == data.server.data,
+                                                VenueAddress.business != char_business
+                                            ))).scalar()
+                housing_conflict = True if checker else False
+            else:
+                checker = db.session.execute(db.
+                                            select(VenueAddress).
+                                            join(VenueAddress).
+                                            where(and_(
+                                                VenueAddress.housing_zone == data.housing_zone.data,
+                                                VenueAddress.housing_ward == data.housing_ward.data,
+                                                VenueAddress.ward_plot == data.ward_plot.data,
+                                                VenueAddress.server == data.server.data,
+                                                VenueAddress.business != char_business
+                                            ))).scalar()
+                housing_conflict = True if checker else False
+            if housing_conflict:
+                print("debug")
+                return jsonify({
+                    "status": "conflict-error", "error": "Plot is already claimed. If this was not done by you in good faith, please contact us."
+                })
             # preload data into char_business first
             char_business.venue_website = data.venue_website.data
-            char_business.venue_operating_times = data.venue_opening_times.data
+            char_business.venue_operating_times = data.venue_operating_times.data
             char_business.venue_discord = data.venue_discord.data
             char_business.venue_twitter = data.venue_twitter.data
 
@@ -721,13 +752,14 @@ def save_business_contacts():
                 char_business.venue_address.housing_ward = data.housing_ward.data
                 char_business.venue_address.is_apartment = data.is_apartment.data
                 char_business.venue_address.server = data.server.data
+                char_business.venue_address.data_center = SERVERS.get_server_data_center(data.server.data)
 
                 response = {
                     "status": "ok",
                     "housing_zone": char_business.venue_address.housing_zone,
                     "housing_ward": char_business.venue_address.housing_ward,
-                    "is_apartment": char_business.venue_address.is_apartment,
                     "server": char_business.venue_address.server,
+                    "data_center": char_business.venue_address.data_center,
                     "venue_website": char_business.venue_website,
                     "venue_operating_times": char_business.venue_operating_times,
                     "venue_discord": char_business.venue_discord,
@@ -737,11 +769,11 @@ def save_business_contacts():
                 if data.is_apartment.data:
                     char_business.venue_address.apartment_num = data.apartment_num.data
                     char_business.venue_address.ward_plot = 0
-                    response["ward_plot"] = char_business.venue_address.ward_plot
+                    response["apartment_num"] = char_business.venue_address.apartment_num
                 else:
                     char_business.venue_address.ward_plot = data.ward_plot.data
                     char_business.venue_address.apartment_num = 0
-                    response["apartment_num"] = char_business.venue_address.apartment_num
+                    response["ward_plot"] = char_business.venue_address.ward_plot
                 db.session.commit()
                 return jsonify(response)
             else:
@@ -750,14 +782,15 @@ def save_business_contacts():
                 new_address.housing_ward = data.housing_ward.data
                 new_address.is_apartment = data.is_apartment.data
                 new_address.server = data.server.data
+                new_address.data_center = SERVERS.get_server_data_center(data.server.data)
                 new_address.business = char_business
 
                 response = {
                     "status": "ok",
                     "housing_zone": new_address.housing_zone,
                     "housing_ward": new_address.housing_ward,
-                    "is_apartment": new_address.is_apartment,
                     "server": new_address.server,
+                    "data_center": new_address.data_center,
                     "venue_website": char_business.venue_website,
                     "venue_operating_times": char_business.venue_operating_times,
                     "venue_discord": char_business.venue_discord,
@@ -766,35 +799,34 @@ def save_business_contacts():
 
                 if data.is_apartment.data:
                     new_address.apartment_num = data.apartment_num.data
-                    response["ward_plot"] = new_address.ward_plot
+                    response["apartment_num"] = new_address.apartment_num
                 else:
                     new_address.ward_plot = data.ward_plot.data
-                    response["apartment_num"] = new_address.apartment_num
+                    response["ward_plot"] = new_address.ward_plot
                 db.session.add(new_address)
                 db.session.commit()
                 return jsonify(response)
         else:
             return jsonify({"status":"error","errors":data.errors})
     else:
-        if get_char.business.venue_address:
-            if get_char.business.venue_address.is_apartment:
-                return jsonify({
-                    "status": "ok",
-                    "housing_zone": get_char.business.venue_address.housing_zone,
-                    "housing_ward": get_char.business.venue_address.housing_ward,
-                    "is_apartment": get_char.business.venue_address.is_apartment,
-                    "apartment_num": get_char.business.venue_address.apartment_num,
-                    "server": get_char.business.venue_address.server
-                })
-            else:
-                return jsonify({
-                    "status": "ok",
-                    "housing_zone": get_char.business.venue_address.housing_zone,
-                    "housing_ward": get_char.business.venue_address.housing_ward,
-                    "is_apartment": get_char.business.venue_address.is_apartment,
-                    "ward_plot": get_char.business.venue_address.ward_plot,
-                    "server": get_char.business.venue_address.server
-                })
+        if get_char.business:
+            response = {
+                "status": "ok",
+                "venue_website": get_char.business.venue_website,
+                "venue_operating_times": get_char.business.venue_operating_times,
+                "venue_discord": get_char.business.venue_discord,
+                "venue_twitter": get_char.business.venue_twitter,
+                "is_apartment": get_char.business.venue_address.is_apartment,
+                "housing_zone": get_char.business.venue_address.housing_zone,
+                "housing_ward": get_char.business.venue_address.housing_ward,
+                "server": get_char.business.venue_address.server
+            }
+            if get_char.business.venue_address:
+                if get_char.business.venue_address.is_apartment:
+                    response["apartment_num"] = get_char.business.venue_address.apartment_num
+                else:
+                    response["ward_plot"] = get_char.business.venue_address.ward_plot
+            return jsonify(response)
         else:
             return jsonify({
                 "status": "empty",

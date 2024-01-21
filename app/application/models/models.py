@@ -128,7 +128,8 @@ class VenueAddress(db.Model):
     apartment_num: Mapped[int] = mapped_column(
         Integer, nullable=True, default=1
     )
-    server: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    server: Mapped[str] = mapped_column(String, nullable=False, default="The 13th")
+    data_center: Mapped[str] = mapped_column(String, nullable=False, default="Etheirys")
 
     # TODO child of Buisness, 1-1
     business_id: Mapped[int] = mapped_column(ForeignKey("business.id"))

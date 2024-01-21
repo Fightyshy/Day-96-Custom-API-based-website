@@ -298,14 +298,12 @@ class VenuePlotAddress(FlaskForm):
 
     server = SelectField(
         "Server",
-        choices=[(0, "Choose...")]
+        choices=["Choose..."]
         + [
-            (i + 1, item["server-name"])
-            for i, item in enumerate(MERGED_SERVERS)
+            item["server-name"]
+            for item in MERGED_SERVERS
         ],
-        validators=[DataRequired("You must select your venue's server")],
-        default=0,
-        coerce=int
+        default="Choose..."
     )
 
     def validate_ward_plot(self, field):
@@ -315,12 +313,16 @@ class VenuePlotAddress(FlaskForm):
     def validate_apartment_num(self, field):
         if self.is_apartment.data and field.data == 0:
             raise ValidationError("You must select a apartment")
+        
+    def validate_server(self, field):
+        if field.data == "Choose...":
+            raise ValidationError("You must select your venue's server")
 
 
 class VenueContactAndSocials(VenuePlotAddress):
     # address = FormField(VenuePlotAddress)
 
-    venue_opening_times = StringField("Operating hours")
+    venue_operating_times = StringField("Operating hours")
     venue_twitter = StringField("Twitter", validators=[Length(max=15)])
     venue_discord = StringField("Discord", validators=[Length(max=32)])
     venue_website = StringField(
