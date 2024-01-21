@@ -12,7 +12,7 @@ from wtforms import (
     SubmitField,
     ValidationError,
 )
-from wtforms.validators import DataRequired, URL, Length, NumberRange
+from wtforms.validators import DataRequired, URL, Length, NumberRange, Optional
 from .api_fetchers import SERVERS
 
 MERGED_SERVERS = (
@@ -267,16 +267,18 @@ class VenuePlotAddress(FlaskForm):
             "The Firmament",
         ],
         default="The Mist",
+        validators=[DataRequired(message="You must select the venue's housing zone")]
     )
 
     # Transform into switch frontend
-    is_appartment = BooleanField("Is it a apartment or plot?")
+    is_apartment = BooleanField("Is it a apartment or plot?")
 
     housing_ward = SelectField(
         "Ward No.",
         choices=[(0, "Choose...")] + [(i, i) for i in range(1, 25)],
+        validators=[DataRequired(message="You must select a ward")],
         default=0,
-        validators=[NumberRange(min=1, max=25)],
+        coerce=int
     )
 
     # Either or for these ones
@@ -284,36 +286,47 @@ class VenuePlotAddress(FlaskForm):
         "Plot No.",
         choices=[(0, "Choose...")] + [(j, j) for j in range(1, 61)],
         default=0,
-        validators=[NumberRange(min=1, max=60)],
+        coerce=int
     )
 
     apartment_num = SelectField(
         "Apartment No.",
         choices=[(0, "Choose...")] + [(k, k) for k in range(1, 91)],
         default=0,
-        validators=[NumberRange(min=1, max=90)],
+        coerce=int
     )
 
     server = SelectField(
-        "Data center",
+        "Server",
         choices=[(0, "Choose...")]
         + [
             (i + 1, item["server-name"])
             for i, item in enumerate(MERGED_SERVERS)
         ],
-        default="Balmung",
-        validators=[NumberRange(1, len(MERGED_SERVERS))],
+        validators=[DataRequired("You must select your venue's server")],
+        default=0,
+        coerce=int
     )
 
+    def validate_ward_plot(self, field):
+        if not self.is_apartment.data and field.data == 0:
+            raise ValidationError("You must select a plot")
 
-class VenueContactAndSocials(FlaskForm):
-    address = FormField(VenuePlotAddress)
+    def validate_apartment_num(self, field):
+        if self.is_apartment.data and field.data == 0:
+            raise ValidationError("You must select a apartment")
 
-    venue_website = StringField("Website")
+
+class VenueContactAndSocials(VenuePlotAddress):
+    # address = FormField(VenuePlotAddress)
+
     venue_opening_times = StringField("Operating hours")
-    venue_discord = StringField("Discord")
-    venue_twitter = StringField("Twitter")
-
+    venue_twitter = StringField("Twitter", validators=[Length(max=15)])
+    venue_discord = StringField("Discord", validators=[Length(max=32)])
+    venue_website = StringField(
+        "Website (Please use a shortener if it's over 40 characters!):",
+        validators=[Length(max=40)],
+    )
     submit_venue_contact = SubmitField("Save venue contacts and socials")
 
 
@@ -327,8 +340,11 @@ class VenueStaffDetails(FlaskForm):
             Length(min=1, max=50),
         ],
     )
-    staff_discord = StringField("Own Discord", validators=[Length(min=2, max=32)])
-    staff_twitter = StringField("Own Twitter", validators=[Length(max=15)])
-    staff_website = StringField("Personal website (if any)", validator=[Length(max=40)])
+    staff_twitter = StringField("Twitter", validators=[Length(max=15)])
+    staff_discord = StringField("Discord", validators=[Length(max=32)])
+    staff_website = StringField(
+        "Website (Please use a shortener if it's over 40 characters!):",
+        validators=[Length(max=40)],
+    )
 
     submit_staff_details = SubmitField("Save own details")

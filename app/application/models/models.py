@@ -119,16 +119,16 @@ class VenueAddress(db.Model):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
 
-    housing_zone: Mapped[int] = mapped_column(String, nullable=False)
-    is_apartment: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    housing_zone: Mapped[int] = mapped_column(String, nullable=False, default="The Mist")
+    is_apartment: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     housing_ward: Mapped[int] = mapped_column(
-        Integer, nullable=False, default=0
+        Integer, nullable=False, default=1
     )
-    ward_plot: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    ward_plot: Mapped[int] = mapped_column(Integer, nullable=True, default=1)
     apartment_num: Mapped[int] = mapped_column(
-        Integer, nullable=False, default=0
+        Integer, nullable=True, default=1
     )
-    server: Mapped[str] = mapped_column(String, nullable=False)
+    server: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
 
     # TODO child of Buisness, 1-1
     business_id: Mapped[int] = mapped_column(ForeignKey("business.id"))

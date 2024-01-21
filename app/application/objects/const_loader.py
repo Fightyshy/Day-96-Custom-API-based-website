@@ -24,6 +24,20 @@ class Servers:
             if servers["server-name"] == server:
                 return servers["server-region"]
 
+    def get_server_data_center(self, server: str) -> str:
+        for servers in self.jp_servers:
+            if servers["server-name"] == server:
+                return servers["server-dc"]
+        for servers in self.na_servers:
+            if servers["server-name"] == server:
+                return servers["server-dc"]
+        for server in self.eu_servers:
+            if servers["server-name"] == server:
+                return servers["server-dc"]
+        for servers in self.oc_servers:
+            if servers["server-name"] == server:
+                return servers["server-dc"]
+
     def get_jp(self) -> list:
         server = []
         with open(

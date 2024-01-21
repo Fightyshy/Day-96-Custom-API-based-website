@@ -1,4 +1,3 @@
-import itertools
 from flask import (
     Blueprint,
     current_app,
@@ -18,7 +17,7 @@ from ..objects.api_fetchers import (
 )
 import os
 from werkzeug.utils import secure_filename
-from ..models.models import Business, Hook, PlayerCharacter, Roleplaying, Trait, VenueStaff, db
+from ..models.models import Business, Hook, PlayerCharacter, Roleplaying, Trait, VenueAddress, VenueStaff, db
 from ..objects.forms import (
     BusinessImages,
     RPCharAlias,
@@ -699,10 +698,113 @@ def save_venue_staff_details():
         })
 
 
+@card_maker.route("/rp-venue-contacts", methods=["GET", "POST"])
+def save_business_contacts():
+    char_id = retrieve_char_id_from_ajax(request)
+    get_char = retrieve_char_by_char_id(char_id)
+
+    if request.method == "POST":
+        data = VenueContactAndSocials()
+        if data.validate():
+            char_business = check_business(get_char)
+            # preload data into char_business first
+            char_business.venue_website = data.venue_website.data
+            char_business.venue_operating_times = data.venue_opening_times.data
+            char_business.venue_discord = data.venue_discord.data
+            char_business.venue_twitter = data.venue_twitter.data
+
+            # check if address model exists
+            # address it 5 fields depending on what type of house it is
+            if char_business.venue_address:
+                # set housing zone/ward/housing type/server first
+                char_business.venue_address.housing_zone = data.housing_zone.data
+                char_business.venue_address.housing_ward = data.housing_ward.data
+                char_business.venue_address.is_apartment = data.is_apartment.data
+                char_business.venue_address.server = data.server.data
+
+                response = {
+                    "status": "ok",
+                    "housing_zone": char_business.venue_address.housing_zone,
+                    "housing_ward": char_business.venue_address.housing_ward,
+                    "is_apartment": char_business.venue_address.is_apartment,
+                    "server": char_business.venue_address.server,
+                    "venue_website": char_business.venue_website,
+                    "venue_operating_times": char_business.venue_operating_times,
+                    "venue_discord": char_business.venue_discord,
+                    "venue_twitter": char_business.venue_twitter
+                }
+                # check if apartment or house plot, save one and delete the other
+                if data.is_apartment.data:
+                    char_business.venue_address.apartment_num = data.apartment_num.data
+                    char_business.venue_address.ward_plot = 0
+                    response["ward_plot"] = char_business.venue_address.ward_plot
+                else:
+                    char_business.venue_address.ward_plot = data.ward_plot.data
+                    char_business.venue_address.apartment_num = 0
+                    response["apartment_num"] = char_business.venue_address.apartment_num
+                db.session.commit()
+                return jsonify(response)
+            else:
+                new_address = VenueAddress()
+                new_address.housing_zone = data.housing_zone.data
+                new_address.housing_ward = data.housing_ward.data
+                new_address.is_apartment = data.is_apartment.data
+                new_address.server = data.server.data
+                new_address.business = char_business
+
+                response = {
+                    "status": "ok",
+                    "housing_zone": new_address.housing_zone,
+                    "housing_ward": new_address.housing_ward,
+                    "is_apartment": new_address.is_apartment,
+                    "server": new_address.server,
+                    "venue_website": char_business.venue_website,
+                    "venue_operating_times": char_business.venue_operating_times,
+                    "venue_discord": char_business.venue_discord,
+                    "venue_twitter": char_business.venue_twitter
+                }
+
+                if data.is_apartment.data:
+                    new_address.apartment_num = data.apartment_num.data
+                    response["ward_plot"] = new_address.ward_plot
+                else:
+                    new_address.ward_plot = data.ward_plot.data
+                    response["apartment_num"] = new_address.apartment_num
+                db.session.add(new_address)
+                db.session.commit()
+                return jsonify(response)
+        else:
+            return jsonify({"status":"error","errors":data.errors})
+    else:
+        if get_char.business.venue_address:
+            if get_char.business.venue_address.is_apartment:
+                return jsonify({
+                    "status": "ok",
+                    "housing_zone": get_char.business.venue_address.housing_zone,
+                    "housing_ward": get_char.business.venue_address.housing_ward,
+                    "is_apartment": get_char.business.venue_address.is_apartment,
+                    "apartment_num": get_char.business.venue_address.apartment_num,
+                    "server": get_char.business.venue_address.server
+                })
+            else:
+                return jsonify({
+                    "status": "ok",
+                    "housing_zone": get_char.business.venue_address.housing_zone,
+                    "housing_ward": get_char.business.venue_address.housing_ward,
+                    "is_apartment": get_char.business.venue_address.is_apartment,
+                    "ward_plot": get_char.business.venue_address.ward_plot,
+                    "server": get_char.business.venue_address.server
+                })
+        else:
+            return jsonify({
+                "status": "empty",
+                "is_apartment": False
+            })
+
+
 @card_maker.route("/rp-venue-mode", methods=["POST"])
 def swtich_rp_venue():
     if request.method == "POST":
-        print(request.get_json()["state"])
         data = request.get_json()
         char_id = data["char_id"]
         get_char = db.session.execute(db.select(PlayerCharacter).where(PlayerCharacter.char_id==char_id)).scalar()
