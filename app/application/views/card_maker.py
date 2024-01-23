@@ -406,6 +406,8 @@ def save_roleplaying_summary():
             "sexuality": get_char.roleplaying.sexuality,
             "relationship": get_char.roleplaying.relationship_status
         })
+        # print(get_char.roleplaying)
+        # return jsonify(get_char.roleplaying)
     
 @card_maker.route("/rp-socials", methods=["GET", "POST"])
 def save_roleplaying_socials():

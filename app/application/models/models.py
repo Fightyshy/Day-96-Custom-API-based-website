@@ -1,3 +1,4 @@
+import dataclasses
 from typing import List
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Boolean, Integer, String, ForeignKey
@@ -23,7 +24,7 @@ class PlayerCharacter(db.Model):
     business: Mapped["Business"] = relationship(back_populates="character")
     # TODO maybe child of flask-login user with usermixin, 1-1
 
-
+@dataclasses.dataclass
 class Roleplaying(db.Model):
     __tablename__ = "roleplaying"
 
