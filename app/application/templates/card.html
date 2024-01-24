@@ -157,7 +157,9 @@
         <!-- If editing, include modals.html and script(s) -->
         {% if is_edit == true %}
         {% include "modals.html" %}
-        <script src="{{url_for('static', filename='assets/scripts/form_handlers.js')}}"></script>
+        <script src="{{url_for('static', filename='assets/scripts/form_rp_handlers.js')}}"></script>
+        <script src="{{url_for('static', filename='assets/scripts/form_venue_handlers.js')}}"></script>
+        <script src="{{url_for('static', filename='assets/scripts/form_handler_methods.js')}}"></script>
         {% endif %}
         <script src="{{url_for('static', filename='assets/scripts/image_handling.js')}}"></script>
         <script src="{{url_for('static', filename='assets/scripts/collectible_handlers.js')}}"></script>
@@ -167,8 +169,8 @@
             document.addEventListener("DOMContentLoaded", event=>{
 
                 initMains("{{database.is_buisness}}");
-                initModalVars("{{database.business.venue_address.is_apartment}}",
-                "{{database.roleplaying.hooks|length}}",
+                initVenueModals("{{database.business.venue_address.is_apartment}}","{{database.char_id}}")
+                initRPModals("{{database.roleplaying.hooks|length}}",
                 "{{database.roleplaying.traits|selectattr('type','equalto','pos')|list|length}}",
                 "{{database.roleplaying.traits|selectattr('type','equalto','neg')|list|length}}",
                 "{{database.char_id}}");
