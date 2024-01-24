@@ -513,21 +513,25 @@ def save_roleplaying_hooks():
             # init response dict
             response = {"status": "ok"}
 
+            retrieved_hooks = db.session.execute(db.select(Hook)
+                                                 .where(and_(Hook.roleplaying==char_rp))).scalars().all()
+
             # setup loop that does 3 iterations, for the 3 hooks per char
             for i in range(3):
                 # check if data exists
                 current_hook_title = data_dict.get(f"hook{i+1}_title")
-                retrieved_hook = db.session.execute(db.select(Hook)
-                                                    .where(and_(Hook.number==i+1, Hook.roleplaying==char_rp))).scalar()
+                current_db_hook = retrieved_hooks[i] if i < len(retrieved_hooks) else None
+                # retrieved_hook = db.session.execute(db.select(Hook)
+                #                                     .where(and_(Hook.number==i+1, Hook.roleplaying==char_rp))).scalar()
                 # if both exist (len data_dict>=1, retrieved_hook is not None), update it
-                if retrieved_hook and len(current_hook_title) >= 1:
-                    retrieved_hook.title = data_dict.get(f"hook{i+1}_title")
-                    retrieved_hook.body = data_dict.get(f"hook{i+1}_body")
+                if current_db_hook and len(current_hook_title) >= 1:
+                    current_db_hook.title = data_dict.get(f"hook{i+1}_title")
+                    current_db_hook.body = data_dict.get(f"hook{i+1}_body")
                     db.session.commit()
-                    response[f"hook{i+1}_title"] = retrieved_hook.title
-                    response[f"hook{i+1}_body"] = retrieved_hook.body
+                    response[f"hook{i+1}_title"] = current_db_hook.title
+                    response[f"hook{i+1}_body"] = current_db_hook.body
                 # if it's not in the db but it's in the data_dict (new entry), add it
-                elif not retrieved_hook and len(current_hook_title) >= 1:
+                elif current_db_hook is None and len(current_hook_title) >= 1:
                     new_hook = Hook(title=current_hook_title,
                                     body=data_dict.get(f"hook{i+1}_body"),
                                     number=i+1,
@@ -537,8 +541,8 @@ def save_roleplaying_hooks():
                     response[f"hook{i+1}_title"] = new_hook.title
                     response[f"hook{i+1}_body"] = new_hook.body
                 # if it's in the db but doesn't exst in data_dict, (was removed), delete it
-                elif current_hook_title == "" and retrieved_hook:
-                    db.session.delete(retrieved_hook)
+                elif current_hook_title == "" and current_db_hook:
+                    db.session.delete(current_db_hook)
                     db.session.commit()
 
             return jsonify(response)
@@ -567,29 +571,32 @@ def save_roleplaying_traits():
 
             response = {"status": "ok"}
 
+            # get current char trait list, order by number
+            # 2 queries instead
+            retrieved_pos_trait = db.session.execute(
+                db.select(Trait).where(and_(Trait.roleplaying == char_rp,
+                                            Trait.type == "pos"))).scalars().all()
+
+            retrieved_neg_trait = db.session.execute(
+                db.select(Trait).where(and_(Trait.roleplaying == char_rp,
+                                            Trait.type == "neg"))).scalars().all()
+
+
             # loop 5 times, we use 2 pointers to get pos and neg traits
             for i in range(5):
                 # loop both types simultaenously
                 current_pos_trait = data_dict.get(f"pos_trait{i+1}")
                 current_neg_trait = data_dict.get(f"neg_trait{i+1}")
-
-                # get both at the same time as well, 10 queries worst case
-                retrieved_pos_trait = db.session.execute(
-                    db.select(Trait).where(and_(Trait.number == i+1,
-                                                Trait.roleplaying == char_rp,
-                                                Trait.type == "pos"))).scalar()
-                retrieved_neg_trait = db.session.execute(
-                    db.select(Trait).where(and_(Trait.number == i+1,
-                                                Trait.roleplaying == char_rp,
-                                                Trait.type == "neg"))).scalar()
+                current_db_pos_trait = retrieved_pos_trait[i] if i < len(retrieved_pos_trait) else None
+                current_db_neg_trait = retrieved_neg_trait[i] if i < len(retrieved_neg_trait) else None
 
                 # Works for now, separate ifs, same function for each
-                # Also 10 queries worst case
-                if retrieved_pos_trait and len(current_pos_trait) >= 1:
-                    retrieved_pos_trait.trait = current_pos_trait
+                # 10 queries worst case
+                if current_db_pos_trait and len(current_pos_trait) >= 1:
+                    current_db_pos_trait.trait = current_pos_trait
                     db.session.commit()
-                    response[f"pos_trait{i+1}"] = retrieved_pos_trait.trait
-                elif not retrieved_pos_trait and len(current_pos_trait) >= 1:
+                    response[f"pos_trait{i+1}"] = current_db_pos_trait.trait
+                elif current_db_pos_trait is None and len(current_pos_trait) >= 1:
                     new_trait = Trait(number=i+1,
                                       type="pos",
                                       trait=current_pos_trait,
@@ -597,15 +604,15 @@ def save_roleplaying_traits():
                     db.session.add(new_trait)
                     db.session.commit()
                     response[f"pos_trait{i+1}"] = new_trait.trait
-                elif current_pos_trait == "" and retrieved_pos_trait:
-                    db.session.delete(retrieved_pos_trait)
+                elif current_pos_trait == "" and current_db_pos_trait:
+                    db.session.delete(current_db_pos_trait)
                     db.session.commit()
 
-                if retrieved_neg_trait and len(current_neg_trait) >= 1:
-                    retrieved_neg_trait.trait = current_neg_trait
+                if current_db_neg_trait and len(current_neg_trait) >= 1:
+                    current_db_neg_trait.trait = current_neg_trait
                     db.session.commit()
-                    response[f"neg_trait{i+1}"] = retrieved_neg_trait.trait
-                elif not retrieved_neg_trait and len(current_neg_trait) >= 1:
+                    response[f"neg_trait{i+1}"] = current_db_neg_trait.trait
+                elif current_db_neg_trait is None and len(current_neg_trait) >= 1:
                     new_trait = Trait(number=i+1,
                                       type="neg",
                                       trait=current_neg_trait,
@@ -613,10 +620,10 @@ def save_roleplaying_traits():
                     db.session.add(new_trait)
                     db.session.commit()
                     response[f"neg_trait{i+1}"] = new_trait.trait
-                elif current_neg_trait == "" and retrieved_neg_trait:
-                    db.session.delete(retrieved_neg_trait)
+                elif current_neg_trait == "" and current_db_neg_trait:
+                    db.session.delete(current_db_neg_trait)
                     db.session.commit()
-            # 20 queries at worst
+            # 12 queries at worst
             return jsonify(response)
         else:
             return jsonify({"status": "error", "errors": data.errors})
