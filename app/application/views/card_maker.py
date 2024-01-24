@@ -406,9 +406,7 @@ def save_roleplaying_summary():
             "sexuality": get_char.roleplaying.sexuality,
             "relationship": get_char.roleplaying.relationship_status
         })
-        # print(get_char.roleplaying)
-        # return jsonify(get_char.roleplaying)
-    
+
 @card_maker.route("/rp-socials", methods=["GET", "POST"])
 def save_roleplaying_socials():
     char_id = retrieve_char_id_from_ajax(request)
@@ -470,7 +468,7 @@ def save_roleplaying_about_me():
             "status": "ok",
             "about_me": get_char.roleplaying.about_me
         })
-    
+
 
 @card_maker.route("/rp-char-quote", methods=["GET", "POST"])
 def save_roleplaying_quote():
@@ -566,7 +564,7 @@ def save_roleplaying_traits():
             data_dict = data.data
             data_dict.pop("submit_traits")
             data_dict.pop("csrf_token")
-            
+
             response = {"status": "ok"}
 
             # loop 5 times, we use 2 pointers to get pos and neg traits
@@ -574,6 +572,7 @@ def save_roleplaying_traits():
                 # loop both types simultaenously
                 current_pos_trait = data_dict.get(f"pos_trait{i+1}")
                 current_neg_trait = data_dict.get(f"neg_trait{i+1}")
+
                 # get both at the same time as well, 10 queries worst case
                 retrieved_pos_trait = db.session.execute(
                     db.select(Trait).where(and_(Trait.number == i+1,
@@ -816,7 +815,7 @@ def swtich_rp_venue():
         db.session.commit()
         return jsonify({"state": get_char.is_business})
 
-
+# TODO fix roleplay check to return None if None
 def check_roleplaying(character: PlayerCharacter) -> Roleplaying:
     """Checks if a Roleplaying child exists within a PlayerCharacter
         :param character: A PlayerCharacter model
