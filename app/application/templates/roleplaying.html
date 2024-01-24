@@ -10,6 +10,8 @@
         {% if database.roleplaying.alias|length >= 2 %}
         <!-- Limit 2-40 chars -->
         <p id="char-alias" class="aliases-text mb-2">AKA: <span id="character-alias">{{database.roleplaying.alias}}</span></p>
+        {% else %}
+        <p id="char-alias" class="aliases-text mb-2 d-none">AKA: <span id="character-alias">{{database.roleplaying.alias}}</span></p>
         {% endif %}
         <!-- Character Box -->
         <div class="socials-box mt-0 px-1 py-2">

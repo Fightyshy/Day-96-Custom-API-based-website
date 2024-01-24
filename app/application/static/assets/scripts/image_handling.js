@@ -7,13 +7,23 @@ const venueImage = document.getElementById('venueImage');
 const businessName = document.getElementById('character-venue_name');
 const imageFields = [document.getElementById('logo'), document.getElementById('venue'), document.getElementById('big_venue')];
 
-// after DOM loaded, do
-document.addEventListener('load', function () {
-    // setup initial roleplay tab state and setting switch
-    "{{database.is_business}}" === "True" ? layoutSwitchHandler(true) : layoutSwitchHandler(false);
-    "{{database.is_business}}" === "True" ? layoutSwitch.checked = true : layoutSwitch.checked = false;
+let isBuisness;
+
+function initMains(ib){
+    isBuisness = ib;
+
+    isBuisness === "True" ? layoutSwitchHandler(true) : layoutSwitchHandler(false);
+    isBuisness === "True" ? layoutSwitch.checked : layoutSwitch.checked = false;
     layoutImageSwitcher(document.getElementById("layout").value == 2 ? true : false, imageFields);
-});
+}
+
+// after DOM loaded, do
+// document.addEventListener('load', function () {
+//     // setup initial roleplay tab state and setting switch
+//     "{{database.is_business}}" === "True" ? layoutSwitchHandler(true) : layoutSwitchHandler(false);
+//     "{{database.is_business}}" === "True" ? layoutSwitch.checked = true : layoutSwitch.checked = false;
+//     layoutImageSwitcher(document.getElementById("layout").value == 2 ? true : false, imageFields);
+// });
 
 // Send ajax to update db on switch state
 layoutSwitch.addEventListener("change", function(){
