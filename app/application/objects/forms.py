@@ -36,18 +36,16 @@ class ClaimCharForm(FlaskForm):
 class UploadPortraitForm(FlaskForm):
     portrait = FileField(
         "Upload custom portrait here (otherwise it defaults to the Lodestone portrait)",
-        validators=[FileAllowed(["jpg", "png", "jpeg"], "JPG/PNG only")],
+        validators=[FileAllowed(["jpg", "png", "jpeg"], message="JPG/PNG only")],
     )
-    char_id_summary = HiddenField(validators=[DataRequired()])
     submit_char = SubmitField("Upload portrait")
 
 
 class RoleplayPortraitForm(FlaskForm):
     portrait = FileField(
         "Upload portrait for RP here (otherwise it defaults to the Lodestone portrait)",
-        validators=[FileAllowed(["jpg", "jpeg", "png"], "JPG/PNG only")],
+        validators=[FileAllowed(["jpg", "jpeg", "png"], message="JPG/PNG only")],
     )
-    char_id_rp = HiddenField(validators=[DataRequired()])
     submit_rp = SubmitField("Upload portrait")
 
 
@@ -73,7 +71,6 @@ class BusinessImages(FlaskForm):
         "Upload venue or 1140x375 image",
         validators=[FileAllowed(["jpg", "jpeg", "png"], "JPG/PNG only")],
     )
-    char_id_bs = HiddenField(validators=[DataRequired()])
     submit_business = SubmitField("Upload images and save layout")
 
 

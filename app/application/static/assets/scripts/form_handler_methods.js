@@ -1,12 +1,19 @@
 
-const responseMaker = (url, form) =>{
+// variadic args is arr with [fieldname, fieldvalue]
+const responseMaker = (url, form, ...args) =>{
     const formData = new FormData(form);
     formData.append("char_id", char_id);
+    [...args].forEach(field=>{
+        formData.append(field[0], field[1])
+    })
+    
     const req = new Request(url, {
         method: "POST",
         body: formData,
-        "Content-Type": false,
-        "Process-Data": false
+        // headers:{
+        //     "Content-Type": false,
+        //     "Process-Data": false
+        // }
     });
     return req;
 }
@@ -98,7 +105,7 @@ function serverValidateForm(data, form){
     // TODO user-friendly response to server-error
         // FORMAT -> Error type, Error code, Error desc, render as dismissable field on top of modal
     if(data.status === "error"){
-        [...form.elements].filter(input=> input.tagName === "TEXTAREA" || input.type === "text" || input.type === "number" || input.tagName === "SELECT").forEach(input=>{
+        [...form.elements].filter(input=> input.tagName === "TEXTAREA" || input.type === "text" || input.type === "number" || input.tagName === "SELECT" || input.type === "file").forEach(input=>{
             let formField =document.getElementById(input.id)
             let errorFeedback = document.getElementById(`${input.id}-invalid-feedback`);
             if(data.errors[input.id] !== undefined){
