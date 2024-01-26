@@ -24,12 +24,14 @@ def init_app():
     app.config["UPLOAD_DIRECTORY"] = os.path.join(
         app.root_path, "../uploaded-img/"
     )
+    app.config["CACHE_THRESHOLD"] = 10
 
     # Apply app libraries
     bs5.init_app(app)
     from .objects.api_fetchers import cache
 
     cache.init_app(app)
+
     from .models.models import db
 
     db.init_app(app)
