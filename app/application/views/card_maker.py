@@ -705,10 +705,22 @@ def swtich_rp_venue():
     if request.method == "POST":
         data = request.get_json()
         char_id = data["char_id"]
-        get_char = db.session.execute(db.select(PlayerCharacter).where(PlayerCharacter.char_id==char_id)).scalar()
+        get_char = retrieve_char_by_char_id(char_id)
         get_char.is_business = data["state"]
         db.session.commit()
         return jsonify({"state": get_char.is_business})
+
+
+@card_maker.route("/rp-venue-img-state", methods=["POST"])
+def switch_venue_img_layout():
+    if request.method == "POST":
+        data = request.get_json()
+        char_id = data["char_id"]
+        get_char = retrieve_char_by_char_id(char_id)
+        get_char.business.venue_state = data["state"]
+        db.session.commit()
+        return jsonify({"state": get_char.business.venue_state})
+
 
 # TODO fix roleplay check to return None if None
 def check_roleplaying(character: PlayerCharacter) -> Roleplaying:

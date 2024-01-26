@@ -141,6 +141,10 @@ class Business(db.Model):
     )
     venue_twitter: Mapped[str] = mapped_column(String, nullable=True)
 
+    # venue image state
+
+    venue_state: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+
     # venue images
     venue_img: Mapped[str] = mapped_column(String, nullable=True)
     logo_img: Mapped[str] = mapped_column(String, nullable=True)

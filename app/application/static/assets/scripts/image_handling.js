@@ -8,12 +8,16 @@ const businessName = document.getElementById('character-venue_name');
 const imageFields = [document.getElementById('logo'), document.getElementById('venue'), document.getElementById('big_venue')];
 
 let isBuisness;
+let venueImgLayout;
 
-function initMains(ib){
+function initMains(ib, vil){
     isBuisness = ib;
+    venueImgLayout = vil;
 
     isBuisness === "True" ? layoutSwitchHandler(true) : layoutSwitchHandler(false);
     isBuisness === "True" ? layoutSwitch.checked = true : layoutSwitch.checked = false;
+    document.getElementById("layout").value = venueImgLayout;
+    layoutImageSelector(document.getElementById("layout").value);
     layoutImageSwitcher(document.getElementById("layout").value == 2 ? true : false, imageFields);
 }
 
@@ -34,38 +38,23 @@ layoutSwitch.addEventListener("change", async event=>{
     // TODO show error as dismissable toast, advise user to try again or contact admin
 })
 
-document.getElementById('layout').addEventListener('change', function () {
-    const selectedLayout = this.value;
-    // TODO set value of 1/2/3 or use actual values to display
-    // TODO form field disabling due to switching
-    switch (selectedLayout) {
-        case '1':
-            // Two Images, 375x375px logo, 650x375px small venue img, no h1 name
-            document.getElementById("logoImg").classList.remove("d-none");
-            document.getElementById("venueImg").classList.remove("d-none");
-            document.getElementById("big_venueImg").classList.add("d-none");
-            businessName.style.display = 'none'
-            layoutImageSwitcher(false, imageFields)
-            break;
-        case '2':
-            // No Image, 1140x375px Space for H1 Text
-            document.getElementById("logoImg").classList.add("d-none");
-            document.getElementById("venueImg").classList.add("d-none");
-            document.getElementById("big_venueImg").classList.remove("d-none");
-            businessName.style.display = 'block'
-            layoutImageSwitcher(true, imageFields)
-            break;
-        case '3':
-            // Two Images, 375x375px logo, 650x375px small venue img, includes h1 name
-            document.getElementById("logoImg").classList.remove("d-none");
-            document.getElementById("venueImg").classList.remove("d-none");
-            document.getElementById("big_venueImg").classList.add("d-none");
-            businessName.style.display = 'block'
-            layoutImageSwitcher(false, imageFields)
-            break;
-        default:
-            break;
-    }
+document.getElementById('layout').addEventListener('change', async ()=> {
+    const selectedLayout = document.getElementById('layout').value;
+    layoutImageSelector(selectedLayout);
+
+    // Send req to update
+    const req = new Request(`http://localhost:5000/rp-venue-img-state?char_id=${char_id}`,{
+        method:"POST",
+        headers:{
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            "state": document.getElementById("layout").value,
+            "char_id": char_id
+        })
+    });
+
+    const res = await fetch(req);
 });
 
 // TODO image uploaders using validators
@@ -226,6 +215,37 @@ function layoutImageSwitcher(state, images){
             }
         }
     })
+}
+
+function layoutImageSelector(val){
+    switch (val) {
+        case '1':
+            // Two Images, 375x375px logo, 650x375px small venue img, no h1 name
+            document.getElementById("logoImg").classList.remove("d-none");
+            document.getElementById("venueImg").classList.remove("d-none");
+            document.getElementById("big_venueImg").classList.add("d-none");
+            businessName.style.display = 'none'
+            layoutImageSwitcher(false, imageFields)
+            break;
+        case '2':
+            // No Image, 1140x375px Space for H1 Text
+            document.getElementById("logoImg").classList.add("d-none");
+            document.getElementById("venueImg").classList.add("d-none");
+            document.getElementById("big_venueImg").classList.remove("d-none");
+            businessName.style.display = 'block'
+            layoutImageSwitcher(true, imageFields)
+            break;
+        case '3':
+            // Two Images, 375x375px logo, 650x375px small venue img, includes h1 name
+            document.getElementById("logoImg").classList.remove("d-none");
+            document.getElementById("venueImg").classList.remove("d-none");
+            document.getElementById("big_venueImg").classList.add("d-none");
+            businessName.style.display = 'block'
+            layoutImageSwitcher(false, imageFields)
+            break;
+        default:
+            break;
+    }
 }
 
 function twoImages(row){
