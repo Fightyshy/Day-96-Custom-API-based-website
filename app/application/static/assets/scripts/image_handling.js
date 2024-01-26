@@ -13,27 +13,25 @@ function initMains(ib){
     isBuisness = ib;
 
     isBuisness === "True" ? layoutSwitchHandler(true) : layoutSwitchHandler(false);
-    isBuisness === "True" ? layoutSwitch.checked : layoutSwitch.checked = false;
+    isBuisness === "True" ? layoutSwitch.checked = true : layoutSwitch.checked = false;
     layoutImageSwitcher(document.getElementById("layout").value == 2 ? true : false, imageFields);
 }
 
-// after DOM loaded, do
-// document.addEventListener('load', function () {
-//     // setup initial roleplay tab state and setting switch
-//     "{{database.is_business}}" === "True" ? layoutSwitchHandler(true) : layoutSwitchHandler(false);
-//     "{{database.is_business}}" === "True" ? layoutSwitch.checked = true : layoutSwitch.checked = false;
-//     layoutImageSwitcher(document.getElementById("layout").value == 2 ? true : false, imageFields);
-// });
-
 // Send ajax to update db on switch state
-layoutSwitch.addEventListener("change", function(){
+layoutSwitch.addEventListener("change", async event=>{
     const switchState = layoutSwitchHandler(layoutSwitch.checked)
-    $.ajax({
-        url:"{{url_for('card_maker.swtich_rp_venue')}}",
-        data: JSON.stringify({"state": switchState, "char_id": "{{database.char_id}}"}),
-        type:"POST",
-        contentType:"application/json"
+    const response = await fetch(`http://localhost:5000/rp-venue-mode?char_id=${char_id}`,{
+        method: "POST",
+        headers:{
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            "state": switchState,
+            "char_id": char_id
+        })
     })
+    const error = response.error
+    // TODO show error as dismissable toast, advise user to try again or contact admin
 })
 
 document.getElementById('layout').addEventListener('change', function () {
@@ -43,25 +41,25 @@ document.getElementById('layout').addEventListener('change', function () {
     switch (selectedLayout) {
         case '1':
             // Two Images, 375x375px logo, 650x375px small venue img, no h1 name
-            document.getElementById("businessImg").classList.remove("d-none");
+            document.getElementById("logoImg").classList.remove("d-none");
             document.getElementById("venueImg").classList.remove("d-none");
-            document.getElementById("bigImg").classList.add("d-none");
+            document.getElementById("big_venueImg").classList.add("d-none");
             businessName.style.display = 'none'
             layoutImageSwitcher(false, imageFields)
             break;
         case '2':
             // No Image, 1140x375px Space for H1 Text
-            document.getElementById("businessImg").classList.add("d-none");
+            document.getElementById("logoImg").classList.add("d-none");
             document.getElementById("venueImg").classList.add("d-none");
-            document.getElementById("bigImg").classList.remove("d-none");
+            document.getElementById("big_venueImg").classList.remove("d-none");
             businessName.style.display = 'block'
             layoutImageSwitcher(true, imageFields)
             break;
         case '3':
             // Two Images, 375x375px logo, 650x375px small venue img, includes h1 name
-            document.getElementById("businessImg").classList.remove("d-none");
+            document.getElementById("logoImg").classList.remove("d-none");
             document.getElementById("venueImg").classList.remove("d-none");
-            document.getElementById("bigImg").classList.add("d-none");
+            document.getElementById("big_venueImg").classList.add("d-none");
             businessName.style.display = 'block'
             layoutImageSwitcher(false, imageFields)
             break;
@@ -70,65 +68,59 @@ document.getElementById('layout').addEventListener('change', function () {
     }
 });
 
-$("#portrait-form").submit(event=>{
+// TODO image uploaders using validators
+// TODO Error message format, should be
+// Error code, Error message, Error explaination (in human)
+document.getElementById("portrait-form").addEventListener("submit", async event=>{
     event.preventDefault();
 
-    const editForm = new FormData(document.getElementById("portrait-form"))
-    editForm.append("source", "summary")
-
-    $.ajax({
-        url: "{{url_for('card_maker.upload_portrait')}}",
-        data: editForm,
-        contentType: false,
-        processData: false,
-        type: "POST",
-    }).done(data=>{
-        imgurl=`${data["src"]}?timestamp=${Date.now()}`
+    const req = responseMaker(`http://localhost:5000/character/portrait?char_id=${char_id}`, document.getElementById("portrait-form"));
+    const response = await fetch(req);
+    const data = await response.json();
+    
+    if(serverValidateForm(data, document.getElementById("portrait-form"))){
+        imgurl=`${data["image"]}?timestamp=${Date.now()}`
         document.getElementById("avatar").src=imgurl
-    })
-})
+        document.getElementById("summary_portrait").value = "";
+    } else{
+        // TODO error response as toast
+    }
+});
 
-$("#roleplay-settings").submit(event=>{
+document.getElementById("roleplay-settings").addEventListener("submit", async event=>{
     event.preventDefault();
 
-    const editForm = new FormData(document.getElementById("roleplay-settings"))
-    editForm.append("source", "roleplay")
+    const req = responseMaker(`http://localhost:5000/character/portrait?char_id=${char_id}`, document.getElementById("roleplay-settings"));
+    const response = await fetch(req);
+    const data = await response.json();
 
-    $.ajax({
-        url: "{{url_for('card_maker.upload_portrait')}}",
-        data: editForm,
-        contentType: false,
-        processData: false,
-        type: "POST",
-    }).done(data=>{
-        imgurl=`${data["src"]}?timestamp=${Date.now()}`
-        document.getElementById("rp-avatar").src=imgurl
-    })
-})
+    if(serverValidateForm(data, document.getElementById("roleplay-settings"))){
+        imgurl=`${data["image"]}?timestamp=${Date.now()}`;
+        document.getElementById("rp-avatar").src=imgurl;
+        document.getElementById("rp_portrait").value = "";
+    } else{
+        // TODO error response as toast
+    }
+});
 
-$("#business-settings").submit(event=>{
+document.getElementById("business-settings").addEventListener("submit", async event=>{
     event.preventDefault();
 
-    const editForm = new FormData(document.getElementById("business-settings"))
+    const req = responseMaker(`http://localhost:5000/character/venue?char_id=${char_id}`, document.getElementById("business-settings"))
+    const response = await fetch(req);
+    const data = await response.json();
+    if(serverValidateForm(data, document.getElementById("business-settings"))){
+        Object.entries(data["images"]).forEach(image=>{
+            // [key, img src]
+            let [key, source] = image;
+            document.getElementById(`${key}Img`).src = source
+        });
+    } else{
+        // TODO error response as toast
+    }
+});
 
-    $.ajax({
-        url: "{{url_for('card_maker.upload_venue_images')}}",
-        data: editForm,
-        contentType: false,
-        processData: false,
-        type: "POST",
-    }).done(data=>{
-        if(data["uploaded"] === "two"){
-            imgOneUrl = `${data["src"]["one"]}?timestamp=${Date.now()}`
-            imgTwoUrl = `${data["src"]["two"]}?timestamp=${Date.now()}`
-            document.getElementById("businessImg").src = imgOneUrl != null ? imgOneUrl : "https://via.placeholder.com/375x375"
-            document.getElementById("venueImg").src = imgTwoUrl != null ? imgTwoUrl : "https://via.placeholder.com/650x375"
-        }else{
-            imgBigUrl = `${data["src"]}?timestamp=${Date.now()}`
-            document.getElementById("bigImg").src = imgBigUrl != null ? imgBigUrl : "https://via.placeholder.com/1140x375"
-        }
-    })
-})
+document.getElementById("edit-summary-button").addEventListener("click", enableEditing);
 
 function layoutSwitchHandler(state){
     let switchState = state;
@@ -148,28 +140,29 @@ function layoutSwitchHandler(state){
     return switchState;
 }
 
-function saveChanges() {
-    // Get the input element and its value
+async function saveChanges() {
+    // Select input element and sanitise length to 200
     const inputElement = document.querySelector('#additional-text textarea');
     const newText = inputElement.value;
-    // Force limit the text to 200 characters to send
     const limitedText = newText.substring(0, 200);
 
-    // jQuery for now to show it's working, gonna figure out async fetch later
-    $.ajax({
-        url: "{{url_for('card_maker.save_char_summary')}}",
-        data: JSON.stringify({
-            "char_id": "{{database.char_id}}",
+    // form request and get response
+    const request = new Request(`http://localhost:5000/char-summary?char_id=${char_id}`, {
+        method: "POST",
+        headers:{
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
             "summary": limitedText
-        }),
-        type: "POST",
-        contentType: "application/json"
-    }).done(data=>{
+        })
+    });
+    const response = await fetch(request);
+    const data = await response.json();
+
+    if (response.ok){
         const additionalTextDiv = document.getElementById('additional-text');
         additionalTextDiv.innerHTML = `<p>${data["summary"]}</p><span id='edit-summary-button' onclick='enableEditing()'>📝</span>`;
-    })
-
-    // Replace the input and button with the updated text
+    }
 }
 
 function enableEditing() {
@@ -209,6 +202,8 @@ function enableEditing() {
 function layoutImageSwitcher(state, images){
     // state bool is for big image, two images is inversed
     images.forEach(ele=>{
+        // May not work on some browsers, but our target is modern browsers atm
+        ele.value = ""
         if(state) {
             if(ele.id === "big_venue"){
                 ele.removeAttribute("disabled")

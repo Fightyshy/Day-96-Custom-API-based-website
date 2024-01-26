@@ -34,7 +34,7 @@ class ClaimCharForm(FlaskForm):
 
 
 class UploadPortraitForm(FlaskForm):
-    portrait = FileField(
+    summary_portrait = FileField(
         "Upload custom portrait here (otherwise it defaults to the Lodestone portrait)",
         validators=[FileAllowed(["jpg", "png", "jpeg"], message="JPG/PNG only")],
     )
@@ -42,7 +42,7 @@ class UploadPortraitForm(FlaskForm):
 
 
 class RoleplayPortraitForm(FlaskForm):
-    portrait = FileField(
+    rp_portrait = FileField(
         "Upload portrait for RP here (otherwise it defaults to the Lodestone portrait)",
         validators=[FileAllowed(["jpg", "jpeg", "png"], message="JPG/PNG only")],
     )

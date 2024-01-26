@@ -20,6 +20,7 @@ def init_app():
     app.config["CACHE_DIR"] = "./temp"
     app.config["CACHE_DEFAULT_TIMEOUT"] = 300
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///store.db"
+    app.config["UPLOAD_DIRECTORY"] = os.path.join(app.root_path, "../uploaded-img/")
 
     # Apply app libraries
     bs5.init_app(app)
