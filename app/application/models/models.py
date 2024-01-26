@@ -1,4 +1,3 @@
-import dataclasses
 from typing import List
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Boolean, Integer, String, ForeignKey
@@ -11,10 +10,18 @@ class PlayerCharacter(db.Model):
     __tablename__ = "character"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    char_id: Mapped[str] = mapped_column(String, nullable=False, default="I am once again, disapointing Yoship by using third party tools that scrape from the Lodestone")
+    char_id: Mapped[str] = mapped_column(
+        String,
+        nullable=False,
+        default="I am once again, disapointing Yoship by using third party tools that scrape from the Lodestone",
+    )
     summary: Mapped[str] = mapped_column(String(length=200), nullable=True)
     # False is rp, True is business, default RP
-    is_business: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    is_business: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False
+    )
+
+    summary_portrait: Mapped[str] = mapped_column(String, nullable=True)
 
     # TODO parent of roleplaying, 1-1
     roleplaying: Mapped["Roleplaying"] = relationship(
@@ -24,6 +31,7 @@ class PlayerCharacter(db.Model):
     business: Mapped["Business"] = relationship(back_populates="character")
     # TODO maybe child of flask-login user with usermixin, 1-1
 
+
 class Roleplaying(db.Model):
     __tablename__ = "roleplaying"
 
@@ -31,18 +39,41 @@ class Roleplaying(db.Model):
 
     # character ic
     alias: Mapped[str] = mapped_column(String(length=40))
-    age: Mapped[str] = mapped_column(String(length=5), nullable=False, default=18)
-    gender: Mapped[str] = mapped_column(String(length=20), nullable=False, default="Fill this in")
-    sexuality: Mapped[str] = mapped_column(String(length=30), nullable=False, default="Fill this in")
-    relationship_status: Mapped[str] = mapped_column(String(length=20), nullable=False, default="Single")
+    age: Mapped[str] = mapped_column(
+        String(length=5), nullable=False, default=18
+    )
+    gender: Mapped[str] = mapped_column(
+        String(length=20), nullable=False, default="Fill this in"
+    )
+    sexuality: Mapped[str] = mapped_column(
+        String(length=30), nullable=False, default="Fill this in"
+    )
+    relationship_status: Mapped[str] = mapped_column(
+        String(length=20), nullable=False, default="Single"
+    )
     tagline: Mapped[str] = mapped_column(String(length=50))
 
     # character ooc
-    twitter: Mapped[str] = mapped_column(String(length=15), nullable=True, default="Fill this in if you want!")
-    website: Mapped[str] = mapped_column(String(length=40), nullable=True, default="Fill this in if you want!")
-    discord: Mapped[str] = mapped_column(String(length=32), nullable=True, default="Fill this in if you want!")
-    oc_notes: Mapped[str] = mapped_column(String(length=90), nullable=True, default="Fill this in if you want!")
-    about_me: Mapped[str] = mapped_column(String(length=290), nullable=True, default="Say something about yourself (or your character)")
+    twitter: Mapped[str] = mapped_column(
+        String(length=15), nullable=True, default="Fill this in if you want!"
+    )
+    website: Mapped[str] = mapped_column(
+        String(length=40), nullable=True, default="Fill this in if you want!"
+    )
+    discord: Mapped[str] = mapped_column(
+        String(length=32), nullable=True, default="Fill this in if you want!"
+    )
+    oc_notes: Mapped[str] = mapped_column(
+        String(length=90), nullable=True, default="Fill this in if you want!"
+    )
+    about_me: Mapped[str] = mapped_column(
+        String(length=290),
+        nullable=True,
+        default="Say something about yourself (or your character)",
+    )
+
+    # image
+    rp_portrait: Mapped[str] = mapped_column(String, nullable=True)
 
     # relationships
     # TODO parent of hooks, 1-many
@@ -63,8 +94,12 @@ class Hook(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
 
     number: Mapped[int] = mapped_column(Integer, nullable=False)
-    title: Mapped[str] = mapped_column(String(length=30), nullable=False, default="Title here")
-    body: Mapped[str] = mapped_column(String(length=240), nullable=False, default="Add content here")
+    title: Mapped[str] = mapped_column(
+        String(length=30), nullable=False, default="Title here"
+    )
+    body: Mapped[str] = mapped_column(
+        String(length=240), nullable=False, default="Add content here"
+    )
 
     # TODO child of roleplaying, many(3)-1
     roleplay_id: Mapped[int] = mapped_column(ForeignKey("roleplaying.id"))
@@ -83,9 +118,7 @@ class Trait(db.Model):
 
     # TODO child of roleplaying, many([1-2]<->5-10)-1
     roleplay_id: Mapped[int] = mapped_column(ForeignKey("roleplaying.id"))
-    roleplaying: Mapped["Roleplaying"] = relationship(
-        back_populates="traits"
-    )
+    roleplaying: Mapped["Roleplaying"] = relationship(back_populates="traits")
 
 
 class Business(db.Model):
@@ -93,12 +126,25 @@ class Business(db.Model):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
 
-    venue_name: Mapped[str] = mapped_column(String(length=25), nullable=False, default="Test venue")
-    venue_tagline: Mapped[str] = mapped_column(String(length=40), nullable=True)
-    venue_website: Mapped[str] = mapped_column(String(length=40), nullable=True)
+    venue_name: Mapped[str] = mapped_column(
+        String(length=25), nullable=False, default="Test venue"
+    )
+    venue_tagline: Mapped[str] = mapped_column(
+        String(length=40), nullable=True
+    )
+    venue_website: Mapped[str] = mapped_column(
+        String(length=40), nullable=True
+    )
     venue_operating_times: Mapped[str] = mapped_column(String, nullable=True)
-    venue_discord: Mapped[str] = mapped_column(String(length=40), nullable=True)
+    venue_discord: Mapped[str] = mapped_column(
+        String(length=40), nullable=True
+    )
     venue_twitter: Mapped[str] = mapped_column(String, nullable=True)
+
+    # venue images
+    venue_img: Mapped[str] = mapped_column(String, nullable=True)
+    logo_img: Mapped[str] = mapped_column(String, nullable=True)
+    big_venue_img: Mapped[str] = mapped_column(String, nullable=True)
 
     # TODO parent of VenueAddress, 1-1
     # TODO parent of staff, 1-1
@@ -119,8 +165,12 @@ class VenueAddress(db.Model):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
 
-    housing_zone: Mapped[int] = mapped_column(String, nullable=False, default="The Mist")
-    is_apartment: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    housing_zone: Mapped[int] = mapped_column(
+        String, nullable=False, default="The Mist"
+    )
+    is_apartment: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False
+    )
     housing_ward: Mapped[int] = mapped_column(
         Integer, nullable=False, default=1
     )
@@ -128,8 +178,12 @@ class VenueAddress(db.Model):
     apartment_num: Mapped[int] = mapped_column(
         Integer, nullable=True, default=1
     )
-    server: Mapped[str] = mapped_column(String, nullable=False, default="The 13th")
-    data_center: Mapped[str] = mapped_column(String, nullable=False, default="Etheirys")
+    server: Mapped[str] = mapped_column(
+        String, nullable=False, default="The 13th"
+    )
+    data_center: Mapped[str] = mapped_column(
+        String, nullable=False, default="Etheirys"
+    )
 
     # TODO child of Buisness, 1-1
     business_id: Mapped[int] = mapped_column(ForeignKey("business.id"))

@@ -65,8 +65,7 @@ function initTraitForm(){
 }
 
 function updatePageFields(data){
-    //populate spans
-    console.log(data);
+    //populate spans;
     Object.keys(data).filter(k=>k!=="status").forEach(k => {
         // TODO empty field handling, both here and in jinja render
         data[k]===""?undefined:document.getElementById(`character-${k}`).innerText = data[k];
@@ -106,7 +105,7 @@ function serverValidateForm(data, form){
         // FORMAT -> Error type, Error code, Error desc, render as dismissable field on top of modal
     if(data.status === "error"){
         [...form.elements].filter(input=> input.tagName === "TEXTAREA" || input.type === "text" || input.type === "number" || input.tagName === "SELECT" || input.type === "file").forEach(input=>{
-            let formField =document.getElementById(input.id)
+            let formField = document.getElementById(input.id)
             let errorFeedback = document.getElementById(`${input.id}-invalid-feedback`);
             if(data.errors[input.id] !== undefined){
                 formField.parentElement.contains(errorFeedback)?errorFeedback.remove():undefined;
@@ -125,7 +124,35 @@ function serverValidateForm(data, form){
             }
         });
         return false;
-    } else{
+    // special edge-case for portrait images
+    } else if (data.status === "error-img"){
+        let formField = document.querySelector(`#${data.source} > .mb-3 > input`);
+        let errorFeedback = document.getElementById(`${formField.id}-invalid-feedback`);
+        if(data.errors[formField.id] !== undefined){
+            formField.parentElement.contains(errorFeedback)?errorFeedback.remove():undefined;
+            let invalidFeedback = document.createElement("div");
+
+            invalidFeedback.id = `${formField.id}-invalid-feedback`;
+            invalidFeedback.classList.add("invalid-feedback");
+            invalidFeedback.innerText = data.errors[formField.id][0];
+
+            formField.classList.add("is-invalid");
+            formField.parentElement.appendChild(invalidFeedback);
+        } else {
+            formField.classList.remove("is-invalid");
+            formField.classList.add("is-valid");
+            formField.parentElement.contains(errorFeedback)?errorFeedback.remove():undefined;
+        }
+        return false;
+    } else if (data.status === "ok-img") {
+        let formField = document.querySelector(`#${data.source} > .mb-3 > input`);
+        let errorFeedback = document.getElementById(`${formField.id}-invalid-feedback`);
+        formField.classList.remove("is-invalid");
+        formField.parentElement.contains(errorFeedback)?errorFeedback.remove():undefined;
+        formField.classList.add("is-valid");
+        return true;
+    }
+    else{
         // Go through form and make everything valid, remove feedback if present
         [...form.elements].filter(input=> input.tagName === "TEXTAREA" || input.type === "text" || input.type === "number" || input.tagName === "SELECT").forEach(input=>{
             let formField = document.getElementById(input.id);
@@ -134,6 +161,6 @@ function serverValidateForm(data, form){
             formField.parentElement.contains(errorFeedback)?errorFeedback.remove():undefined;
             formField.classList.add("is-valid");
         });
-        return true
+        return true;
     }
 }

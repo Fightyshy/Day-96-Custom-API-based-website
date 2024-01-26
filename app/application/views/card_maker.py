@@ -1,4 +1,4 @@
-from glob import glob, iglob
+from glob import glob
 from flask import (
     Blueprint,
     current_app,
@@ -36,6 +36,7 @@ from ..objects.forms import (
 
 card_maker = Blueprint("card_maker", __name__, template_folder="templates")
 
+
 # TODO for uploaders, find object store service to send images too
 @card_maker.route("/character/venue", methods=["POST"])
 def upload_venue_images():
@@ -48,22 +49,24 @@ def upload_venue_images():
             data.pop("layout")
             data.pop("submit_business")
             data.pop("csrf_token")
-            char_id = retrieve_char_id_from_ajax(request)
+            char_id = retrieve_char_id_from_request(request)
+            get_char = retrieve_char_by_char_id(char_id)
+
             images = {}
             for key, image in data.items():
                 if image:
                     extension = image.filename.split(".")[-1]
                     filename = secure_filename(f"{char_id}_{key}.{extension}")
-                    filepath = os.path.join(current_app.root_path, "static/assets/uploaded-img/", filename)
-                    
+                    filepath = os.path.join(current_app.root_path, "static/assets/uploaded-img/", filename)        
                     # Glob to pattern match files in filepath dir
                     existing_image = glob(f"{filename[:-4]}*", root_dir=os.path.join(current_app.root_path, "../uploaded-img/"))
                     if len(glob(f"{filename[:-4]}*", root_dir=os.path.join(current_app.root_path, "../uploaded-img/"))) > 0:
-                        print("here")
                         os.remove(os.path.join(current_app.config["UPLOAD_DIRECTORY"], existing_image[0]))
 
                     image.save(filepath)
                     images[key] = url_for("static", filename="/assets/uploaded-img/"+filename)
+                    get_char.business.__setattr__(f"{key}_img", url_for("static", filename="/assets/uploaded-img/"+filename))
+                    db.session.commit()
             return jsonify({
                 "status": "ok",
                 "images": images
@@ -78,34 +81,43 @@ def upload_venue_images():
 @card_maker.route("/character/portrait", methods=["POST"])
 def upload_portrait():
     if request.method == "POST":
+        portrait_type = request.form.get("type")
+        portrait_source = request.form.get("source")
         portraitform = UploadPortraitForm()
         if portraitform.validate():
-            print(portraitform.data)
             data = portraitform.data
             data.pop("submit_char")
             data.pop("csrf_token")
-            char_id = retrieve_char_id_from_ajax(request)
+            char_id = retrieve_char_id_from_request(request)
+            get_char = retrieve_char_by_char_id(char_id)
 
-            portrait_type = list(data.keys())[0]
-            image = data[portrait_type]
+            image = data["portrait"]
             extension = image.filename.split(".")[-1]
             filename = secure_filename(f"{char_id}_{portrait_type}.{extension}")
             filepath = os.path.join(current_app.root_path, "static/assets/uploaded-img/", filename)
-            print(os.path.join(current_app.root_path, "static/assets/uploaded-img/", filename))
 
             existing_image = glob(f"{filename[:-4]}*", root_dir=os.path.join(current_app.root_path, "../uploaded-img/"))
             if len(glob(f"{filename[:-4]}*", root_dir=os.path.join(current_app.root_path, "../uploaded-img/"))) > 0:
-                print("here")
                 os.remove(os.path.join(current_app.config["UPLOAD_DIRECTORY"], existing_image[0]))
 
             image.save(filepath)
-
+            if portrait_source == "portrait-form":
+                get_char.summary_portrait = url_for("static", filename="/assets/uploaded-img/"+filename)
+            else:
+                get_char.roleplaying.rp_portrait = url_for("static", filename="/assets/uploaded-img/"+filename)
+            db.session.commit()
+            print({
+                "status": "ok-img",
+                "source": portrait_source,
+                "portrait": url_for("static", filename="/assets/uploaded-img/"+filename)
+            })
             return jsonify({
-                "status": "ok",
-                "image": url_for("static", filename="/assets/uploaded-img/"+filename)
+                "status": "ok-img",
+                "source": portrait_source,
+                "portrait": url_for("static", filename="/assets/uploaded-img/"+filename)
             })
         else:
-            return jsonify({"status": "error", "errors": portraitform.errors})
+            return jsonify({"status": "error-img", "source": portrait_source, "errors": portraitform.errors})
     else:
         return jsonify({"Error": f"Route does not support {request.method} requests, only POST"})
 
@@ -130,55 +142,21 @@ def retrieve_char_details():
 
     try:
         # Character's lodestone id
-        lodestone_id = int(request.args.get("charid"))
-        # portraitform.char_id_summary.data = lodestone_id
-        # bsform.char_id_bs.data = lodestone_id
-        src = {}
+        char_id = retrieve_char_id_from_request(request)
+        get_char = retrieve_char_by_char_id(char_id)
+        src = {
+            "avatar": get_char.summary_portrait,
+            "roleplay": get_char.roleplaying.rp_portrait,
+            "one": get_char.business.logo_img,
+            "two": get_char.business.venue_img,
+            "big": get_char.business.big_venue_img
+        }
 
-        # TODO change to saving paths/links in database
-        for root, dirs, files in os.walk(
-            os.path.join(current_app.root_path, r"static\assets\uploaded-img")
-        ):
-            for name in files:
-                print(name, root)
-                splitted = name.split(".")
-                if splitted[0] == str(
-                    lodestone_id
-                ):
-                    print("setting summary")
-                    print(rf"{root}\{name}")
-                    src["avatar"] = url_for(
-                        "static", filename=f"/assets/uploaded-img/{name}"
-                    )         
-                elif splitted[0] == str(lodestone_id)+"_rp":
-                    print("setting rp")
-                    print(rf"{root}\{splitted[0]}{splitted[1]}")
-                    src["roleplay"] = url_for(
-                        "static", filename=f"/assets/uploaded-img/{name}"
-                    )
-                elif splitted[0] == str(lodestone_id)+"_venue_1":
-                    print("one of two")
-                    print(rf"{root}\{splitted[0]}{splitted[1]}")
-                    src["one"] = url_for(
-                        "static", filename=f"/assets/uploaded-img/{name}"
-                    )
-                elif splitted[0] == str(lodestone_id)+"_venue_2":
-                    print("two of two")
-                    print(rf"{root}\{splitted[0]}{splitted[1]}")
-                    src["two"] = url_for(
-                        "static", filename=f"/assets/uploaded-img/{name}"
-                    )
-                elif splitted[0] == str(lodestone_id)+"_venue_big":
-                    print("big")
-                    print(rf"{root}\{splitted[0]}{splitted[1]}")
-                    src["big"] = url_for(
-                        "static", filename=f"/assets/uploaded-img/{name}"
-                    )
         # GET reqs/Scraper funcs
         # Character summary page data
-        retrieved_data = get_lodestone_char_basic(lodestone_id)
-        # Collectibles data (either from FFXIV Collect API or scrape name/id and use FFXIV Collect queries to populate)
-        retrieve_collectibles = get_collectibles(lodestone_id)
+        retrieved_data = get_lodestone_char_basic(char_id)
+        # Collectibles data (Scrape and populate with cached external api call)
+        retrieve_collectibles = get_collectibles(char_id)
         # Fetch FFLogs data and merge into single dict/json
         retrieve_token = get_fflogs_token()
         retrieved_logs = merge_raids(
@@ -189,12 +167,12 @@ def retrieve_char_details():
                 SERVERS.get_region(retrieved_data.dcserver[0]),
             )
         )
-        retrieved_database = db.session.execute(db.select(PlayerCharacter).where(PlayerCharacter.char_id == lodestone_id)).scalar()
     except TypeError as error:
         return {
             "Status": "404",
             "Type": "TypeError",
             "Message": "Data input is incorrectly typed/formatted.",
+            "Exception Msg": str(error)
         }
     except IndexError:
         return {
@@ -219,7 +197,7 @@ def retrieve_char_details():
                 if retrieved_logs is not None
                 else None,
                 collectible=retrieve_collectibles,
-                database=retrieved_database,
+                database=get_char,
                 form=portraitform,
                 bsform=bsform,
                 hookform=hookform,
@@ -243,7 +221,7 @@ def retrieve_char_details():
                 if retrieved_logs is not None
                 else None,
                 collectible=retrieve_collectibles,
-                database=retrieved_database,
+                database=get_char,
                 src=src,
                 is_edit=False,
             )
@@ -253,10 +231,11 @@ def retrieve_char_details():
 @card_maker.route("/char-summary", methods=["POST"])
 def save_char_summary():
     """Saves the Char Summary section of a Character's page."""
-
+    print(request.get_json())
+    print(request.full_path)
     if request.method == "POST":
         # print(type(request.get_json()["summary"]))
-        char_id = retrieve_char_id_from_ajax(request)
+        char_id = retrieve_char_id_from_request(request)
         get_char = db.session.execute(db.select(PlayerCharacter).where(PlayerCharacter.char_id==char_id)).scalar()
         get_char.summary = request.get_json()["summary"]
         db.session.commit()
@@ -265,7 +244,7 @@ def save_char_summary():
 
 @card_maker.route("/rp-alias", methods=["GET", "POST"])
 def save_roleplaying_alias():
-    char_id = retrieve_char_id_from_ajax(request)
+    char_id = retrieve_char_id_from_request(request)
     get_char = db.session.execute(db.select(PlayerCharacter).where(PlayerCharacter.char_id==char_id)).scalar()
     if request.method == "POST":
         data = RPCharAlias()
@@ -273,15 +252,15 @@ def save_roleplaying_alias():
             char_rp = check_roleplaying(get_char)
             char_rp.alias = data.alias.data
             db.session.commit()
-            return jsonify({"status":"ok", "alias": char_rp.alias})
+            return jsonify({"status": "ok", "alias": char_rp.alias})
         else:
-            return jsonify({"status":"error", "errors": data.errors})
+            return jsonify({"status": "error", "errors": data.errors})
     else:
-        return jsonify({"status":"ok", "alias": get_char.roleplaying.alias})
+        return jsonify({"status": "ok", "alias": get_char.roleplaying.alias})
 
 @card_maker.route("/rp-summary", methods=["GET", "POST"])
 def save_roleplaying_summary():
-    char_id = retrieve_char_id_from_ajax(request)
+    char_id = retrieve_char_id_from_request(request)
     get_char = retrieve_char_by_char_id(char_id)
     if request.method == "POST":
         data = RPCharSummary()
@@ -305,7 +284,7 @@ def save_roleplaying_summary():
                     "relationship": char_rp.relationship_status
                 })
         else:
-            return jsonify({"status":"error","errors":data.errors})
+            return jsonify({"status": "error", "errors": data.errors})
     else:
         return jsonify({
             "status": "ok",
@@ -315,9 +294,10 @@ def save_roleplaying_summary():
             "relationship": get_char.roleplaying.relationship_status
         })
 
+
 @card_maker.route("/rp-socials", methods=["GET", "POST"])
 def save_roleplaying_socials():
-    char_id = retrieve_char_id_from_ajax(request)
+    char_id = retrieve_char_id_from_request(request)
     get_char = retrieve_char_by_char_id(char_id)
     if request.method == "POST":
         data = RPOOCSocials()
@@ -353,7 +333,7 @@ def save_roleplaying_socials():
 
 @card_maker.route("/rp-about-me", methods=["GET", "POST"])
 def save_roleplaying_about_me():
-    char_id = retrieve_char_id_from_ajax(request)
+    char_id = retrieve_char_id_from_request(request)
     get_char = retrieve_char_by_char_id(char_id)
     if request.method == "POST":
         data = RPOOCAboutMe()
@@ -380,7 +360,7 @@ def save_roleplaying_about_me():
 
 @card_maker.route("/rp-char-quote", methods=["GET", "POST"])
 def save_roleplaying_quote():
-    char_id = retrieve_char_id_from_ajax(request)
+    char_id = retrieve_char_id_from_request(request)
     get_char = retrieve_char_by_char_id(char_id)
     if request.method == "POST":
         data = RPCharQuote()
@@ -407,7 +387,7 @@ def save_roleplaying_quote():
 
 @card_maker.route("/rp-hooks", methods=["GET", "POST"])
 def save_roleplaying_hooks():
-    char_id = retrieve_char_id_from_ajax(request)
+    char_id = retrieve_char_id_from_request(request)
     get_char = retrieve_char_by_char_id(char_id)
     if request.method == "POST":
         data = RPHookForm()
@@ -467,7 +447,7 @@ def save_roleplaying_hooks():
 
 @card_maker.route("/rp-traits", methods=["GET", "POST"])
 def save_roleplaying_traits():
-    char_id = retrieve_char_id_from_ajax(request)
+    char_id = retrieve_char_id_from_request(request)
     get_char = retrieve_char_by_char_id(char_id)
     if request.method == "POST":
         data = RPTraitsForm(request.form)
@@ -544,7 +524,7 @@ def save_roleplaying_traits():
 
 @card_maker.route("/rp-venue-names", methods=["GET", "POST"])
 def save_venue_names():
-    char_id = retrieve_char_id_from_ajax(request)
+    char_id = retrieve_char_id_from_request(request)
     get_char = retrieve_char_by_char_id(char_id)
 
     if request.method == "POST":
@@ -572,7 +552,7 @@ def save_venue_names():
 
 @card_maker.route("/rp-venue-staff", methods=["GET", "POST"])
 def save_venue_staff_details():
-    char_id = retrieve_char_id_from_ajax(request)
+    char_id = retrieve_char_id_from_request(request)
     get_char = retrieve_char_by_char_id(char_id)
 
     if request.method == "POST":
@@ -616,7 +596,7 @@ def save_venue_staff_details():
 
 @card_maker.route("/rp-venue-contacts", methods=["GET", "POST"])
 def save_business_contacts():
-    char_id = retrieve_char_id_from_ajax(request)
+    char_id = retrieve_char_id_from_request(request)
     get_char = retrieve_char_by_char_id(char_id)
 
     if request.method == "POST":
@@ -757,13 +737,13 @@ def check_business(character: PlayerCharacter) -> Business:
         return character.business
 
 
-def retrieve_char_id_from_ajax(req: request) -> int:
-    """Retrieves the Char ID from an AJAX POST Request Body or URI Args
-        :param req: The request data
+def retrieve_char_id_from_request(req: request) -> int:
+    """Retrieves a Character ID from an request whether through a form's field or request args
+        :param req: The request itself
         :rtype: int
-        :return: The char_id as an integer
+        :return: The Character as an integer
     """
-    return request.form.get("char_id") if request.form.get("char_id") is not None else request.args.get("char_id")
+    return request.form.get("char_id") if request.form.get("char_id") is not None else int(request.args.get("char_id"))
 
 
 def retrieve_char_by_char_id(char_id: int) -> PlayerCharacter:

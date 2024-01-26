@@ -2,8 +2,6 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import (
     BooleanField,
-    FormField,
-    HiddenField,
     IntegerField,
     SelectField,
     StringField,
@@ -12,7 +10,7 @@ from wtforms import (
     SubmitField,
     ValidationError,
 )
-from wtforms.validators import DataRequired, URL, Length, NumberRange, Optional
+from wtforms.validators import DataRequired, URL, Length, NumberRange
 from .api_fetchers import SERVERS
 
 MERGED_SERVERS = (
@@ -34,20 +32,13 @@ class ClaimCharForm(FlaskForm):
 
 
 class UploadPortraitForm(FlaskForm):
-    summary_portrait = FileField(
+    portrait = FileField(
         "Upload custom portrait here (otherwise it defaults to the Lodestone portrait)",
-        validators=[FileAllowed(["jpg", "png", "jpeg"], message="JPG/PNG only")],
+        validators=[
+            FileAllowed(["jpg", "png", "jpeg"], message="JPG/PNG only")
+        ],
     )
     submit_char = SubmitField("Upload portrait")
-
-
-class RoleplayPortraitForm(FlaskForm):
-    rp_portrait = FileField(
-        "Upload portrait for RP here (otherwise it defaults to the Lodestone portrait)",
-        validators=[FileAllowed(["jpg", "jpeg", "png"], message="JPG/PNG only")],
-    )
-    submit_rp = SubmitField("Upload portrait")
-
 
 class BusinessImages(FlaskForm):
     layout = SelectField(
@@ -264,7 +255,9 @@ class VenuePlotAddress(FlaskForm):
             "The Firmament",
         ],
         default="The Mist",
-        validators=[DataRequired(message="You must select the venue's housing zone")]
+        validators=[
+            DataRequired(message="You must select the venue's housing zone")
+        ],
     )
 
     # Transform into switch frontend
@@ -275,7 +268,7 @@ class VenuePlotAddress(FlaskForm):
         choices=[(0, "Choose...")] + [(i, i) for i in range(1, 25)],
         validators=[DataRequired(message="You must select a ward")],
         default=0,
-        coerce=int
+        coerce=int,
     )
 
     # Either or for these ones
@@ -283,24 +276,21 @@ class VenuePlotAddress(FlaskForm):
         "Plot No.",
         choices=[(0, "Choose...")] + [(j, j) for j in range(1, 61)],
         default=0,
-        coerce=int
+        coerce=int,
     )
 
     apartment_num = SelectField(
         "Apartment No.",
         choices=[(0, "Choose...")] + [(k, k) for k in range(1, 91)],
         default=0,
-        coerce=int
+        coerce=int,
     )
 
     server = SelectField(
         "Server",
         choices=["Choose..."]
-        + [
-            item["server-name"]
-            for item in MERGED_SERVERS
-        ],
-        default="Choose..."
+        + [item["server-name"] for item in MERGED_SERVERS],
+        default="Choose...",
     )
 
     def validate_ward_plot(self, field):
@@ -310,7 +300,7 @@ class VenuePlotAddress(FlaskForm):
     def validate_apartment_num(self, field):
         if self.is_apartment.data and field.data == 0:
             raise ValidationError("You must select a apartment")
-        
+
     def validate_server(self, field):
         if field.data == "Choose...":
             raise ValidationError("You must select your venue's server")

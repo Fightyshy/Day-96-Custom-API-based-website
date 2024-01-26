@@ -97,6 +97,6 @@ def claim_charid():
             new_char.char_id = charid
             db.session.add(new_char)
             db.session.commit()
-            return redirect(url_for("retrieve_char_details", charid=charid, mode="edit"))
+            return redirect(url_for("retrieve_char_details", char_id=charid, mode="edit"))
 
     return render_template("authentication.html", form=claimform, token=token)

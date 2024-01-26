@@ -74,30 +74,38 @@ document.getElementById('layout').addEventListener('change', function () {
 document.getElementById("portrait-form").addEventListener("submit", async event=>{
     event.preventDefault();
 
-    const req = responseMaker(`http://localhost:5000/character/portrait?char_id=${char_id}`, document.getElementById("portrait-form"));
+    const field = document.querySelector("#portrait-form > .mb-3 > input");
+    const req = responseMaker(`http://localhost:5000/character/portrait?char_id=${char_id}`, document.getElementById("portrait-form"), ["source", "portrait-form"], ["type", "summary_portrait"]);
     const response = await fetch(req);
     const data = await response.json();
     
     if(serverValidateForm(data, document.getElementById("portrait-form"))){
-        imgurl=`${data["image"]}?timestamp=${Date.now()}`
-        document.getElementById("avatar").src=imgurl
-        document.getElementById("summary_portrait").value = "";
+        imgurl=`${data["portrait"]}?timestamp=${Date.now()}`;
+        document.getElementById("avatar").src=imgurl;
+        setTimeout(() => {
+            field.classList.remove("is-valid");
+            field.value = "";
+        }, 1500);
     } else{
         // TODO error response as toast
     }
 });
-
+// TODO query selectors for above and below to access same form field name
 document.getElementById("roleplay-settings").addEventListener("submit", async event=>{
     event.preventDefault();
 
-    const req = responseMaker(`http://localhost:5000/character/portrait?char_id=${char_id}`, document.getElementById("roleplay-settings"));
+    const field = document.querySelector("#roleplay-settings > .mb-3 > input");
+    const req = responseMaker(`http://localhost:5000/character/portrait?char_id=${char_id}`, document.getElementById("roleplay-settings"), ["source", "roleplay-settings"], ["type", "roleplaying_portrait"]);
     const response = await fetch(req);
     const data = await response.json();
 
     if(serverValidateForm(data, document.getElementById("roleplay-settings"))){
-        imgurl=`${data["image"]}?timestamp=${Date.now()}`;
+        imgurl=`${data["portrait"]}?timestamp=${Date.now()}`;
         document.getElementById("rp-avatar").src=imgurl;
-        document.getElementById("rp_portrait").value = "";
+        setTimeout(() => {
+            field.classList.remove("is-valid");
+            field.value = "";
+        }, 1500);
     } else{
         // TODO error response as toast
     }

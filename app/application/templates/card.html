@@ -157,6 +157,7 @@
         <!-- If editing, include modals.html and script(s) -->
         {% if is_edit == true %}
         {% include "modals.html" %}
+        <!-- TODO something broken and scripts no longer render -->
         <script src="{{url_for('static', filename='assets/scripts/form_rp_handlers.js')}}"></script>
         <script src="{{url_for('static', filename='assets/scripts/form_venue_handlers.js')}}"></script>
         <script src="{{url_for('static', filename='assets/scripts/form_handler_methods.js')}}"></script>
@@ -167,7 +168,6 @@
         <script type="text/javascript">
             // rp form and js handler vars pass and init vars
             document.addEventListener("DOMContentLoaded", event=>{
-
                 initMains("{{database.is_business}}");
                 initVenueModals("{{database.business.venue_address.is_apartment}}","{{database.char_id}}")
                 initRPModals("{{database.roleplaying.hooks|length}}",
