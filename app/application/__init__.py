@@ -3,6 +3,8 @@ from dotenv import load_dotenv
 from flask import Flask
 from flask_bootstrap import Bootstrap5
 
+from .models.models import User
+
 from .objects.api_fetchers import ffxiv_cached_resources
 
 bs5 = Bootstrap5()
@@ -35,6 +37,13 @@ def init_app():
     from .models.models import db
 
     db.init_app(app)
+
+    from .views.char_get import login_manager
+
+    login_manager.init_app(app)
+    @login_manager.user_loader
+    def load_user(user_id):
+        return db.get_or_404(User, user_id)
 
     # substitute with actual caching solution or cache to file later
     # for now, filesystem cache to temp folder

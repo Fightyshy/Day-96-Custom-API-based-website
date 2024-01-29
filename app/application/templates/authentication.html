@@ -30,9 +30,6 @@
                 {% endif %}
                 {% endwith %}
                 {{ render_form(form, id="userform", extra_classes="w-50 m-auto", novalidate=true) }}
-                <!-- <form action="{{ url_for('main_page.claim_charid', token=token,id=id) }}" method="post" class="w-50 m-auto">
-                    {{ form.submit(class="btn btn-primary") }}
-                </form> -->
             </main>
 
             {% include "footer.html" %}

@@ -22,7 +22,7 @@ MERGED_SERVERS = (
 
 class UserLogin(FlaskForm):
     char_id = StringField("Character ID", validators=[DataRequired(message="You need to enter a character id")])
-    password = PasswordField("Password", validators=[DataRequired()])
+    password = PasswordField("Password", validators=[DataRequired(message="You need to enter your password")])
     submit = SubmitField("Submit")
 
 

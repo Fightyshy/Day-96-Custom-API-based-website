@@ -31,7 +31,12 @@
                 </div>
                 <div class="row">
                     <h4 class="lead">Or if you've already claimed your character, you can login with your character ID and password below to edit it</h4>
-                    {{ render_form(userform, id="loginform", extra_classes="w-50 m-auto" ) }}
+                    {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                    <div class="flash alert alert-danger w-75 mx-auto">{{ messages[0] }}</div>
+                    {% endif %}
+                    {% endwith %}
+                    {{ render_form(userform, id="loginform", extra_classes="w-50 mx-auto", novalidate=true ) }}
                 </div>
             </main>
             {% include "footer.html" %}

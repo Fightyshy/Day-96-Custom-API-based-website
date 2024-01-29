@@ -10,13 +10,13 @@ from flask import (
 )
 import bs4
 import requests
-from werkzeug.security import generate_password_hash
-
+from sqlalchemy import and_
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import LoginManager, login_user
 from ..objects.char_claim_token import generate_token, confirm_token
 from ..objects import const_loader
 from ..models.models import PlayerCharacter, User, db
 from .forms.forms import (
-    ClaimCharForm,
     LodestoneForm,
     UserLogin,
     UserRegistration,
@@ -26,7 +26,11 @@ from .forms.forms import (
 CHARACTER_SELECTORS = const_loader.CharacterData()
 SERVERS = const_loader.Servers()
 
+# temp login init
+login_manager = LoginManager()
+
 main_page = Blueprint("main_page", __name__, template_folder="templates")
+
 
 # Enable only for testing
 # @app.route("/test/<int:char_id>")
@@ -61,6 +65,17 @@ def get_charid():
         return redirect(url_for("main_page.claim_charid", token=char_token))
         # else
         # get existing page that matched with check and redirect to editting page
+    elif userform.validate_on_submit():
+        result = db.session.execute(db.select(User).where(User.char_id==userform.char_id.data)).scalar()
+        if not result:
+            flash("Character has not been claimed yet")
+            return redirect(url_for("main_page.get_charid"))
+        elif not check_password_hash(result.password, userform.password.data):
+            flash("Wrong password")
+            return redirect(url_for("main_page.get_charid"))
+        else:
+            login_user(result)
+            return redirect(url_for("card_maker.retrieve_char_details", char_id=result.char_id, mode="edit"))
     return render_template("index.html", form=lodestoneform, userform=userform)
     # TODO user login form to template, handle in different blueprint
 

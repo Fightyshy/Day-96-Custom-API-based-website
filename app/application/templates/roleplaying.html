@@ -113,7 +113,7 @@
             <ul id="hooks-list" class="list-unstyled">
                 <!-- h4 30 chars -->
                 <!-- 240 chars text -->
-                
+                {% if database.roleplaying != none %}
                 {% for hook in database.roleplaying.hooks %}
                 {% if hook.title|length > 0 and hook.body|length > 0 %}
                     {% if hook.number == 1 %}
@@ -123,6 +123,9 @@
                     {% endif %}
                 {% endif %}
                 {% endfor %}
+                {% else %}
+                {% if is_edit == True %}<span data-bs-toggle="modal" data-bs-target="#RPHooksModal">📝</span>{% endif %}
+                {% endif %}
             </ul>
         </div>
     </div>
