@@ -2,6 +2,7 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import (
     BooleanField,
+    EmailField,
     IntegerField,
     SelectField,
     StringField,
@@ -9,13 +10,24 @@ from wtforms import (
     URLField,
     SubmitField,
     ValidationError,
+    PasswordField
 )
 from wtforms.validators import DataRequired, URL, Length, NumberRange
-from .api_fetchers import SERVERS
+from ...objects.api_fetchers import SERVERS
 
 MERGED_SERVERS = (
     SERVERS.get_jp() + SERVERS.get_NA() + SERVERS.get_EU() + SERVERS.get_OC()
 )
+
+
+class UserLogin(FlaskForm):
+    char_id = StringField("Character ID", validators=[DataRequired(message="You need to enter a character id")])
+    password = PasswordField("Password", validators=[DataRequired()])
+    submit = SubmitField("Submit")
+
+
+class UserRegistration(UserLogin):
+    email = EmailField(validators=[DataRequired()])
 
 
 class LodestoneForm(FlaskForm):
