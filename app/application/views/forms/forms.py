@@ -26,8 +26,15 @@ class UserLogin(FlaskForm):
     submit = SubmitField("Submit")
 
 
-class UserRegistration(UserLogin):
-    email = EmailField(validators=[DataRequired()])
+class UserRegistration(FlaskForm):
+    email = EmailField("Email (We use this for recovery and support verification)", validators=[DataRequired("Please enter your email address")])
+    password = PasswordField("Password", validators=[DataRequired("Please enter a password")])
+    repeat = PasswordField("Repeat password", validators=[DataRequired("Please enter your password again")])
+    submit = SubmitField("Submit and claim character")
+
+    def validate_repeat(self, field):
+        if self.password.data != field.data:
+            raise ValidationError("Passwords do not match")
 
 
 class LodestoneForm(FlaskForm):

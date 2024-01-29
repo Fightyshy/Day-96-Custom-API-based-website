@@ -19,7 +19,7 @@ from ..objects.api_fetchers import (
 import os
 from werkzeug.utils import secure_filename
 from ..models.models import Business, Hook, PlayerCharacter, Roleplaying, Trait, VenueAddress, VenueStaff, db
-from ..objects.forms import (
+from .forms.forms import (
     BusinessImages,
     RPCharAlias,
     RPCharQuote,
@@ -144,13 +144,16 @@ def retrieve_char_details():
         # Character's lodestone id
         char_id = retrieve_char_id_from_request(request)
         get_char = retrieve_char_by_char_id(char_id)
-        src = {
-            "avatar": get_char.summary_portrait,
-            "roleplay": get_char.roleplaying.rp_portrait,
-            "one": get_char.business.logo_img,
-            "two": get_char.business.venue_img,
-            "big": get_char.business.big_venue_img
-        }
+        src = {}
+        print(get_char.__getattribute__("roleplaying"))
+        if get_char.__getattribute__("roleplaying"):
+            src = {
+                "avatar": get_char.summary_portrait,
+                "roleplay": get_char.roleplaying.rp_portrait,
+                "one": get_char.business.logo_img,
+                "two": get_char.business.venue_img,
+                "big": get_char.business.big_venue_img
+            }
 
         # GET reqs/Scraper funcs
         # Character summary page data
@@ -231,8 +234,6 @@ def retrieve_char_details():
 @card_maker.route("/char-summary", methods=["POST"])
 def save_char_summary():
     """Saves the Char Summary section of a Character's page."""
-    print(request.get_json())
-    print(request.full_path)
     if request.method == "POST":
         # print(type(request.get_json()["summary"]))
         char_id = retrieve_char_id_from_request(request)
@@ -727,9 +728,10 @@ def check_roleplaying(character: PlayerCharacter) -> Roleplaying:
     """Checks if a Roleplaying child exists within a PlayerCharacter
         :param character: A PlayerCharacter model
         :rtype: Roleplaying
-        :return: The PlayerCharacter associated Roleplaying model
+        :return: The PlayerCharacter associated Roleplaying model or a new instance if it's not found
     """
-    if character.roleplaying:
+
+    if character.__getattribute__("roleplaying") is not None:
         return character.roleplaying
     else:
         character.roleplaying = Roleplaying()
@@ -755,7 +757,7 @@ def retrieve_char_id_from_request(req: request) -> int:
         :rtype: int
         :return: The Character as an integer
     """
-    return request.form.get("char_id") if request.form.get("char_id") is not None else int(request.args.get("char_id"))
+    return req.form.get("char_id") if req.form.get("char_id") is not None else int(req.args.get("char_id"))
 
 
 def retrieve_char_by_char_id(char_id: int) -> PlayerCharacter:

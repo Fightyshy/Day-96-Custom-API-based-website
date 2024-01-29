@@ -176,7 +176,7 @@
             // rp form and js handler vars pass and init vars
             document.addEventListener("DOMContentLoaded", event=>{
                 initMains("{{database.is_business}}", "{{database.business.venue_state}}");
-                initVenueModals("{{database.business.venue_address.is_apartment}}","{{database.char_id}}")
+                initVenueModals("{{database.business.venue_address.is_apartment if database.business else 0}}","{{database.char_id}}")
                 initRPModals("{{database.roleplaying.hooks|length}}",
                 "{{database.roleplaying.traits|selectattr('type','equalto','pos')|list|length}}",
                 "{{database.roleplaying.traits|selectattr('type','equalto','neg')|list|length}}",

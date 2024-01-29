@@ -1,5 +1,3 @@
-from itertools import groupby
-import json
 import os
 from flask import url_for
 from flask_caching import Cache

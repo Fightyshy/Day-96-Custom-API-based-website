@@ -33,11 +33,19 @@
         <!-- Business Card Column -->
         <div class="col-md-6 py-2">
             <!-- Additional Business Card Details -->
+            {% if database.business != none %}
             <h3 id="character-venue_name" style="display: none;" class="mt-2">{{database.business.venue_name}}</h1>
                 <div class="row">
                     <div class="col">
                         <h5 id="character-venue_tagline">{{database.business.venue_tagline}} </h4>
                     </div>
+            {% else %}
+            <h3 id="character-venue_name" style="display: none;" class="mt-2">Test tavern</h1>
+                <div class="row">
+                    <div class="col">
+                        <h5 id="character-venue_tagline">A placeholder for all your drinking needs </h4>
+                    </div>
+            {% endif %}
                     <div class="col-md-auto">
                         {% if is_edit == True %}<span data-bs-toggle="modal" data-bs-target="#VenueNameAndTaglineModal">📝</span>{% endif %}
                     </div>
@@ -46,27 +54,40 @@
             <div class="socials-box mt-1 px-1 py-2">
                 <!-- <h4>Contact & Socials </h4> -->
                 <ul class="list-unstyled mb-0">
-                    <li><strong>Address:</strong> 
+                    <li><strong>Address:</strong>
+                    {% if database.business != none %}
                         <span id="character-housing_zone">{{database.business.venue_address.housing_zone}}</span> - 
                         Ward <span id="character-housing_ward">{{database.business.venue_address.housing_ward}}</span> - 
                         {% if database.business.venue_address.is_apartment == true %}
                         Apartment no. <span id="character-apartment_num">{{database.business.venue_address.apartment_num}}</span> - 
                         {% else %}
                         Plot no.  <span id="character-ward_plot">{{database.business.venue_address.ward_plot}}</span> - 
-                        {% endif %}
                         <!-- TODO server and dc can't be numbers, convert them -->
+                        {% endif %}
                         <span id="character-server">{{database.business.venue_address.server}}</span> - 
                         <span id="character-data_center">Elemental</span> {% if is_edit == True %}<span data-bs-toggle="modal" data-bs-target="#VenueContactAndSocialsModal">📝</span>{% endif %}</li>
                     <li><strong>Venue website:</strong> <span id="character-venue_website"><a href="{{database.business.venue_website}}">{{database.business.venue_website}}</a></span></li>
                     <li><strong>Operating times:</strong> <span id="character-venue_operating_times">{{database.business.operating_times}}</span></li>
                     <li><strong>Discord:</strong> <span id="character_venue_discord">{{database.business.discord}}</span></li>
                     <li><strong>Twitter:</strong> <span id="character_venue_twitter">{{database.business.twitter}}</span></li>
-                    <!-- Additional socials or contact information can be added here -->
+                    {% else %}
+                    <span id="character-housing_zone">The Mist</span> - 
+                    Ward <span id="character-housing_ward">0</span> - 
+                    Apartment no. <span id="character-apartment_num">0</span> - 
+                    <!-- TODO server and dc can't be numbers, convert them -->
+                    <span id="character-server">Tonberry</span> - 
+                    <span id="character-data_center">Elemental</span> {% if is_edit == True %}<span data-bs-toggle="modal" data-bs-target="#VenueContactAndSocialsModal">📝</span>{% endif %}</li>
+                    <li><strong>Venue website:</strong> <span id="character-venue_website"><a href="#">http://example.com</a></span></li>
+                    <li><strong>Operating times:</strong> <span id="character-venue_operating_times">All week, 12AM-12PM</span></li>
+                    <li><strong>Discord:</strong> <span id="character_venue_discord">Discord link here</span></li>
+                    <li><strong>Twitter:</strong> <span id="character_venue_twitter">Twitter handle here</span></li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
 
         <!-- Character Details Column -->
+        {% if database.business != none %}
         <div class="col-md-5 py-2 ps-0 text-md-end">
             <!-- Current Character's Details -->
             <h3>{{character["name"]}} {% if is_edit == True %}<span data-bs-toggle="modal" data-bs-target="#VenueStaffDetailsModal">📝</span>{% endif %}</h3>
@@ -82,5 +103,22 @@
                 </ul>
             </div>
         </div>
+        {% else %}
+        <div class="col-md-5 py-2 ps-0 text-md-end">
+            <!-- Current Character's Details -->
+            <h3>{{character["name"]}} {% if is_edit == True %}<span data-bs-toggle="modal" data-bs-target="#VenueStaffDetailsModal">📝</span>{% endif %}</h3>
+            <p id="character-staff_role" class="mb-0">I just work here</p>
+            <!-- Contact Information/Socials Box -->
+            <div class="socials-box mt-2 px-1 py-2">
+                <!-- <h4>You can reach m</h4> -->
+                <ul class="list-unstyled mb-0">
+                    <li><strong>Discord:</strong> <span id="character-staff_discord">Discord handle here</span></li>
+                    <li><strong>Twitter:</strong> <span id="character-staff_twitter">Twitter handle here</li>
+                    <li><strong>Personal website:</strong> <span id="character-staff_website"><a href="#">http://example.com</a></span></li>
+                    <!-- Additional socials or contact information can be added here -->
+                </ul>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>

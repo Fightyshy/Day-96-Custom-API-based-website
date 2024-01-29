@@ -24,14 +24,15 @@
                 <h1>Final Fantasy XIV Character Card Generator</h1>
                 <p class="lead">Your confirmation code is</p>
                 <p class="list-group-item">{{ token }}</p>
-                <form action="{{ url_for('main_page.claim_charid', token=token,id=id) }}" method="post" class="w-50 m-auto">
-                    {{ form.submit(class="btn btn-primary") }}
-                </form>
                 {% with messages = get_flashed_messages() %}
                 {% if messages %}
-                <p class="flash text-danger w-75 mx-auto">{{ messages[0] }}</p>
+                <div class="flash alert alert-danger w-75 mx-auto">{{ messages[0] }}</div>
                 {% endif %}
                 {% endwith %}
+                {{ render_form(form, id="userform", extra_classes="w-50 m-auto", novalidate=true) }}
+                <!-- <form action="{{ url_for('main_page.claim_charid', token=token,id=id) }}" method="post" class="w-50 m-auto">
+                    {{ form.submit(class="btn btn-primary") }}
+                </form> -->
             </main>
 
             {% include "footer.html" %}

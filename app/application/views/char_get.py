@@ -2,6 +2,7 @@ from flask import (
     Blueprint,
     current_app,
     flash,
+    jsonify,
     redirect,
     render_template,
     request,
@@ -9,13 +10,16 @@ from flask import (
 )
 import bs4
 import requests
+from werkzeug.security import generate_password_hash
 
 from ..objects.char_claim_token import generate_token, confirm_token
 from ..objects import const_loader
-from ..models.models import PlayerCharacter, db
-from ..objects.forms import (
+from ..models.models import PlayerCharacter, User, db
+from .forms.forms import (
     ClaimCharForm,
     LodestoneForm,
+    UserLogin,
+    UserRegistration,
 )
 
 # load selectors and helpers
@@ -38,10 +42,12 @@ main_page = Blueprint("main_page", __name__, template_folder="templates")
 #     #             final.append(achieve)
 #     return jsonify({"test": cache.get("ffxiv_cached_resources")["mounts"]})
 
+# TODO add login form, with inputs (char_id, password)
 @main_page.route("/", methods=["GET", "POST"])
 def get_charid():
     """Takes user lodestone url and any extra generation params"""
     lodestoneform = LodestoneForm()
+    userform = UserLogin()
     if lodestoneform.validate_on_submit():
         # We want two things
         # The charid - leave as str
@@ -55,48 +61,63 @@ def get_charid():
         return redirect(url_for("main_page.claim_charid", token=char_token))
         # else
         # get existing page that matched with check and redirect to editting page
-    return render_template("index.html", form=lodestoneform)
+    return render_template("index.html", form=lodestoneform, userform=userform)
+    # TODO user login form to template, handle in different blueprint
 
-
+# TODO convert into a registration page, trigger reg the same time as form validation is happening
+# TODO login if successful, handle failure in the same way as currently
 @main_page.route("/auth", methods=["GET", "POST"])
 def claim_charid():
     # In the future with a db, query first to see if char token exists, if it does, redirect and flash to index
-    claimform = ClaimCharForm()
+    userform = UserRegistration()
+
     token = request.args.get("token")
-    # print(token, charid)
-    if claimform.is_submitted():
-        # retrieve charid
+
+    if userform.validate_on_submit():
+        # retrieve charid, redirect if invalid
         charid = confirm_token(token, current_app)
         if charid is False:
             flash("Token has expired or was invalid.")
             return redirect(url_for("main_page.get_charid"))
-
-        response = requests.get(
-            f"https://na.finalfantasyxiv.com/lodestone/character/{charid}"
-        )
-        response.raise_for_status()
-        soup = bs4.BeautifulSoup(response.text, "html.parser")
-        char_prof = soup.select_one(".character__selfintroduction")
-        retrieved = db.session.execute(db.select(PlayerCharacter).where(PlayerCharacter.char_id==charid)).scalar()
-
-        if retrieved:
-            print("Exists already")
-            flash("This character has already been claimed. If this was not done by you, please contact me to resolve this.")
-            return render_template("authentication.html", form=claimform, token=token)
-        elif char_prof.text != token:
-            flash(
-                "Text in character profile does not match. Please try again removing any extra text/spaces from your character profile, and inserting your confirmation code again.",
-                "error",
+        try:
+            response = requests.get(
+                f"https://na.finalfantasyxiv.com/lodestone/character/{charid}"
             )
-            return render_template(
-                "authentication.html", form=claimform, token=token
-            )
+            response.raise_for_status()
+            soup = bs4.BeautifulSoup(response.text, "html.parser")
+            char_prof = soup.select_one(".character__selfintroduction")
+            retrieved = db.session.execute(db.select(User).where(User.char_id==charid)).scalar()
+        except requests.HTTPError as error:
+            return jsonify({
+                "status": "400",
+                "errorMsg": str(error)
+            })
         else:
-            print("Success")
-            new_char = PlayerCharacter()
-            new_char.char_id = charid
-            db.session.add(new_char)
-            db.session.commit()
-            return redirect(url_for("retrieve_char_details", char_id=charid, mode="edit"))
+            if char_prof.text != token:
+                flash(
+                    "Token in character profile does not match provided token. Please check that you've copied it properly and that it's the ONLY thing in the character profile.",
+                )
+                return render_template(
+                    "authentication.html", form=userform, token=token
+                )
+            elif retrieved:
+                flash("This character has already been claimed. If this was not done by you, please contact me to resolve this.")
+                return render_template("authentication.html", form=userform, token=token)
+            else:
+                new_char = PlayerCharacter()
+                new_char.char_id = charid
 
-    return render_template("authentication.html", form=claimform, token=token)
+                new_user = User()
+                new_user.char_id = charid
+                new_user.password = generate_password_hash(userform.password.data)
+                new_user.email = userform.email.data
+                new_user.character = new_char
+
+                db.session.add(new_char)
+                db.session.add(new_user)
+                db.session.commit()
+                return redirect(url_for("card_maker.retrieve_char_details", char_id=charid, mode="edit"))
+    elif userform.errors:
+        return render_template("authentication.html", errors=userform.errors, form=userform, token=token)
+
+    return render_template("authentication.html", form=userform, token=token)

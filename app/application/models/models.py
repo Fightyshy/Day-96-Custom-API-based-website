@@ -1,9 +1,24 @@
 from typing import List
+from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Boolean, Integer, String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 db = SQLAlchemy()
+
+
+# TODO user model, username = char_id, password = password, email = user email (for recovery)
+class User(UserMixin, db.Model):
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+
+    char_id: Mapped[str] = mapped_column(String, nullable=False, unique=True)
+    password: Mapped[str] = mapped_column(String, nullable=False)
+    email: Mapped[str] = mapped_column(String, nullable=False)
+
+    # TODO Parent of PlayerCharacter, 1-1
+    character: Mapped["PlayerCharacter"] = relationship(back_populates="user")
 
 
 class PlayerCharacter(db.Model):
@@ -12,10 +27,9 @@ class PlayerCharacter(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     char_id: Mapped[str] = mapped_column(
         String,
-        nullable=False,
-        default="I am once again, disapointing Yoship by using third party tools that scrape from the Lodestone",
+        nullable=False
     )
-    summary: Mapped[str] = mapped_column(String(length=200), nullable=True)
+    summary: Mapped[str] = mapped_column(String(length=200), nullable=True, default="I am once again, disapointing Yoship by using third party tools that scrape from the Lodestone")
     # False is rp, True is business, default RP
     is_business: Mapped[bool] = mapped_column(
         Boolean, nullable=False, default=False
@@ -29,7 +43,10 @@ class PlayerCharacter(db.Model):
     )
     # TODO parent of hooks, 1-1
     business: Mapped["Business"] = relationship(back_populates="character")
-    # TODO maybe child of flask-login user with usermixin, 1-1
+
+    # TODO child of flask-login user with usermixin, 1-1
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    user: Mapped["User"] = relationship(back_populates="character", single_parent=True)
 
 
 class Roleplaying(db.Model):
@@ -38,7 +55,7 @@ class Roleplaying(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
 
     # character ic
-    alias: Mapped[str] = mapped_column(String(length=40))
+    alias: Mapped[str] = mapped_column(String(length=40), nullable=True)
     age: Mapped[str] = mapped_column(
         String(length=5), nullable=False, default=18
     )
