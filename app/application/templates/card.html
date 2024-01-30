@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+        <title>Adventure Plate generator</title>
+
+        <!-- Add Bootstrap JS and Popper.js scripts -->
+        {{ bootstrap.load_css() }}
+        {{ bootstrap.load_js() }}
+        <script src="https://code.createjs.com/1.0.0/createjs.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <link rel="stylesheet" href="{{url_for('static', filename='assets/styles/styles.css')}}">
+        {% from 'bootstrap5/form.html' import render_form %}
+        <!-- Desktop layout coded and styled against 1280x720 (720p) displays, then 1920x1080 1080p displays. -->
+        <!-- Any biggest upscale is currently 2k 4k should scale content bigger accordingly too -->
+        <!-- Any smaller and it becomes mobile/small safe layout, coming soon(tm) -->
+    </head>
+
+    <body>
+        <div id="loading" class="h-25 z-3 position-absolute m-auto" style="top:0;bottom:0;left:0;right:0;">
+            <div class="text-center align-middle h-100">
+                <h1 class="modal-title fs-5" id="LoadingModal">Loading... </h1>
+                <div class="spinner-border" aria-hidden="true"></div>
+            </div>
+        </div>
+
+        <div id="main" class="container main-container px-0 pb-2 h-100 d-none z-0" style="border: 2px solid black; border-radius: 10px;">
+            <header class="bg-dark text-white">
+                <!-- Navigation tabs -->
+                <ul class="nav nav-tabs" id="myTabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="summary-tab" data-bs-toggle="tab" href="#summary">Summary</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="raid-performance-tab" data-bs-toggle="tab" href="#raid-performance">Raid Performance</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="mounts-minions-tab" data-bs-toggle="tab" href="#collectibles">Collectibles</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="roleplay-tab" data-bs-toggle="tab" href="#roleplay">Roleplay</a>
+                    </li>
+                    {% if is_edit == True %}
+                    <li class="nav-item">
+                        <a class="nav-link" id="settings-tab" data-bs-toggle="tab" href="#settings">Settings</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </header>
+    
+            <!-- Avatar and text container -->
+            <!-- Content tabs -->
+            <div class="tab-content tab-containers px-3">
+                <!-- Summary tab content -->
+                <div class="tab-pane fade show active h-100" id="summary">
+                    <div class="row my-1 h-100">
+                        <!-- Avatar container with max dimensions and centered position -->
+                        <div class="col-md-4 d-flex align-items-center">
+                            <div class="avatar-container">
+                                <!-- Your dynamic avatar image -->
+                                {% if src["avatar"] is none %}
+                                <img class="avatar img-fluid" id="avatar" src="{{collectible['character']['portrait']}}" alt="Avatar">
+                                {% else %}
+                                <img class="avatar img-fluid" id="avatar" src="{{src['avatar']}}" alt="Avatar">
+                                {% endif %}
+                            </div>
+                        </div>
+    
+                        <!-- Text container for right-aligned text -->
+                        <div class="col-md-8 text-container align-items-center">
+                            <div class="row h-100 justify-content-between">
+
+                                {% include "job-containers.html" %}
+                                <div class="col">
+                                    <div class="character-name"><h3>{{character["name"]}} / {{character["race"]["gender"]}} / <img class="icon" style="height: 2.5rem; width: 2.5rem;" src="static\assets\job_icons\weaver.png"></h3></div>
+                                    <div class="ingame-title"><h3>« {{character["title"]}} »</h3></div>
+                                    <div class="race-subrace"><h3>{{character["race"]["race"][0]}} - {{character["race"]["race"][1:]|join(" ")}}</h3></div>
+                                    <div class="twelve"><h2>{{character["twelve"]["name"]}} <img src="{{character['twelve']['icon']}}" /></h3></div>
+                                    <div class="server-info mb-0"><h3 class="mb-0">{{character["dcserver"][1]}} - {{character["dcserver"][0]}}</h3></div>
+                                    {% if character.get("freecompany") != None %}
+                                    <div class="free-company py-3 mt-0">
+                                        <div class="flex-container">
+                                            <!-- Three overlapping images -->
+                                            <img class="company-logo top-layer" src="{{character['freecompany']['top']}}" alt="Logo 1">
+                                            <img class="company-logo middle-layer" src="{{character['freecompany']['middle']}}" alt="Logo 2">
+                                            <img class="company-logo bottom-layer" src="{{character['freecompany']['bottom']}}" alt="Logo 3">
+                                            <!-- Text content -->
+                                            <div class="text-content">
+                                                <h3>{{character["freecompany"]["name"]}} - {{character["freecompany"]["tag"]}}</h3>
+                                            </div>
+                                
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    <!-- Additional element for displaying up to 200 characters of text -->
+                                    <div id="additional-text" class="additional-text text-wrap">
+                                        <p>{{database.summary}}</p>
+                                        {% if is_edit == True %}
+                                        <span id="edit-summary-button">📝</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="activity-indicators" style="border: 1px solid black;" style="height: 10rem;">
+                                        <!-- possibly will naturally fill -->
+                                        <!-- possibly up to 8 icons -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Raid Performance tab content -->
+                <div class="tab-pane fade h-100" id="raid-performance">
+                    <div class="row h-100 py-2">
+                        {% if raid != none %}
+                        {% include "raids.html" %}
+                        {% else %}
+                        <!-- Another condition might be needed for fully private logs -->
+                        <h1>This character's raid logs either don't exist or are privated</h1>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Mounts/Minions tab content -->
+                <div class="tab-pane fade h-100" id="collectibles">
+                    <div class="row h-100 py-2">
+                        {% include "collectible-containers.html" %}
+                    </div>
+                </div>
+
+                <!-- Roleplay tab content -->
+                <div class="tab-pane fade h-100" id="roleplay">
+                    {% include "roleplaying.html" %}
+
+                    {% include "business.html" %}
+                </div>
+                
+                {% if is_edit == True %}
+                <!-- Settings tab content -->
+                <div class="tab-pane fade h-100" id="settings">
+                    <!-- New Container for Elements Outside main-container -->
+                    <!-- TODO fix 1080p -->
+                    <!-- style="width:72rem; border: 2px solid black; border-radius: 10px; position: absolute; top:100%;" -->
+                    <div id="edit" class="container px-0 pb-2 mt-2 m-auto form-check form-switch">
+                        <div id="settings">
+                            <a href="{{url_for('main_page.logout_char')}}" class="btn btn-primary">Logout</a>
+                            {{render_form(form, id="portrait-form", novalidate=True)}}
+                            <div id="layout_switch" class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="layoutSwitch">
+                                <label class="form-check-label" for="layoutSwitch">Switch between layouts (On for venues)</label>
+                            </div>
+                            {{render_form(form, id="roleplay-settings", novalidate=True, extra_classes="form-check form-switch px-0")}}
+                            {{render_form(bsform, id="business-settings", novalidate=True, extra_classes="form-check form-switch px-0 d-none")}}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <footer>
+                <!-- Your footer content here -->
+            </footer>
+        </div>
+        <!-- If editing, include modals.html and script(s) -->
+        {% if is_edit == true %}
+        {% include "modals.html" %}
+        <!-- TODO something broken and scripts no longer render -->
+        <script src="{{url_for('static', filename='assets/scripts/form_rp_handlers.js')}}"></script>
+        <script src="{{url_for('static', filename='assets/scripts/form_venue_handlers.js')}}"></script>
+        <script src="{{url_for('static', filename='assets/scripts/form_handler_methods.js')}}"></script>
+        {% endif %}
+        <script src="{{url_for('static', filename='assets/scripts/image_handling.js')}}"></script>
+        <script src="{{url_for('static', filename='assets/scripts/collectible_handlers.js')}}"></script>
+        <script src="{{url_for('static', filename='assets/scripts/raid_tab_managers.js')}}"></script>
+        <script type="text/javascript">
+            // rp form and js handler vars pass and init vars
+            document.addEventListener("DOMContentLoaded", event=>{
+                initMains("{{database.is_business}}", "{{database.business.venue_state}}");
+                initVenueModals("{{database.business.venue_address.is_apartment if database.business else 0}}","{{database.char_id}}")
+                initRPModals("{{database.roleplaying.hooks|length}}",
+                "{{database.roleplaying.traits|selectattr('type','equalto','pos')|list|length}}",
+                "{{database.roleplaying.traits|selectattr('type','equalto','neg')|list|length}}",
+                "{{database.char_id}}");
+            });
+
+            window.addEventListener("load", event=>{
+                document.getElementById("loading").classList.add("d-none");
+                document.getElementById("main").classList.remove("d-none")
+            })
+        </script>
+    </body>
+</html>

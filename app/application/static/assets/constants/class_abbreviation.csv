@@ -1,0 +1,41 @@
+full,abbr,role
+Paladin,PLD,tank
+Warrior,WAR,tank
+Dark Knight,DRK,tank
+Gunbreaker,GNB,tank
+White Mage,WHM,healer
+Scholar,SCH,healer
+Astrologian,AST,healer
+Sage,SGE,healer
+Monk,MNK,melee
+Dragoon,DRG,melee
+Ninja,NIN,melee
+Samurai,SAM,melee
+Reaper,RPR,melee
+Bard,BRD,prange
+Machinist,MCH,prange
+Dancer,DNC,prange
+Black Mage,BLM,caster
+Summoner,SMN,caster
+Red Mage,RDM,caster
+Blue Mage,BLU,caster
+Carpenter,CRP,doh
+Blacksmith,BSM,doh
+Armorer,ARM,doh
+Goldsmith,GSM,doh
+Leatherworker,LTW,doh
+Weaver,WVR,doh
+Alchemist,ALC,doh
+Culinarian,CUL,doh
+Miner,MIN,dol
+Botanist,BTN,dol
+Fisher,FSH,dol
+Gladiator,Gladiator,tank
+Marauder,MRD,tank
+Lancer,LNC,melee
+Pugilist,PUG,melee
+Rogue,ROG,melee
+Archer,ARC,prange
+Thaumaturge,THM,caster
+Arcanist,ACN,caster
+Conjurer,CNJ,healer

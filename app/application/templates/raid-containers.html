@@ -1,0 +1,53 @@
+<div class="tab-pane fade" id="{{name|replace(' ','-')|replace('\'s', '')}}">
+    <div class="row mt-2">
+        <div class="col-md-2 my-0 px-0 text-center">
+            <h4 class="my-0">Best Perf. Avg.</h3>
+            <h2 class="my-0">{{tier["best-performance-avg"]}}%</h1>
+        </div>
+        <!-- Icons column -->
+        <div class="col">
+            <div class="row">
+                {% for job, stats in tier["job-performance"]|items %}
+                <div class="col-sm-1 text-center">
+                    {% set jobicon = "/assets/job_icons/"+job.lower()|replace(' ','_')+".png" %}
+                    <img class="icon text-center job-icon" src="{{url_for('static', filename=jobicon)}}">
+                    <p class="text-center">Rank: {{stats["rank"]}}</p>
+                    <p class="text-center">Points: {{stats["points"]}}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <!-- Additional row for new content -->
+    <div class="row mt-5">
+        <!-- Content columns -->
+        {% for fight in tier["ranking-floor-job"] %}
+        <div class="col-md-3 px-0 mb-3">
+            <div class="text-center">
+                <!-- Icon -->
+                {% set jobicon = "/assets/job_icons/"+fight["job"].lower()|replace(' ','_')+".png" %}
+                <img class="boss-icon" src="{{url_for('static', filename=jobicon)}}">
+                
+                <!-- Boss name -->
+                <p class="mt-2 fight-text">{{ fight["floor"] }}</p>
+                
+                <!-- Job icon and best percentage -->
+                {% if fight["ranking"] != "-" %}
+                <div class="d-flex justify-content-center align-items-center">
+                    <img class="icon job-icon" src="{{url_for('static', filename=jobicon)}}">
+                    <p class="ms-2 fight-text">{{ fight["ranking"] }}</p>
+                </div>
+                {% else %}
+                <div class="d-flex justify-content-center align-items-center">
+                    <p class="ms-2 fight-text">{{ fight["ranking"] }}</p>
+                </div>
+                {% endif %}
+                
+                <!-- Highest rdps and total kills -->
+                <p class="mt-2 fight-text">Highest RDPS: {{ fight["best-rdps"] }}</p>
+                <p class="fight-text">Kills: {{fight["total-kills"]}}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>

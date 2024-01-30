@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100">
+    {% from 'bootstrap5/form.html' import render_form %}
+    <head>
+        <meta charset="utf-8">
+        <title>Adventure Plate generator</title>
+        {{ bootstrap.load_css() }}
+    </head>
+    <body class="d-flex h-100 text-center text-bg-dark">
+        
+        <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+            <header class="mb-auto">
+                <!-- For alignment -->
+            </header>
+
+            <main class="px-3 gap-5">
+                <div class="row">
+                    <h1>Final Fantasy XIV Character Card Generator</h1>
+                    <p class="lead">Tired of messing with carrd? Want a simple business-card styled summary of your character's stuff?</p>
+                    <p class="lead">Quintuple legend? Mount collection? Housing? Running a bar of club? Showing off your achivement grindset?</p>
+                    <p class="lead">We can even take your character's cropped image for your portrait*</p>
+                    <p class="lead">Put your character's Lodestone URL below!</p>
+                </div>
+                <div class="row my-3">
+                    <form action="{{ url_for('main_page.get_charid') }}" method="post" class="w-50 m-auto">
+                    {{ form.csrf_token }}
+                    {{ form.lodestone_url.label(for="lodestone_url") }}
+                    {{ form.lodestone_url(class="form-control mb-2") }}
+                    {{ form.submit(class="btn btn-primary") }}
+                    </form>
+                </div>
+                <div class="row">
+                    <h4 class="lead">Or if you've already claimed your character, you can login with your character ID and password below to edit it</h4>
+                    {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                    <div class="flash alert alert-danger w-75 mx-auto">{{ messages[0] }}</div>
+                    {% endif %}
+                    {% endwith %}
+                    {{ render_form(userform, id="loginform", extra_classes="w-50 mx-auto", novalidate=true ) }}
+                </div>
+            </main>
+            {% include "footer.html" %}
+        </div>
+        {{ bootstrap.load_js() }}
+    </body>
+</html>
