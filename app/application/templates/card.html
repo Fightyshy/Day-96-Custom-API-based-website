@@ -59,7 +59,7 @@
                         <div class="col-md-4 d-flex align-items-center">
                             <div class="avatar-container">
                                 <!-- Your dynamic avatar image -->
-                                {% if "avatar" not in src %}
+                                {% if src["avatar"] is none %}
                                 <img class="avatar img-fluid" id="avatar" src="{{collectible['character']['portrait']}}" alt="Avatar">
                                 {% else %}
                                 <img class="avatar img-fluid" id="avatar" src="{{src['avatar']}}" alt="Avatar">
@@ -144,6 +144,7 @@
                     <!-- style="width:72rem; border: 2px solid black; border-radius: 10px; position: absolute; top:100%;" -->
                     <div id="edit" class="container px-0 pb-2 mt-2 m-auto form-check form-switch">
                         <div id="settings">
+                            <a href="{{url_for('main_page.logout_char')}}" class="btn btn-primary">Logout</a>
                             {{render_form(form, id="portrait-form", novalidate=True)}}
                             <div id="layout_switch" class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="layoutSwitch">

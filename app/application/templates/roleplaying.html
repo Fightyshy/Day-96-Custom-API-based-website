@@ -67,14 +67,18 @@
     <div class="col-md-4 px-0 h-100">
         <div class="row-auto h-100">
             <!-- Include an image or any other content for the character's portrait -->
-            {% if "roleplay" not in src %}
+            {% if src["roleplay"] is none %}
             <img class="img-fluid" id="rp-avatar" src="{{collectible['character']['portrait']}}" alt="RP-Avatar">
             {% else %}
             <img class="img-fluid" id="rp-avatar" src="{{src['roleplay']}}" alt="RP-Avatar">
             {% endif %}
             <!-- 50 chars -->
             <h4 class="tagline mt-2 text-center">
-                <span id="character-quote">{{database.roleplaying.tagline}}</span>
+                <span id="character-quote">
+                {% if database.roleplaying.tagline is not none %}
+                    {{database.roleplaying.tagline}}
+                {% endif %}
+                </span>
                 {% if is_edit == True %}<span data-bs-toggle="modal" data-bs-target="#RPCharQuoteModal">📝</span>{% endif %}
             </h4>
         </div>
@@ -114,10 +118,11 @@
                 <!-- h4 30 chars -->
                 <!-- 240 chars text -->
                 {% if database.roleplaying != none %}
+                {% if is_edit == True %}<span data-bs-toggle="modal" data-bs-target="#RPHooksModal">📝</span>{% endif %}
                 {% for hook in database.roleplaying.hooks %}
                 {% if hook.title|length > 0 and hook.body|length > 0 %}
                     {% if hook.number == 1 %}
-                    <li><h4>{{hook.title}} {% if is_edit == True %}<span data-bs-toggle="modal" data-bs-target="#RPHooksModal">📝</span>{% endif %}</h4><span>{{hook.body}}</span></li>
+                    <li><h4>{{hook.title}}</h4><span>{{hook.body}}</span></li>
                     {% else %}
                     <li><h4>{{hook.title}}</h4><span>{{hook.body}}</span></li>
                     {% endif %}

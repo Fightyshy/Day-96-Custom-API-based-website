@@ -55,7 +55,7 @@ class Roleplaying(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
 
     # character ic
-    alias: Mapped[str] = mapped_column(String(length=40), nullable=True)
+    alias: Mapped[str] = mapped_column(String(length=40), nullable=True, default="Nicknames here")
     age: Mapped[str] = mapped_column(
         String(length=5), nullable=False, default=18
     )

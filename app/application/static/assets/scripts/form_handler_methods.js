@@ -66,9 +66,10 @@ function initTraitForm(){
 
 function updatePageFields(data){
     //populate spans;
+    console.log(data)
     Object.keys(data).filter(k=>k!=="status").forEach(k => {
         // TODO empty field handling, both here and in jinja render
-        data[k]===""?undefined:document.getElementById(`character-${k}`).innerText = data[k];
+        data[k]===""?document.getElementById(`character-${k}`).innerText = "":document.getElementById(`character-${k}`).innerText = data[k];
     });
 }
 
