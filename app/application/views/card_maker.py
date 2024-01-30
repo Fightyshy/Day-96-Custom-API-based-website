@@ -106,11 +106,6 @@ def upload_portrait():
             else:
                 get_char.roleplaying.rp_portrait = url_for("static", filename="/assets/uploaded-img/"+filename)
             db.session.commit()
-            print({
-                "status": "ok-img",
-                "source": portrait_source,
-                "portrait": url_for("static", filename="/assets/uploaded-img/"+filename)
-            })
             return jsonify({
                 "status": "ok-img",
                 "source": portrait_source,
@@ -145,14 +140,13 @@ def retrieve_char_details():
         char_id = retrieve_char_id_from_request(request)
         get_char = retrieve_char_by_char_id(char_id)
         src = {}
-        print(get_char.__getattribute__("roleplaying"))
         if get_char.__getattribute__("roleplaying"):
             src = {
-                "avatar": get_char.summary_portrait,
-                "roleplay": get_char.roleplaying.rp_portrait,
-                "one": get_char.business.logo_img,
-                "two": get_char.business.venue_img,
-                "big": get_char.business.big_venue_img
+                "avatar": get_char.summary_portrait if get_char.summary_portrait else None,
+                "roleplay": get_char.roleplaying.rp_portrait if get_char.roleplaying.rp_portrait else None,
+                "one": get_char.business.logo_img if get_char.business.logo_img else None,
+                "two": get_char.business.venue_img if get_char.business.venue_img else None,
+                "big": get_char.business.big_venue_img if get_char.business.big_venue_img else None
             }
 
         # GET reqs/Scraper funcs
@@ -170,13 +164,13 @@ def retrieve_char_details():
                 SERVERS.get_region(retrieved_data.dcserver[0]),
             )
         )
-    except TypeError as error:
-        return {
-            "Status": "404",
-            "Type": "TypeError",
-            "Message": "Data input is incorrectly typed/formatted.",
-            "Exception Msg": str(error)
-        }
+    # except TypeError as error:
+    #     return {
+    #         "Status": "404",
+    #         "Type": "TypeError",
+    #         "Message": "Data input is incorrectly typed/formatted.",
+    #         "Exception Msg": str(error)
+    #     }
     except IndexError:
         return {
             "Status": "404",
@@ -230,12 +224,11 @@ def retrieve_char_details():
             )
     return render_template("card.html")
 
-
+# TODO make roleplaying and business children tables access safe
 @card_maker.route("/char-summary", methods=["POST"])
 def save_char_summary():
     """Saves the Char Summary section of a Character's page."""
     if request.method == "POST":
-        # print(type(request.get_json()["summary"]))
         char_id = retrieve_char_id_from_request(request)
         get_char = db.session.execute(db.select(PlayerCharacter).where(PlayerCharacter.char_id==char_id)).scalar()
         get_char.summary = request.get_json()["summary"]
@@ -676,29 +669,25 @@ def save_business_contacts():
         else:
             return jsonify({"status":"error","errors":data.errors})
     else:
-        if get_char.business:
-            response = {
-                "status": "ok",
-                "venue_website": get_char.business.venue_website,
-                "venue_operating_times": get_char.business.venue_operating_times,
-                "venue_discord": get_char.business.venue_discord,
-                "venue_twitter": get_char.business.venue_twitter,
-                "is_apartment": get_char.business.venue_address.is_apartment,
-                "housing_zone": get_char.business.venue_address.housing_zone,
-                "housing_ward": get_char.business.venue_address.housing_ward,
-                "server": get_char.business.venue_address.server
-            }
-            if get_char.business.venue_address:
-                if get_char.business.venue_address.is_apartment:
-                    response["apartment_num"] = get_char.business.venue_address.apartment_num
-                else:
-                    response["ward_plot"] = get_char.business.venue_address.ward_plot
-            return jsonify(response)
+        response = {
+            "status": "ok",
+            "venue_website": get_char.business.venue_website,
+            "venue_operating_times": get_char.business.venue_operating_times,
+            "venue_discord": get_char.business.venue_discord,
+            "venue_twitter": get_char.business.venue_twitter,
+        }
+        if get_char.business.venue_address:
+            response["is_apartment"] = get_char.business.venue_address.is_apartment
+            response["server"] = get_char.business.venue_address.server
+            response["housing_zone"] = get_char.business.venue_address.housing_zone
+            response["housing_ward"] = get_char.business.venue_address.housing_ward
+            if get_char.business.venue_address.is_apartment:
+                response["apartment_num"] = get_char.business.venue_address.apartment_num
+            else:
+                response["ward_plot"] = get_char.business.venue_address.ward_plot
         else:
-            return jsonify({
-                "status": "empty",
-                "is_apartment": False
-            })
+            response["is_apartment"] = False
+            return jsonify(response)
 
 
 @card_maker.route("/rp-venue-mode", methods=["POST"])
@@ -735,6 +724,7 @@ def check_roleplaying(character: PlayerCharacter) -> Roleplaying:
         return character.roleplaying
     else:
         character.roleplaying = Roleplaying()
+        db.session.commit()
         return character.roleplaying
 
 
@@ -748,6 +738,7 @@ def check_business(character: PlayerCharacter) -> Business:
         return character.business
     else:
         character.business = Business()
+        db.session.commit()
         return character.business
 
 

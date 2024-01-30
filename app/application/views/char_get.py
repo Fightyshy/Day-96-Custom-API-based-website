@@ -12,10 +12,10 @@ import bs4
 import requests
 from sqlalchemy import and_
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import LoginManager, login_user
+from flask_login import LoginManager, login_user, logout_user
 from ..objects.char_claim_token import generate_token, confirm_token
 from ..objects import const_loader
-from ..models.models import PlayerCharacter, User, db
+from ..models.models import Business, PlayerCharacter, Roleplaying, User, db
 from .forms.forms import (
     LodestoneForm,
     UserLogin,
@@ -32,21 +32,6 @@ login_manager = LoginManager()
 main_page = Blueprint("main_page", __name__, template_folder="templates")
 
 
-# Enable only for testing
-# @app.route("/test/<int:char_id>")
-# def test(char_id):
-#     # get_ffxiv_collect(5286865)
-#     # return jsonify(get_ffxiv_collect(5286865))
-#     # lodestone_achievement_scrape(5286865)
-#     # retrieved = lodestone_achievement_scrape(char_id)
-#     # final = [COLLECT_CACHE[2][int(id)] for id in retrieved]
-#     # for entry in test:
-#     #     for achieve in cached_achivements["results"]:
-#     #         if achieve["id"]==int(entry):
-#     #             final.append(achieve)
-#     return jsonify({"test": cache.get("ffxiv_cached_resources")["mounts"]})
-
-# TODO add login form, with inputs (char_id, password)
 @main_page.route("/", methods=["GET", "POST"])
 def get_charid():
     """Takes user lodestone url and any extra generation params"""
@@ -119,8 +104,12 @@ def claim_charid():
                 flash("This character has already been claimed. If this was not done by you, please contact me to resolve this.")
                 return render_template("authentication.html", form=userform, token=token)
             else:
+                new_business = Business()
+                new_roleplaying = Roleplaying()
                 new_char = PlayerCharacter()
                 new_char.char_id = charid
+                new_char.business = new_business
+                new_char.roleplaying = new_roleplaying
 
                 new_user = User()
                 new_user.char_id = charid
@@ -131,8 +120,15 @@ def claim_charid():
                 db.session.add(new_char)
                 db.session.add(new_user)
                 db.session.commit()
+                login_user(new_user)
                 return redirect(url_for("card_maker.retrieve_char_details", char_id=charid, mode="edit"))
     elif userform.errors:
         return render_template("authentication.html", errors=userform.errors, form=userform, token=token)
 
     return render_template("authentication.html", form=userform, token=token)
+
+
+@main_page.route("/logout")
+def logout_char():
+    logout_user()
+    return redirect(url_for("main_page.get_charid"))
