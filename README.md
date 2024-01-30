@@ -1,16 +1,21 @@
 # FFXIV Adventurer's guild card thing 
 
-A simple one-page (currently proof of concept) interactive "business"/"calling" card style website using multiple community-made APIs and Lodestone scraped data to present a summary of a character and the activities they've done, including
-- Basic character information (Class levels, FC, DC and server, etc)
-- Savage/Ultimate raids
-- Mounts/Minions/Achievements owned
-- Housing/Roleplaying activiets (really selling that business card vibe)
-- Probably more as I make it up
+A dynamically generated one-page interactive "business"/"calling" card style website whcih gathers information from multiple community-made APIs and website-scrapped data to present a condensed summary of a player's character and their achievements and activities, including
+- Basic character information (Class levels, Free Company (Guild), Character's home Data-center and Server, etc)
+- Endgame raiding performance (Savage/Ultimate raids)
+- Collectables status (Achievements/Mounts/Minions)
 
-Currently, only the first three have had any progress. With planning on how to do Housing/Roleplay still being worked on.
+Done as part of the 100 Days of Code: The Complete Python Pro Bootcamp for 2023 course, [link here]([https://www.udemy.com/course/100-days-of-code/learn/practice/1251204#overview](https://www.udemy.com/course/100-days-of-code/)), but further refined into it's current state. Check out the "full-implementation" branch for a rougher, but more progressed development that is currently adding the player and their character's social activities (Roleplaying and Roleplaying Venues).
 
-Originally done as part of day 96 of the 100 Days of Code: The Complete Python Pro Bootcamp for 2023 course, [link here]([https://www.udemy.com/course/100-days-of-code/learn/practice/1251204#overview](https://www.udemy.com/course/100-days-of-code/)), which this is currently a branch of.
-All Python modules used are included in the requirements.txt, while relevant static files are contained in a static/assets folder.
+This project currently uses the following technologies:
+- Frontend: HTML/CSS/Bootstrap, Javascript and jQuery for functionality/Request/Respsonse
+- Backend: Python - Flask
+- External API:
+    - FFLogs (Uses GraphQL, documentation link below)
+    - FFXIV-Collect (REST API, documentation link below)
+**Disclaimer:** The frontend of the card was developed with assistance from AI (Using ChatGPT), with the basic structure and components being established, but fine-tuning and getting the exactly-desired functionality and appearence was personally done. The AI did **not** assist in the development of the backend and database components.
+
+All Python modules used are included in the requirements.txt, while relevant static files are contained in a static/assets folder. At this stage, a database (and as a result, no SQLAlchemy) is not implemented yet. Character portraits are uploaded to a folder local to the project, and the editable character summary is rather a proof-of-concept and storing the data is not yet implemented. 
 
 In addition, the following resources were used:
 - [FFLogs API documentation](https://www.archon.gg/ffxiv/articles/help/api-documentation), where we used the Authorization, Token, and Public URIs provided were used.
