@@ -5,7 +5,7 @@ A dynamically generated one-page interactive "business"/"calling" card style web
 - Endgame raiding performance (Savage/Ultimate raids)
 - Collectables status (Achievements/Mounts/Minions)
 
-Done as part of the 100 Days of Code: The Complete Python Pro Bootcamp for 2023 course, [link here]([https://www.udemy.com/course/100-days-of-code/learn/practice/1251204#overview](https://www.udemy.com/course/100-days-of-code/)), but further refined into it's current state. Check out the "full-implementation" branch for a rougher, but more progressed development that is currently adding the player and their character's social activities (Roleplaying and Roleplaying Venues).
+Done as part of the 100 Days of Code: The Complete Python Pro Bootcamp for 2023 course, [link here](https://www.udemy.com/course/100-days-of-code/), but further refined into it's current state. The main branch has been updated with the current minimally viable build, however, any further refinements will be made on the 'full-implementation' branch before being merged with the main branch.
 
 This project currently uses the following technologies:
 - Frontend: HTML/CSS/Bootstrap, Javascript and jQuery for functionality/Request/Respsonse
