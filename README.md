@@ -9,13 +9,14 @@ Done as part of the 100 Days of Code: The Complete Python Pro Bootcamp for 2023 
 
 This project currently uses the following technologies:
 - Frontend: HTML/CSS/Bootstrap, Javascript and jQuery for functionality/Request/Respsonse
-- Backend: Python - Flask
+- Backend: Python - Flask, SQLAlchemy
+- Database: Sqlite (Swappable for MySQL or PostgreSQL database)
 - External API:
     - FFLogs (Uses GraphQL, documentation link below)
     - FFXIV-Collect (REST API, documentation link below)
-**Disclaimer:** The frontend of the card was developed with assistance from AI (Using ChatGPT), with the basic structure and components being established, but fine-tuning and getting the exactly-desired functionality and appearence was personally done. The AI did **not** assist in the development of the backend and database components.
+**Disclaimer:** The frontend of the card was developed with assistance from AI (Using ChatGPT), with the basic structure and components being established. But fine-tuning and getting the exactly desired functionality and appearence was personally done. The AI did **not** assist in the development of the backend and database components.
 
-All Python modules used are included in the requirements.txt, while relevant static files are contained in a static/assets folder. At this stage, a database (and as a result, no SQLAlchemy) is not implemented yet. Character portraits are uploaded to a folder local to the project, and the editable character summary is rather a proof-of-concept and storing the data is not yet implemented. 
+All Python modules used are included in the requirements.txt, while relevant static files are contained in a static/assets folder. Both 'full-implementation' and 'main' branches now implement a database as part of their system to store user input content (roleplaying/venue fields, character summary), though uploaded images are still saved and served from the static folder.
 
 In addition, the following resources were used:
 - [FFLogs API documentation](https://www.archon.gg/ffxiv/articles/help/api-documentation), where we used the Authorization, Token, and Public URIs provided were used.
