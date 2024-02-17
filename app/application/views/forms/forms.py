@@ -1,3 +1,4 @@
+import re
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import (
@@ -28,9 +29,13 @@ class UserLogin(FlaskForm):
 
 class UserRegistration(FlaskForm):
     email = EmailField("Email (We use this for recovery and support verification)", validators=[DataRequired("Please enter your email address")])
-    password = PasswordField("Password", validators=[DataRequired("Please enter a password")])
+    password = PasswordField("Password (Must have one capital letter, number minimum, and be between 8-15 characters)", validators=[DataRequired("Please enter a password"), Length(8, 15)])
     repeat = PasswordField("Repeat password", validators=[DataRequired("Please enter your password again")])
     submit = SubmitField("Submit and claim character")
+
+    def validate_password(self, field):
+        if re.fullmatch(".*(?=.?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).*", field.data) is None and (len(field.data) < 7 and len(field.data) > 16):
+            raise ValidationError("Password must contain 1 uppercase letter and 1 number, and must be between 8-15 characters")
 
     def validate_repeat(self, field):
         if self.password.data != field.data:
@@ -58,6 +63,7 @@ class UploadPortraitForm(FlaskForm):
         ],
     )
     submit_char = SubmitField("Upload portrait")
+
 
 class BusinessImages(FlaskForm):
     layout = SelectField(

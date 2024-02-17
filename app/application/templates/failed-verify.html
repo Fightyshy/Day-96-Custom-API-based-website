@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100">
+    {% from 'bootstrap5/form.html' import render_form %}
+    <head>
+        <meta charset="utf-8">
+        <title>Failed to confirm your account</title>
+        {{ bootstrap.load_css() }}
+    </head>
+    <body class="d-flex h-100 text-center text-bg-dark">
+        
+        <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+            <header class="mb-auto">
+                <!-- For alignment -->
+            </header>
+
+            <main class="px-3 gap-5">
+                <h1>Something has gone wrong</h1>
+                <h4>Either validation link you clicked is either invalid or has expired</h4>
+                <h4>Please try re-claiming and re-registering again.</h4>
+                <a href="{{url_for('main_page.get_charid')}}" class="btn btn-primary w-50">Return to home page</a>
+            </main>
+            {% include "footer.html" %}
+        </div>
+        {{ bootstrap.load_js() }}
+    </body>
+</html>

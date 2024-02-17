@@ -34,7 +34,7 @@ def init_app():
     app.config["MAIL_PASSWORD"] = os.environ["SENDER_PASSWORD"]
     app.config["MAIL_DEFAULT_SENDER"] = os.environ["SENDER"]
     app.config["MAIL_USE_TLS"] = True
-    app.config["MAIL_USE_SSL"] = True
+    app.config["MAIL_USE_SSL"] = False
 
     # Apply app libraries
     bs5.init_app(app)
@@ -46,7 +46,7 @@ def init_app():
 
     db.init_app(app)
 
-    from .views.char_get import login_manager
+    from .views.auth import login_manager
 
     login_manager.init_app(app)
     @login_manager.user_loader
