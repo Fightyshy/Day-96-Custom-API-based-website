@@ -3,9 +3,9 @@ from flask_mail import Mail, Message
 from sqlalchemy import and_
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, logout_user
-from ..objects.char_claim_token import generate_account_token, generate_token, confirm_token, confirm_account_token
+from ..objects.char_claim_token import confirm_password_token, generate_account_token, generate_password_token, generate_token, confirm_token, confirm_account_token
 from ..models.models import Business, Roleplaying, User, PlayerCharacter, db
-from .forms.forms import UserLogin, UserRegistration
+from .forms.forms import PasswordChange, PasswordReset, UserLogin, UserRegistration
 
 login_manager = LoginManager()
 mail_manager = Mail()
@@ -22,7 +22,7 @@ def register_user(email: str, char_id: str, password: str):
 
     retrieved = db.session.execute(db.select(User).where(and_(User.char_id == char_id,
                                                               User.enabled == True))).scalar()
-    print(confirmation_token)
+    # print(confirmation_token) # Temp workaround for email
     # If we can't find a disabled one existing, create a new user
     if retrieved is None:
         new_business = Business()
@@ -96,14 +96,57 @@ def logout_char():
     return redirect(url_for("main_page.get_charid"))
 
 
-# TODO password reset
-@auth.route("/reset-password")
+@auth.route("/reset-password", methods=["GET", "POST"])
 def reset_password():
     """Sends a request to reset the user's password, and issues the user's email with a link"""
-    pass
+    resetform = PasswordReset()
+    if resetform.validate_on_submit():
+        # Retrieve user
+        retrieved = db.session.execute(db.select(User).where(and_(User.char_id == resetform.char_id.data,
+                                                                  User.email == resetform.email.data))).scalar()
+        # If retrieve is none, flash "No account exists"
+        if retrieved is None:
+            flash("No account found for provided details")
+            return render_template("reset-password.html", form=resetform, state="request")
+        else:
+            # Else Generate account token with email+char_id
+            password_token = generate_password_token(retrieved.email, retrieved.char_id, current_app)
+            # Structure reset password email
+            html_mail = f"""You have recieved this email because a request was sent to us for a password reset on for Character ID {retrieved.char_id}. This link will be valid for 5 minutes. If you have not made this request, you should ignore this email.
+            <br><br>
+            <a href="{"http://localhost:5000"+url_for("auth.confirm_password_reset", token=password_token)}">Click here to verify your request and change your password</a>"""
+            # Send email
+            reset_email = Message(
+                subject="Adventurer's Guild Card Password Reset",
+                recipients=[retrieved.email],
+                html=html_mail
+            )
+            mail_manager.send(reset_email)
+            # Render email-sent page
+            return render_template("email-success.html", mode="password")
+    elif resetform.errors:
+        # Form errors here
+        return render_template("reset-password.html", errors=resetform.errors, form=resetform, state="request")
+    return render_template("reset-password.html", form=resetform, state="request")
 
 
-@auth.route("/confirm-reset")
+@auth.route("/confirm-reset", methods=["GET", "POST"])
 def confirm_password_reset():
     """Recieved the token from the link and checks it for validity, then allows user to input a new password and submit it"""
-    pass
+    retrieved_token = confirm_password_token(request.args.get("token"), current_app)
+
+    passwordform = PasswordChange()
+
+    if retrieved_token == "":
+        flash("This link is invalid, please try again")
+        return render_template("invalid-link.html")
+    elif passwordform.validate_on_submit():
+        retrieved_user = db.session.execute(db.select(User).where(and_(User.char_id == retrieved_token[0],
+                                                                   User.email == retrieved_token[1])))
+        retrieved_user.password = passwordform.password.data
+        db.session.commit()
+        return render_template("reset-password.html", state="success")
+    elif passwordform.errors:
+        return render_template("reset-password.html", errors=passwordform.errors, form=passwordform, state="change")
+
+    return render_template("reset-password.html", form=passwordform, state="change")

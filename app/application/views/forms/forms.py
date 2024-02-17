@@ -26,12 +26,40 @@ class UserLogin(FlaskForm):
     password = PasswordField("Password", validators=[DataRequired(message="You need to enter your password")])
     submit = SubmitField("Submit")
 
+    def validate_char_id(self, field):
+        if re.fullmatch("^[0-9]+$", field.data) is None:
+            raise ValidationError("Character ID must only have numbers")
+
 
 class UserRegistration(FlaskForm):
     email = EmailField("Email (We use this for recovery and support verification)", validators=[DataRequired("Please enter your email address")])
     password = PasswordField("Password (Must have one capital letter, number minimum, and be between 8-15 characters)", validators=[DataRequired("Please enter a password"), Length(8, 15)])
     repeat = PasswordField("Repeat password", validators=[DataRequired("Please enter your password again")])
     submit = SubmitField("Submit and claim character")
+
+    def validate_password(self, field):
+        if re.fullmatch(".*(?=.?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).*", field.data) is None and (len(field.data) < 7 and len(field.data) > 16):
+            raise ValidationError("Password must contain 1 uppercase letter and 1 number, and must be between 8-15 characters")
+
+    def validate_repeat(self, field):
+        if self.password.data != field.data:
+            raise ValidationError("Passwords do not match")
+
+
+class PasswordReset(FlaskForm):
+    char_id = StringField("Character ID", validators=[DataRequired(message="You need to enter the character id")])
+    email = StringField("Email address of Character", validators=[DataRequired("Please enter the email associated with the character ID")])
+    submit = SubmitField("Reset password")
+
+    def validate_char_id(self, field):
+        if re.fullmatch("^[0-9]+$", field.data) is None:
+            raise ValidationError("Character ID must only have numbers")
+
+
+class PasswordChange(FlaskForm):
+    password = PasswordField("Password", validators=[DataRequired("Please enter a new password")])
+    repeat = PasswordField("Repeat password", validators=[DataRequired("Please enter your password again")])
+    submit = SubmitField("Change password")
 
     def validate_password(self, field):
         if re.fullmatch(".*(?=.?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).*", field.data) is None and (len(field.data) < 7 and len(field.data) > 16):

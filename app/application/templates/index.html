@@ -38,6 +38,9 @@
                     {% endwith %}
                     {{ render_form(userform, id="loginform", action=url_for('auth.login_char'),extra_classes="w-50 mx-auto", novalidate=true ) }}
                 </div>
+                <div class="row">
+                    <a href="{{url_for('auth.reset_password')}}" class="btn btn-primary w-50 mx-auto my-3">Reset password</a>
+                </div>
             </main>
             {% include "footer.html" %}
         </div>

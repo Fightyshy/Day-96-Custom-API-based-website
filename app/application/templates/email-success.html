@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100">
+    {% from 'bootstrap5/form.html' import render_form %}
+    <head>
+        <meta charset="utf-8">
+        <title>Password Reset</title>
+        {{ bootstrap.load_css() }}
+    </head>
+    <body class="d-flex h-100 text-center text-bg-dark">
+        
+        <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+            <header class="mb-auto">
+                <!-- For alignment -->
+            </header>
+
+            <main class="px-3 gap-5">
+                <div class="row">
+                    <h1>Password reset email sent!</h1>
+                    <h4>Check your email for a password reset link. Please check your spam folder as well for the email.</h4>
+                </div>
+                <div class="row">
+                    <a href="{{url_for('main_page.get_charid')}}" class="btn btn-primary w-50 mx-auto my-3">Return to home page</a>
+                </div>
+            </main>
+            {% include "footer.html" %}
+        </div>
+        {{ bootstrap.load_js() }}
+    </body>
+</html>
