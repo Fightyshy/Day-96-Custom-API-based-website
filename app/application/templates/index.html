@@ -36,7 +36,7 @@
                     <div class="flash alert alert-danger w-75 mx-auto">{{ messages[0] }}</div>
                     {% endif %}
                     {% endwith %}
-                    {{ render_form(userform, id="loginform", extra_classes="w-50 mx-auto", novalidate=true ) }}
+                    {{ render_form(userform, id="loginform", action=url_for('auth.login_char'),extra_classes="w-50 mx-auto", novalidate=true ) }}
                 </div>
             </main>
             {% include "footer.html" %}

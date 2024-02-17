@@ -144,7 +144,7 @@
                     <!-- style="width:72rem; border: 2px solid black; border-radius: 10px; position: absolute; top:100%;" -->
                     <div id="edit" class="container px-0 pb-2 mt-2 m-auto form-check form-switch">
                         <div id="settings">
-                            <a href="{{url_for('main_page.logout_char')}}" class="btn btn-primary">Logout</a>
+                            <a href="{{url_for('auth.logout_char')}}" class="btn btn-primary">Logout</a>
                             {{render_form(form, id="portrait-form", novalidate=True)}}
                             <div id="layout_switch" class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="layoutSwitch">

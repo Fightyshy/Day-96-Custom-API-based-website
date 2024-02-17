@@ -50,17 +50,19 @@ def get_charid():
         return redirect(url_for("main_page.claim_charid", token=char_token))
         # else
         # get existing page that matched with check and redirect to editting page
-    elif userform.validate_on_submit():
-        result = db.session.execute(db.select(User).where(User.char_id==userform.char_id.data)).scalar()
-        if not result:
-            flash("Character has not been claimed yet")
-            return redirect(url_for("main_page.get_charid"))
-        elif not check_password_hash(result.password, userform.password.data):
-            flash("Wrong password")
-            return redirect(url_for("main_page.get_charid"))
-        else:
-            login_user(result)
-            return redirect(url_for("card_maker.retrieve_char_details", char_id=result.char_id, mode="edit"))
+    # elif userform.validate_on_submit():
+    #     print(userform.data)
+    #     return redirect(url_for("auth.login_char", char_id=userform.char_id.data, password=userform.password.data))
+        # result = db.session.execute(db.select(User).where(User.char_id==userform.char_id.data)).scalar()
+        # if not result:
+        #     flash("Character has not been claimed yet")
+        #     return redirect(url_for("main_page.get_charid"))
+        # elif not check_password_hash(result.password, userform.password.data):
+        #     flash("Wrong password")
+        #     return redirect(url_for("main_page.get_charid"))
+        # else:
+        #     login_user(result)
+        #     return redirect(url_for("card_maker.retrieve_char_details", char_id=result.char_id, mode="edit"))
     return render_template("index.html", form=lodestoneform, userform=userform)
     # TODO user login form to template, handle in different blueprint
 
@@ -86,7 +88,8 @@ def claim_charid():
             response.raise_for_status()
             soup = bs4.BeautifulSoup(response.text, "html.parser")
             char_prof = soup.select_one(".character__selfintroduction")
-            retrieved = db.session.execute(db.select(User).where(User.char_id==charid)).scalar()
+            # retrieved = db.session.execute(db.select(User).where(and_(User.char_id == charid,
+            #                                                           User.enabled == True))).scalar()
         except requests.HTTPError as error:
             return jsonify({
                 "status": "400",
@@ -111,16 +114,16 @@ def claim_charid():
                 new_char.business = new_business
                 new_char.roleplaying = new_roleplaying
 
-                new_user = User()
-                new_user.char_id = charid
-                new_user.password = generate_password_hash(userform.password.data)
-                new_user.email = userform.email.data
-                new_user.character = new_char
-
                 db.session.add(new_char)
-                db.session.add(new_user)
                 db.session.commit()
-                login_user(new_user)
+                # new_user = User()
+                # new_user.char_id = charid
+                # new_user.password = generate_password_hash(userform.password.data)
+                # new_user.email = userform.email.data
+                # new_user.character = new_char
+
+                # db.session.add(new_user)
+                # login_user(new_user)
                 return redirect(url_for("card_maker.retrieve_char_details", char_id=charid, mode="edit"))
     elif userform.errors:
         return render_template("authentication.html", errors=userform.errors, form=userform, token=token)
@@ -128,7 +131,7 @@ def claim_charid():
     return render_template("authentication.html", form=userform, token=token)
 
 
-@main_page.route("/logout")
-def logout_char():
-    logout_user()
-    return redirect(url_for("main_page.get_charid"))
+# @main_page.route("/logout")
+# def logout_char():
+#     logout_user()
+#     return redirect(url_for("main_page.get_charid"))
