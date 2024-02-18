@@ -15,7 +15,7 @@ class User(UserMixin, db.Model):
 
     char_id: Mapped[str] = mapped_column(String, nullable=False, unique=True)
     password: Mapped[str] = mapped_column(String, nullable=False)
-    email: Mapped[str] = mapped_column(String, nullable=False, unique=True)
+    email: Mapped[str] = mapped_column(String, nullable=False)
 
     enabled: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
