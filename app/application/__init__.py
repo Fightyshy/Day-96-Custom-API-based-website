@@ -17,7 +17,8 @@ def init_app():
     load_dotenv()  # Load first
 
     # Config app
-    app.config["SECRET_KEY"] = os.environ["CSRF"]
+    # 3 keys for rotation
+    app.config["SECRET_KEY"] = [os.environ["TOKEN_KEY_1"], os.environ["TOKEN_KEY_2"], os.environ["TOKEN_KEY_3"]]
     app.config["SECURITY_PASSWORD_SALT"] = os.environ["TOKEN_SALT"]
     app.config["CACHE_TYPE"] = "FileSystemCache"
     app.config["CACHE_DIR"] = "./temp"
